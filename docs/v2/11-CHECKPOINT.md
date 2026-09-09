@@ -1,12 +1,17 @@
 # UADS V2 — Current Checkpoint
 
-Status: BOOTSTRAP IN REVIEW  
+Status: BOOTSTRAP APPROVED / MERGED  
 Date: 2026-09-09  
-Active Work Order: UADS2-BOOTSTRAP-001
+Completed Work Order: UADS2-BOOTSTRAP-001  
+Merged PR: #8  
+Approved PR head: `7c5b56a998103494feea6dd91e386f5696d44384`  
+Main merge SHA: `ce1655b2e5a5d1220ba3af78fe08af59af3ff6f0`
 
 ## Canonical execution truth
 
-UADS V1 remains the active existing product line. UADS V2 is a new development line in `KayzenRoot/uads-v2`.
+UADS V1 remains the active existing product line. UADS V2 is the separately governed development line in `KayzenRoot/uads-v2`.
+
+The bootstrap is objectively complete for its declared scope and was merged after HEDS audit with exact-head CI evidence.
 
 ## Frozen lineage
 
@@ -17,32 +22,70 @@ Bootstrap source reconciliation:
 - V1 tracked files: 489;
 - missing in V2 bootstrap: 0;
 - mismatched blob SHA: 0;
-- V2-only provenance files before Source Pack: 1.
+- inherited workflows restored: 7/7;
+- UADS V1 repository modified by bootstrap: NO.
 
-## Active known defects
+## Bootstrap verification
+
+Exact approved PR head `7c5b56a998103494feea6dd91e386f5696d44384`:
+- CI: SUCCESS;
+- CodeQL: SUCCESS;
+- Dependency Review: SUCCESS;
+- UADS Cross-Platform Compatibility: SUCCESS;
+- unresolved review threads: 0;
+- known HIGH/CRITICAL bootstrap defects: 0.
+
+HEDS audit verdict: APPROVED.
+
+GitHub did not permit the PR author to submit a formal APPROVE review on their own PR, so the objective HEDS verdict is recorded as a review comment rather than a GitHub approval-state review.
+
+## Review operating model
+
+UADS V2 adopts HEDS as its canonical review and engineering-delivery model.
+
+Pipeline:
+Source Lock → Work Order → Context Capsule → Implement → Change Impact Manifest → Risk Routing → Selected Verification → Evidence Bundle → Delta-First Review → Verified Correction Loop → Trusted Merge → Checkpoint Update → Learning Feedback.
+
+Primary metric: Time-to-Trusted-Merge.
+
+Proof reuse remains conservative/experiment-gated until validity and benchmark obligations are proven.
+
+## Operating modes
+
+- `SOLO`: UADS V2 must operate fully without Hive V2.
+- `HIVE_CONNECTED`: Hive integration is optional and additive through explicit contracts.
+
+Hive owns macro/canonical truth when connected. UADS owns bounded execution/micro-orchestration. UADS must not duplicate Hive canonical governance authority.
+
+## Active known V2 targets
 
 - BUG-UADS2-001: review specialist fan-out / quota waste.
 - BUG-UADS2-002: per-specialist visible conversations.
 - BUG-UADS2-003: duplicated review analysis.
 - BUG-UADS2-004: model/reasoning effort over-provisioning.
 
-These are known V1 behavior targets for V2 and are not declared fixed by bootstrap.
+These remain unresolved product targets. Bootstrap does not claim they are fixed.
 
-## Review operating model
+## Repository governance follow-up
 
-UADS V2 delivery adopts Hive Review Standard v2 / HEDS-compatible delta-first review:
-Context Lock → Preflight → Change Impact → Selected Verification → Evidence Bundle → Audit → Verdict → Checkpoint Delta.
+Issue #9 remains open for admin-only repository configuration such as branch protection and supported security settings. This did not invalidate the technical bootstrap merge, but repository-administration setup must not be declared complete until an admin-capable executor applies and audits those settings.
 
-Proof reuse remains conservative/experimental until its validity and benchmark obligations are satisfied.
+## Next NECESSARY increment
 
-## Hive V2 dependency
+Create and execute `UADS2-WO-001 — V1 Operational Baseline & Multi-Agent Fan-out Reproduction` before implementing V2 runtime modules.
 
-Hive V2 source inspected at bootstrap: `KayzenRoot/hive-v2@ead0c8d92c9e84739e5c24913329e329f36ec251`.
+The baseline must measure at minimum:
+- worker/specialist spawn count;
+- maximum simultaneous specialists;
+- visible worker-conversation count;
+- token/quota amplification;
+- review duration / TTTM components;
+- retries/correction depth;
+- selected model and reasoning effort;
+- context radius;
+- duplicated analysis;
+- first-pass approval vs correction rate.
 
-Hive V2 product implementation is itself still gated by its own source-preservation/re-freeze checkpoint. UADS may define compatibility contracts now but cannot claim end-to-end Hive V2 integration validated yet.
+After the baseline is evidence-bound, begin M01 / S00 planning for Sequential Agent Orchestrator.
 
-## Next necessary gate
-
-Complete UADS2-BOOTSTRAP-001 evidence, run inherited validation/CI on the exact PR head, perform independent audit and merge only if APPROVED.
-
-No runtime V2 module implementation is authorized by this checkpoint yet.
+Runtime V2 module implementation must not skip this baseline gate.
