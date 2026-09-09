@@ -2,6 +2,17 @@
 
 UADS V2 is a NexLabs project and a controlled continuation of UADS V1.
 
+## Fresh-chat / fresh-session continuity
+
+If the user says **“vamos continuar do chat antigo”**, **“continue do chat anterior”**, or equivalent:
+1. reconcile current GitHub `main`, open PRs and active branch;
+2. read `docs/v2/continuity/CURRENT.json`;
+3. follow `docs/v2/operations/CHAT-CONTINUITY-PROTOCOL.md`;
+4. preserve the graphical status/progress format in `docs/v2/operations/RESPONSE-AND-PROGRESS-STANDARD.md`;
+5. do not ask the user to re-explain history Git can resolve.
+
+GitHub is canonical project memory. Chat memory is convenience only.
+
 ## Source of truth
 
 Before material work, read in this order:
@@ -15,6 +26,21 @@ Before material work, read in this order:
 8. active Work Order / Context Lock / Evidence Bundle.
 
 Inherited V1 docs remain authoritative where the V2 overlay does not explicitly supersede them. Git/repository evidence prevails over conversational memory.
+
+## Module/session planning
+
+- All 26 modules are explicit under `docs/v2/modules/`.
+- Follow `docs/v2/operations/MODULE-SESSION-LIFECYCLE.md` (S00–S07).
+- Candidate technology is not canonical until approved.
+- After every approved session, update the module plus affected Requirements, Architecture, ADRs, Backlog, Checkpoint and `docs/v2/continuity/CURRENT.json` before continuing.
+- Tests/benchmarks are designed with each session, not appended after implementation.
+
+## Standalone-first architecture
+
+- `SOLO` is a mandatory first-class UADS V2 operating mode.
+- Hive V2 is optional and additive through the versioned integration bridge.
+- Do not introduce a core runtime dependency on Hive packages, services or availability.
+- When connected, complement Hive V2 rather than duplicate its canonical truth/governance authority.
 
 ## Use the globally installed UADS
 
