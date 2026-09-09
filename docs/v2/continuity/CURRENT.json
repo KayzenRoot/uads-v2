@@ -8,13 +8,13 @@
   "completedPullRequest": 17,
   "approvedHead": "8f585caf15c2a3ccd217439bd989a1ba9309d8be",
   "mergeCommit": "6ec3a4c025532ceafb67df79f07daf1b7c7042ad",
-  "lastRecordedHead": "097a09d9d49d3b3b732c0ba7a9cbd74b0a973731",
+  "lastRecordedHead": "497ff7efa1fb5549523fa943375e6ad8bcb98669",
   "activeWorkOrder": "UADS2-WO-002",
-  "activePullRequest": null,
+  "activePullRequest": 20,
   "activeBranch": "work/uads2-wo-002-enterprise-runtime-planning",
   "activeModule": "M01/M27-M31 planning",
-  "activeSession": "Enterprise production-readiness architecture and pre-runtime sequencing",
-  "nextNecessaryAction": "Complete UADS2-WO-002 planning artifacts, open PR, run exact-head CI and HEDS. No runtime implementation before approval.",
+  "activeSession": "Enterprise production-readiness architecture ready for exact-head CI/HEDS review",
+  "nextNecessaryAction": "Wait for exact-head CI on PR #20 and run HEDS. No runtime implementation before APPROVED.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
