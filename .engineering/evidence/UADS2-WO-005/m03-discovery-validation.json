@@ -1,0 +1,56 @@
+{
+  "schema": "uads2.wo-005.m03.discovery-validation",
+  "schemaVersion": "1.0.0",
+  "sourceBase": "122426d0c7079722ed7ca118f13385b7b67183ee",
+  "contentParent": "772670bdfc11e2305fc285ee687170e7c7e58608",
+  "sessions": [
+    "S00",
+    "S01",
+    "S01.5",
+    "S02",
+    "S03",
+    "S04"
+  ],
+  "runtimeImplementationAuthorized": false,
+  "currentCapabilityIds": 10,
+  "proposedAdditionalCapabilityIds": 6,
+  "richStates": [
+    "SUPPORTED",
+    "UNSUPPORTED",
+    "UNKNOWN",
+    "BLOCKED",
+    "STALE"
+  ],
+  "inventions": [
+    "PCCR",
+    "CEL",
+    "NPC",
+    "CLDS",
+    "PBF"
+  ],
+  "mandatoryTestCases": 66,
+  "firstS05Slice": "PCCR core + passive/deterministic-local proof + compatibility projector",
+  "invariants": {
+    "unknownBlockedStaleNeverTrue": true,
+    "absenceNeverUnsupported": true,
+    "arbitraryShellDefault": false,
+    "automaticNetworkProbe": false,
+    "automaticMutatingProbe": false,
+    "perHostProbeConcurrencyDefault": 1
+  },
+  "enterprise": {
+    "M27": "COVERED_BY_DESIGN",
+    "M28": "COVERED_BY_DESIGN",
+    "M29": "COVERED_BY_DESIGN",
+    "M30": "COVERED_BY_DESIGN",
+    "M31": "COVERED_BY_DESIGN"
+  },
+  "scope": {
+    "runtimeSourceChanged": false,
+    "runtimeSchemaChanged": false,
+    "packageDependencyChanged": false,
+    "docsAndEngineeringOnly": true
+  },
+  "staleCanonicalSequenceReconciled": true,
+  "pass": true
+}

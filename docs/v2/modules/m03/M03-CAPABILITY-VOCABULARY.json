@@ -1,0 +1,103 @@
+{
+  "schema": "uads2.m03.capability-vocabulary",
+  "schemaVersion": "1.0.0-planning",
+  "status": "FROZEN_CANDIDATE_HEDS_PENDING",
+  "existing": [
+    {
+      "id": "modelSelection",
+      "class": "ROUTER_CONTROL"
+    },
+    {
+      "id": "toolCalling",
+      "class": "MODEL_HOST_INTERSECTION"
+    },
+    {
+      "id": "structuredOutput",
+      "class": "MODEL_HOST_INTERSECTION"
+    },
+    {
+      "id": "promptCache",
+      "class": "MODEL_HOST_INTERSECTION"
+    },
+    {
+      "id": "explicitCache",
+      "class": "MODEL_HOST_INTERSECTION"
+    },
+    {
+      "id": "persistentContext",
+      "class": "MODEL_HOST_INTERSECTION"
+    },
+    {
+      "id": "subagents",
+      "class": "HOST_ONLY"
+    },
+    {
+      "id": "parallelAgents",
+      "class": "HOST_ONLY"
+    },
+    {
+      "id": "usageTelemetry",
+      "class": "MODEL_HOST_INTERSECTION"
+    },
+    {
+      "id": "visionInput",
+      "class": "MODEL_HOST_INTERSECTION"
+    }
+  ],
+  "proposedAdditions": [
+    {
+      "id": "modelEnumeration",
+      "class": "HOST_ONLY",
+      "consumer": [
+        "M04"
+      ]
+    },
+    {
+      "id": "reasoningEffortControl",
+      "class": "ROUTER_CONTROL",
+      "consumer": [
+        "M06"
+      ]
+    },
+    {
+      "id": "backgroundExecution",
+      "class": "HOST_ONLY",
+      "consumer": [
+        "M01",
+        "M02"
+      ]
+    },
+    {
+      "id": "headlessExecution",
+      "class": "HOST_ONLY",
+      "consumer": [
+        "M01",
+        "M02"
+      ]
+    },
+    {
+      "id": "workerCancellation",
+      "class": "HOST_ONLY",
+      "consumer": [
+        "M01",
+        "M02"
+      ]
+    },
+    {
+      "id": "workerResume",
+      "class": "HOST_ONLY",
+      "consumer": [
+        "M01",
+        "M02"
+      ]
+    }
+  ],
+  "projection": {
+    "SUPPORTED": true,
+    "UNSUPPORTED": false,
+    "UNKNOWN": "unknown",
+    "BLOCKED": "unknown",
+    "STALE": "unknown"
+  },
+  "note": "Planning vocabulary only; current runtime schema is unchanged by WO-005."
+}

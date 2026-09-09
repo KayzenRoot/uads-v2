@@ -1,12 +1,58 @@
 # M03 — Host Capability Detector
-Status: DISCOVERY | Class: NECESSARY
 
-Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools or telemetry.
+Status: DISCOVERY — S00-S04 FROZEN CANDIDATE / UADS2-WO-005 HEDS PENDING
+Class: NECESSARY
 
-Standalone: mandatory in solo mode. Hive complement: publishes capability facts, never imports Hive runtime assumptions.
+Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools, telemetry or other host-dependent behavior.
 
-Candidate technology radar, UNAPPROVED: signed/cached capability snapshots; active probe sandbox; confidence/expiry model; negative-capability proof; drift detector.
+Standalone: mandatory in SOLO mode. Hive complement: publishes capability facts; Hive never substitutes local host truth.
 
-Sessions S00–S07: capability vocabulary, probing research, snapshot architecture, spoofing/failure model, matrix tests, implementation, host integration, freeze.
+## Architecture direction
 
-Mandatory tests: UNKNOWN≠TRUE, stale snapshot invalidation, spoof rejection, version drift, safe degradation.
+M03 V2 uses **Proof-Carrying Host Capabilities**:
+- per-capability proof rather than snapshot-wide trust;
+- evidence ladder;
+- Negative Proof Contract;
+- freshness/lease and deterministic drift invalidation;
+- bounded static probe registry;
+- conservative compatibility projection.
+
+Canonical proposed ADR:
+`docs/v2/adrs/ADR-UADS2-012-PROOF-CARRYING-HOST-CAPABILITIES.md`
+
+## Sessions
+
+- S00: `docs/v2/modules/m03/M03-S00-PROBLEM-METRICS.md`
+- S01: `docs/v2/modules/m03/M03-S01-TECHNOLOGY-RADAR.md`
+- S01.5: `docs/v2/modules/m03/M03-S01.5-TECHNOLOGY-INVENTION-RADAR.md`
+- S02: `docs/v2/modules/m03/M03-S02-ARCHITECTURE.md`
+- S03: `docs/v2/modules/m03/M03-S03-FAILURE-SECURITY-RESILIENCE.md`
+- S04: `docs/v2/modules/m03/M03-S04-TEST-BENCHMARK-DESIGN.md`
+- S05: NOT AUTHORIZED until WO-005 HEDS APPROVED.
+- S06: future integration/hardening.
+- S07: future module freeze.
+
+## Core invariant
+
+Only a current valid `SUPPORTED` proof can project to enabled `true`.
+`UNKNOWN`, `BLOCKED` and `STALE` project to legacy `unknown`.
+
+`UNSUPPORTED` is legal only under the Negative Proof Contract. Absence, timeout or permission denial is never sufficient.
+
+## Existing assets to reuse
+
+- `RuntimeCapabilitySnapshot`;
+- SHA-256 identity digest;
+- sidecar persistence;
+- host root identity/binding;
+- host adapter detection;
+- strict schemas/privacy validation;
+- replay/tamper tests.
+
+## HARD consumers
+
+M01, M04, M06 and M23.
+
+## Enterprise gates
+
+M27 capacity/load, M28 resilience/recovery, M29 operational security, M30 observability and M31 safe release apply to every future M03 runtime slice.
