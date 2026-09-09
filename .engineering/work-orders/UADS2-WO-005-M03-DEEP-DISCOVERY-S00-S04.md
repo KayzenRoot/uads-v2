@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-005
 
-Status: CONTENT FROZEN — PR #27 EXACT-HEAD HEDS PENDING
+Status: COMPLETED — HEDS APPROVED / MERGED
 Module: M03 — Host Capability Detector
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-005-m03-deep-discovery`
@@ -75,8 +75,8 @@ Current gaps:
 - [x] S04 tests/benchmarks frozen before S05;
 - [x] no runtime source/schema/package modification;
 - [x] stale WO-002 sequencing reconciled as superseded without deleting provenance;
-- [ ] exact-head hosted gates SUCCESS;
-- [ ] HEDS APPROVED before first S05 slice.
+- [x] exact-head hosted gates SUCCESS;
+- [x] HEDS APPROVED before first S05 slice.
 
 ## Stop condition
 
@@ -88,3 +88,18 @@ STOP if:
 - negative proof is inferred merely from absence;
 - M03 takes ownership from M04/M06/M23;
 - runtime implementation appears in this Work Order.
+
+
+## Final completion record
+
+- Exact reviewed head: `f6915633f2722ac7258e0c04e3931a90178b8e05`
+- HEDS verdict: `APPROVED`
+- GitHub review recording: exact-head COMMENT review because self-approval is prohibited by GitHub
+- CI: SUCCESS
+- CodeQL: SUCCESS
+- Dependency Review: SUCCESS
+- Cross-Platform Compatibility: SUCCESS
+- Unresolved review threads: 0
+- PR #27 merge SHA: `91da3704dff14e6cb1bd81ba0370be20cde7cddc`
+- ADR-UADS2-012 promoted to ACCEPTED
+- S05 implementation may proceed only through a new bounded Work Order

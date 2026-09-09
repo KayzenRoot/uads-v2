@@ -179,9 +179,9 @@ The first selected deep-discovery module after UADS2-WO-004 approval is M03 Host
 Architecture Reconciliation runs every 3–5 completed module freezes, default 4, and immediately on material boundary/ADR/technology/regression changes.
 
 
-## M03 deep-discovery candidate — ADR-UADS2-012
+## M03 accepted architecture — ADR-UADS2-012
 
-UADS2-WO-005 proposes **Proof-Carrying Host Capabilities** for M03.
+UADS2-WO-005 accepted **Proof-Carrying Host Capabilities** for M03.
 
 The candidate architecture separates:
 - host/adapter presence;
@@ -195,4 +195,4 @@ Only a current valid `SUPPORTED` proof may project to enabled `true`.
 
 `UNSUPPORTED` is legal only under the Negative Proof Contract; absence/timeout/permission denial is insufficient.
 
-This subsection is a frozen candidate until exact-head HEDS approves UADS2-WO-005. No M03 runtime implementation is authorized by this text.
+ADR-UADS2-012 is ACCEPTED after exact-head HEDS on PR #27. Runtime implementation still proceeds only through bounded S05 Work Orders and cannot bypass the frozen S03/S04 safety/test obligations.

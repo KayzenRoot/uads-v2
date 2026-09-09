@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-005 / M03 S00-S04
 
-Status: CONTENT FROZEN / EXACT-HEAD HEDS PENDING
+Status: HEDS APPROVED / MERGED
 Issue: #26
 PR: #27
 Base main: `122426d0c7079722ed7ca118f13385b7b67183ee`
@@ -151,3 +151,16 @@ The CEL rule was tightened after PR opening:
 - stronger per-capability requirements may require E3/E4.
 
 This removes declaration-only enablement for all capabilities, not only high-impact capabilities.
+
+
+## Final HEDS evidence
+
+- Exact reviewed head: `f6915633f2722ac7258e0c04e3931a90178b8e05`
+- HEDS verdict: `APPROVED`
+- CI: SUCCESS
+- CodeQL: SUCCESS
+- Dependency Review: SUCCESS
+- Cross-Platform Compatibility: SUCCESS
+- Unresolved review threads: 0
+- Merge SHA: `91da3704dff14e6cb1bd81ba0370be20cde7cddc`
+- Runtime/source/schema/test/package changes in WO-005: none

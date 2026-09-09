@@ -1,6 +1,6 @@
 # M03 — Host Capability Detector
 
-Status: DISCOVERY — S00-S04 FROZEN CANDIDATE / UADS2-WO-005 HEDS PENDING
+Status: DISCOVERY — S00-S04 FROZEN / S05 SLICE 1 NEXT
 Class: NECESSARY
 
 Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools, telemetry or other host-dependent behavior.
@@ -17,7 +17,7 @@ M03 V2 uses **Proof-Carrying Host Capabilities**:
 - bounded static probe registry;
 - conservative compatibility projection.
 
-Canonical proposed ADR:
+Canonical accepted ADR:
 `docs/v2/adrs/ADR-UADS2-012-PROOF-CARRYING-HOST-CAPABILITIES.md`
 
 ## Sessions
@@ -28,7 +28,7 @@ Canonical proposed ADR:
 - S02: `docs/v2/modules/m03/M03-S02-ARCHITECTURE.md`
 - S03: `docs/v2/modules/m03/M03-S03-FAILURE-SECURITY-RESILIENCE.md`
 - S04: `docs/v2/modules/m03/M03-S04-TEST-BENCHMARK-DESIGN.md`
-- S05: NOT AUTHORIZED until WO-005 HEDS APPROVED.
+- S05: AUTHORIZED only through bounded implementation Work Orders; first slice is PCCR core + passive/deterministic-local proof + compatibility projector.
 - S06: future integration/hardening.
 - S07: future module freeze.
 

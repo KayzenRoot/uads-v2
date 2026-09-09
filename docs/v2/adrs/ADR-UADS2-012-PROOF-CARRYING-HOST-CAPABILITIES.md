@@ -1,6 +1,6 @@
 # ADR-UADS2-012 — Proof-Carrying Host Capabilities
 
-Status: PROPOSED — UADS2-WO-005 HEDS PENDING
+Status: ACCEPTED
 Date: 2026-09-09
 Module: M03
 Issue: #26
@@ -11,7 +11,7 @@ Current UADS has conservative tri-state runtime capabilities, strict schema vali
 
 Host/adapter presence is not equivalent to feature support.
 
-## Proposed decision
+## Decision
 
 M03 SHALL use evidence-bound per-capability proof records.
 
@@ -54,7 +54,14 @@ Cost:
 - declaration-only enablement;
 - TPM/remote-attestation requirement for the initial local threat model.
 
-## Promotion gate
+## Promotion record
 
-ACCEPTED only after UADS2-WO-005 exact-head HEDS approves S00-S04.
-Runtime implementation remains unauthorized until then.
+Accepted after UADS2-WO-005 exact-head HEDS APPROVED.
+
+- Reviewed head: `f6915633f2722ac7258e0c04e3931a90178b8e05`
+- Merged PR: #27
+- Merge SHA: `91da3704dff14e6cb1bd81ba0370be20cde7cddc`
+- Hosted gates: CI, CodeQL, Dependency Review and Cross-Platform Compatibility all SUCCESS.
+- HEDS review is recorded as an exact-head COMMENT review because GitHub prohibits the PR author account from formally approving its own PR.
+
+Acceptance authorizes bounded S05 implementation Work Orders under this architecture; it does not claim M03 runtime completion.

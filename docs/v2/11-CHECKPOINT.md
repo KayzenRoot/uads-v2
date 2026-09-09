@@ -1,63 +1,65 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-004 APPROVED / MERGED; M03 DEEP DISCOVERY NEXT
+Status: UADS2-WO-005 APPROVED / MERGED; M03 S05 SLICE 1 NEXT
 Date: 2026-09-09
 
-Completed Work Order: UADS2-WO-004
-Active Work Order: none
-Active PR: none
-Merged PR: #25
-Approved UADS2-WO-004 head: `84015b45088a0d4df0a0f2d07424784d73ca730e`
-UADS2-WO-004 merge SHA: `58233f5d15ff60cf61a43dae355e51215cc20e33`
+Completed Work Order: UADS2-WO-005
+Completed PR: #27
+Approved head: `f6915633f2722ac7258e0c04e3931a90178b8e05`
+Merge SHA: `91da3704dff14e6cb1bd81ba0370be20cde7cddc`
 
-## Canonical construction model
+## M03 deep-discovery freeze
 
-ADR-UADS2-011 is ACCEPTED:
+S00–S04 are objectively frozen:
+- S00 problem, capability vocabulary and success metrics;
+- S01 Technology Radar;
+- S01.5 Technology Invention Radar;
+- S02 detailed architecture and ownership;
+- S03 failure/security/resilience model;
+- S04 66-test benchmark design before implementation.
 
-**Global Architecture → Deep Module Discovery → Vertical Implementation → Integration Freeze**
+ADR-UADS2-012 is ACCEPTED.
 
-- all 31 modules are architected first at system level;
-- one deep-discovery module is active at a time by default;
-- construction order is dependency-driven, not numeric;
-- S01 Technology Radar is mandatory;
-- S01.5 Technology Invention Radar is mandatory and falsifiable;
-- S02–S04 freeze detailed architecture, failure/security/resilience and tests/benchmarks before code;
-- S05 uses small end-to-end vertical slices with continuous tests;
-- S06 integrates/hardens;
-- S07 requires exact-head HEDS module freeze;
-- M27–M31 enterprise gates apply continuously;
-- Architecture Reconciliation occurs every 3–5 completed module freezes, default 4, or earlier on material change.
+## M03 accepted architecture
 
-## Global dependency graph
+**Proof-Carrying Host Capabilities**
 
-Frozen system graph:
-- modules: 31;
-- HARD edges: 60;
-- missing references: 0;
-- cycles: 0;
-- manifest mismatches: 0.
+Primary targets:
+- PCCR — Proof-Carrying Capability Record;
+- CEL — Capability Evidence Ladder;
+- NPC — Negative Proof Contract;
+- CLDS — Capability Lease & Drift Sentinel;
+- PBF — Probe Budget Fence.
 
-Current HARD roots:
-M03, M07, M14, M17, M19, M25, M29, M30.
-
-WO-003 delivered a bounded M30 runtime foundation, not a complete M30 S07 module freeze.
-
-Dependency-derived delivery criticality preserves declared classes while elevating delivery priority:
-- M14 → `NECESSARY_BY_HARD_DEPENDENCY`;
-- M23 → `NECESSARY_BY_HARD_DEPENDENCY`;
-- M24 → `NECESSARY_BY_HARD_DEPENDENCY`;
-- M25 → `NECESSARY_BY_HARD_DEPENDENCY`.
+Hard invariants:
+- E1 DECLARED is discovery input only and never produces SUPPORTED;
+- every enabling SUPPORTED proof requires at least E2 DETERMINISTIC_LOCAL_FACT;
+- UNKNOWN, BLOCKED and STALE never project to TRUE;
+- absence, timeout, permission denial or unrecognized output never imply UNSUPPORTED;
+- no arbitrary shell/user-command probing;
+- initial automatic active probing is bounded READ_ONLY_LOCAL only;
+- M03 proves host capability facts and does not steal M04/M05/M06/M23 authority.
 
 ## Next NECESSARY increment
 
-Create `UADS2-WO-005 — M03 Host Capability Detector Deep Discovery`.
+Create **UADS2-WO-006 — M03 S05 Slice 1: PCCR Core + Passive/Deterministic-Local Proof + Compatibility Projector**.
 
-M03 is selected because it is a HARD root and directly unlocks M01, M04, M06 and M23 while reducing unsafe/fabricated host-capability assumptions.
+Slice 1 MUST remain compatibility-first:
+1. introduce rich proof schema/types/store;
+2. implement passive/E2 deterministic-local proof compilation;
+3. implement freshness/integrity validation needed by that bounded path;
+4. project valid rich states into the legacy tri-state surface;
+5. emit M30-compatible lifecycle signals where the existing event contract permits or through a bounded versioned extension;
+6. satisfy the S04 tests applicable to Slice 1.
 
-WO-005 begins with:
-S00 → S01 → S01.5.
+Vendor-specific Cursor/Codex active probes remain EXPERIMENT and are OUT OF SCOPE for Slice 1.
 
-No M03 runtime implementation begins before its S02–S04 contracts and tests are frozen under HEDS.
+## Global construction rule
+
+ADR-UADS2-011 remains authoritative:
+Global Architecture → Deep Module Discovery → Vertical Implementation → Integration Freeze.
+
+M03 is not S07-frozen merely because S00-S04 are complete.
 
 ## Repository follow-up
 
