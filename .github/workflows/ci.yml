@@ -70,7 +70,16 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
+          original_origin="$(git remote get-url origin)"
+          restore_origin() { git remote set-url origin "$original_origin"; }
+          trap restore_origin EXIT
+          # One inherited V1 release-security regression intentionally verifies
+          # the immutable historical v0.11.0 tag. Point origin at the frozen V1
+          # lineage only for the test process, then restore the V2 origin.
+          git remote set-url origin "https://github.com/KayzenRoot/uads.git"
           npm test 2>&1 | tee "$RUNNER_TEMP/uads-tests.log"
+          restore_origin
+          trap - EXIT
 
       - name: Orchestrator eval
         id: eval_orchestrator
