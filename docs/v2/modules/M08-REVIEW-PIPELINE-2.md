@@ -108,6 +108,26 @@ At minimum:
 - Correction Delta cannot hide unresolved finding;
 - TTTM/rework/token metrics remain attributable to the Work Order.
 
+## Owner-approved B-001 event contract
+
+V2 review MUST emit privacy-safe identity-bound structured analysis events sufficient for `normalized-structured-analysis-signature-v1`.
+
+Minimum canonical fields:
+- `eventType`;
+- `gate`;
+- `normalizedSubjectPath`;
+- `normalizedFindingCode`;
+- `evidenceDigest`;
+- Work Order/review identity and timestamp.
+
+M08 owns semantic emission at review-analysis boundaries. M30 owns authoritative event transport/operational surface. M24 owns Work Order/cost attribution.
+
+Required V2 benchmark evidence MUST produce deterministic numerator, denominator, Duplicate Analysis Rate and raw-event hashes. Missing required event evidence fails closed.
+
+## Enterprise dependencies
+
+M27 performance/load, M28 failure/recovery, M29 security/evidence integrity, M30 observability and M31 safe release apply to M08.
+
 ## Promotion gate
 
 M08 cannot be frozen merely because HEDS is documented. Runtime support must be demonstrated by tests, representative review scenarios and V1/current-baseline comparison showing improved or equal defect detection with lower or justified delivery cost.

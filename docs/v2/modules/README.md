@@ -2,13 +2,17 @@
 
 Status: DISCOVERY INVENTORY
 
-All 26 planned modules are explicit here and each has an individual discovery file. Presence is not approval or implementation.
+All 31 planned modules are explicit. Presence is not implementation or production readiness.
 
-## Standalone-first invariant
-UADS V2 MUST remain usable without Hive V2. Core modules cannot require Hive packages/services at runtime. Hive connectivity is an optional bridge selected through capability negotiation. `SOLO` is a first-class mode; `HIVE_CONNECTED` adds context/governance exchange without changing UADS core ownership.
+Each module follows S00–S07 and, starting with UADS2-WO-002, must classify the five enterprise pillars using `docs/v2/planning/ENTERPRISE-PRODUCTION-READINESS-MATRIX.md`.
 
-## Planning method
-Each module follows S00–S07 from `docs/v2/operations/MODULE-SESSION-LIFECYCLE.md`. Every session includes test implications and ends with a repository update only after approval.
+M01–M26 retain their existing functional missions.
 
-## Inventory
-M01 Sequential Agent Orchestrator; M02 Background Worker Runtime; M03 Host Capability Detector; M04 Model Capability Registry; M05 Automatic Model Router 2.0; M06 Effort Autopilot; M07 Token & Quota Governor 2.0; M08 Review Pipeline 2.0; M09 Smart Gate Selector; M10 Fault Resolution Engine 2.0; M11 Experience Engine; M12 Policy Memory; M13 Adaptive Routing Learner; M14 Context Radius Optimizer; M15 Cursor Adapter V2; M16 Codex Adapter V2; M17 Project Resume Bootstrap; M18 UADS ↔ Hive Integration Bridge; M19 Evidence Cache 2.0; M20 Failure Memory 2.0; M21 Retry Controller; M22 Evidence-Driven Escalation; M23 Capability Negotiation Layer; M24 Observability & Cost Ledger; M25 Configuration & Policy Profiles; M26 Safe Learning / Rollback.
+Enterprise cross-cutting NECESSARY modules:
+- M27 Capacity & Load Engineering;
+- M28 Resilience & Recovery Engineering;
+- M29 Operational Security & Supply Chain;
+- M30 Production Observability & Real-Time Operations;
+- M31 Release Engineering & Safe Operations.
+
+They compose with, rather than replace, M10/M21 fault/retry, M24 Work Order/cost ledger, and M26 learned-policy rollback.

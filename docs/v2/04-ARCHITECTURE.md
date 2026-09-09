@@ -102,6 +102,43 @@ reconcile • promote • canonical checkpoint
 
 Analyze once when validity permits. Exchange evidence and identity rather than recomputing the same conclusion in both systems. A capability already owned by Hive should become a bridge/contract in UADS when integration is useful, not a duplicate authority.
 
+## Enterprise production-readiness plane
+
+Every module Work Order MUST classify:
+1. Scale & load.
+2. Resilience & failure handling.
+3. Operational security.
+4. Production observability.
+5. Continuous operations & safe delivery.
+
+Each classification is `COVERED`, `NOT_APPLICABLE` with rationale, or `GAP`. A necessary GAP blocks production-readiness declaration.
+
+Cross-cutting owners:
+- M27 Capacity & Load Engineering;
+- M28 Resilience & Recovery Engineering;
+- M29 Operational Security & Supply Chain;
+- M30 Production Observability & Real-Time Operations;
+- M31 Release Engineering & Safe Operations.
+
+These compose with functional modules rather than replacing them.
+
+## Observability ownership split
+
+M08 emits privacy-safe review-analysis events required by the owner-approved B-001 V2 obligation.
+M24 owns Work Order/cost attribution and ledger semantics.
+M30 owns authoritative production event transport, operational aggregation, SLI/SLO, health/alerts and the real-time dashboard/operator plane.
+
+A real-time UI claim MUST be backed by an objective source. Missing data is `UNAVAILABLE` or degraded, never fabricated.
+
+## Runtime sequencing after UADS2-WO-002 approval
+
+1. Establish M30 event spine + dashboard/operator foundation.
+2. Implement the first bounded M01 Sequential Agent Orchestrator slice integrated with M30 telemetry.
+3. Add M03 capability proof and M02 background-worker integration.
+4. Continue remaining modules through bounded Work Orders.
+
+M27/M28/M29/M31 constraints apply from the first runtime slice.
+
 ## Safety invariants
 
 - standalone core remains operable with Hive absent;
@@ -110,4 +147,6 @@ Analyze once when validity permits. Exchange evidence and identity rather than r
 - no unbounded specialist spawn;
 - no retry without changed hypothesis/evidence;
 - no proof reuse without validity;
-- no next increment while current one is CORRECTION REQUIRED/BLOCKED.
+- no next increment while current one is CORRECTION REQUIRED/BLOCKED;
+- no production-readiness declaration with a necessary enterprise pillar still GAP;
+- no real-time UI claim without objective event/source backing.

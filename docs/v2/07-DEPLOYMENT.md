@@ -23,3 +23,20 @@ Bootstrap does not rename package metadata, publish V2, create a tag or replace 
 ## Rollback
 
 Until V2 release is explicitly approved, rollback is simply continued use of the existing V1 installation/repository. V2 deployment work must never require destructive mutation of V1.
+
+## M31 safe-delivery contract
+
+Any production release/migration Work Order MUST define, where applicable:
+- release-readiness gates and exact merge candidate;
+- schema/contract versioning;
+- backward/forward compatibility and deprecation policy;
+- reversible migration strategy;
+- feature flag, canary or blue/green only when justified by risk;
+- post-deploy verification;
+- rollback trigger and tested rollback path;
+- operator/runbook ownership;
+- deployment-health evidence before promotion.
+
+M28 owns backup/restore and RTO/RPO objectives where applicable.
+M26 rollback applies specifically to learned policy/experiments.
+M31 owns runtime/product/config/schema release rollback.
