@@ -2,7 +2,7 @@
   "schema": "uads2.wo-006.s04-test-map",
   "schemaVersion": "1.0.0",
   "issue": 28,
-  "implementationHead": "0c96f6c4b74e73157fae3cb9533ffdd3f3254a44",
+  "implementationHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
   "tests": [
     "M03-T001",
     "M03-T002",
@@ -49,16 +49,16 @@
     "M03-T061-M03-T066 active-probe cross-platform"
   ],
   "benchmarkLinePrefix": "UADS2_WO_006_BENCHMARK",
-  "status": "HEDS_CORRECTION_APPLIED_PENDING_EXACT_HEAD_REVERIFY",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "result": {
     "testFilesPassed": 52,
-    "testsPassed": 462,
+    "testsPassed": 463,
     "testsFailed": 0,
-    "sourceRunId": 34407137445,
+    "sourceRunId": 34408214090,
     "benchmark": {
       "B1": {
-        "p50Ms": 0.06329399999992802,
-        "p95Ms": 0.13411899999994148,
+        "p50Ms": 0.07195400000000518,
+        "p95Ms": 0.14788499999997384,
         "targetP95Ms": 50,
         "pass": true
       },
@@ -84,5 +84,5 @@
   "regressionTests": [
     "M03-REG-001 cross-capability proof replay rejected"
   ],
-  "note": "T047 strengthened to test copied cross-subject replay; fresh exact-head verification required."
+  "note": "T047 strengthened to copied cross-subject replay; M03-REG-001 closes cross-capability replay. Exact-head HEDS approved."
 }

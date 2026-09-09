@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-006
 
-Status: ACTIVE — M03 S05 SLICE 1
+Status: COMPLETED — HEDS APPROVED / MERGED
 Module: M03 — Host Capability Detector
 Slice: S05.1 — PCCR Core + Passive/Deterministic-Local Proof + Conservative Projection
 Repository: `KayzenRoot/uads-v2`
@@ -249,3 +249,23 @@ Required bounded correction has been applied in-scope:
 - extend B4 replay attempt coverage.
 
 Final status remains CORRECTION APPLIED / exact-head verification pending until fresh hosted gates and benchmark pass.
+
+
+## Final HEDS completion record
+
+- Exact reviewed head: `7212f4f2f134589b655dcd4b480fa6dd699d8606`
+- HEDS verdict: `APPROVED`
+- Review recording: exact-head COMMENT review because GitHub prohibits self-approval
+- CI: SUCCESS
+- CodeQL: SUCCESS
+- Dependency Review: SUCCESS
+- Cross-Platform Compatibility: SUCCESS
+- 52/52 test files PASS
+- 463/463 tests PASS
+- Fresh B1 p95: 0.147885 ms <= 50 ms
+- B3: 10,990 bytes/host <= 65,536
+- B4: unsafeTrue=0, tamperReplayAccepted=0, driftMisses=0, absenceUnsupported=0
+- B7: corruptAccepted=0, recovered=true
+- Cross-capability replay HIGH finding closed before approval
+- PR #29 merge SHA: `c1fff560a1a50a5806c6f84d6e7990e6d8bf07af`
+- M03 remains not S07-frozen

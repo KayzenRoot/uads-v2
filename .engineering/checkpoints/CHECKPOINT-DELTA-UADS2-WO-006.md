@@ -1,45 +1,39 @@
 # CHECKPOINT DELTA — UADS2-WO-006
 
-Status: IMPLEMENTED / PR #29 FINAL EXACT-HEAD HEDS PENDING
+Status: PROMOTED
 Module: M03 S05.1
 Issue: #28
 PR: #29
-Implementation head: `d6a355106f600be43c53746a7a4cb6866473b458`
+Reviewed head: `7212f4f2f134589b655dcd4b480fa6dd699d8606`
+Merge SHA: `c1fff560a1a50a5806c6f84d6e7990e6d8bf07af`
 
-## Implemented candidate promotion
+## Promoted
 
-- PCCR core runtime implemented.
-- Closed proof schema limited to existing ten legacy capability IDs.
-- E2 global proof floor enforced.
-- Slice-1 NPC `adapter-contract-impossible` enforced.
-- proof integrity/freshness/drift evaluation implemented.
-- global sidecar proof persistence implemented.
-- conservative legacy RuntimeCapabilitySnapshot projector implemented.
-- legacy TRUE without valid PCCR becomes UNKNOWN.
-- M30 best-effort evidence lifecycle telemetry implemented without event-schema expansion.
-- applicable S04 tests T001-T010, T018-T030, T045-T060 implemented.
-- B1/B3/B4/B7 benchmark harness implemented.
+- PCCR core runtime.
+- Closed host-capability-proof schema.
+- E2 global SUPPORTED floor.
+- Slice-1 NPC adapter-contract-impossible path.
+- proof integrity, freshness and drift evaluation.
+- global sidecar proof storage.
+- conservative legacy projection.
+- best-effort M30 evidence telemetry.
+- corrupt/tamper/replay fail-closed behavior.
+- cross-subject and cross-capability binding enforcement.
+- T001-T010, T018-T030, T045-T060 plus M03-REG-001.
+- B1/B3/B4/B7 exact-head proof.
 
-## Verified on implementation-equivalent runtime head
+## Exact-head result
 
-Head: `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`
+- 52/52 files PASS.
+- 463/463 tests PASS.
+- all four hosted gates SUCCESS.
+- B1 p95 = 0.147885 ms.
+- B3 = 10,990 bytes/host.
+- B4 all counters = 0.
+- B7 corruptAccepted=0 / recovered=true.
 
-- 52/52 test files and 462/462 tests PASS.
-- CI SUCCESS.
-- CodeQL SUCCESS.
-- Dependency Review SUCCESS.
-- Cross-Platform SUCCESS.
-- B1/B3/B4/B7 all PASS.
-- First failed run was corrected by test-fixture-only change; no runtime correction was required.
+## Next
 
-## Pending
+UADS2-WO-007 — M03 S05.2 Host Subject Identity & Passive Evidence Bridge.
 
-- hosted gates on the final evidence-only review head;
-- exact-head HEDS.
-
-## Not promoted
-
-- no vendor-specific active probe;
-- no future six capability IDs;
-- no M03 S07 freeze;
-- no other module implementation.
+No active vendor-specific probe is promoted or authorized.

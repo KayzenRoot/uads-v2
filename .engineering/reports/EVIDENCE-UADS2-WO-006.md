@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-006 / M03 S05 Slice 1
 
-Status: HEDS CORRECTION APPLIED / FRESH EXACT-HEAD GATES PENDING
+Status: HEDS APPROVED / MERGED
 Issue: #28
 PR: #29
 Base main: `36b2019fc22b4d6c5d250e41edf12e737c4ddcfa`
@@ -147,3 +147,27 @@ Bounded correction:
 No schema, package, probe or architectural scope expansion was required.
 
 The prior benchmark values remain historical only. Fresh exact-head B1/B3/B4/B7 values and all four hosted gates must be auditor-bound before final APPROVED.
+
+
+## Final exact-head HEDS evidence
+
+Exact reviewed head: `7212f4f2f134589b655dcd4b480fa6dd699d8606`
+Merge SHA: `c1fff560a1a50a5806c6f84d6e7990e6d8bf07af`
+CI run: `34408214090`
+CI job: `102656284247`
+
+Fresh exact-head results:
+- 52/52 test files PASS;
+- 463/463 tests PASS;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Cross-Platform Compatibility SUCCESS;
+- unresolved review threads = 0;
+- B1 sample #1 p50 = 0.071954 ms, p95 = 0.147885 ms;
+- B1 validation rerun p50 = 0.071113 ms, p95 = 0.147074 ms;
+- B3 = 10,990 bytes/host;
+- B4 unsafeTrue=0, tamperReplayAccepted=0, driftMisses=0, absenceUnsupported=0;
+- B7 corruptAccepted=0, recovered=true.
+
+The HEDS cross-capability replay finding is closed by exact subject/path, capability/path and proof/key binding checks plus M03-REG-001.

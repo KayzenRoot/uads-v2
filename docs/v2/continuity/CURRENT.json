@@ -3,41 +3,48 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_006_PR29_HEDS_CORRECTION_APPLIED_EXACT_HEAD_REVERIFY_PENDING",
-  "completedWorkOrder": "UADS2-WO-005",
-  "completedPullRequest": 27,
-  "approvedHead": "f6915633f2722ac7258e0c04e3931a90178b8e05",
-  "mergeCommit": "91da3704dff14e6cb1bd81ba0370be20cde7cddc",
-  "lastRecordedHead": "a0b0f5ebd5cfc0b1b0322967697a2af5a233b51a",
-  "activeWorkOrder": "UADS2-WO-006",
-  "activePullRequest": 29,
-  "activeBranch": "work/uads2-wo-006-m03-pccr-core",
+  "programState": "UADS2_WO_006_APPROVED_MERGED_M03_S05_2_NEXT",
+  "completedWorkOrder": "UADS2-WO-006",
+  "completedPullRequest": 29,
+  "approvedHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
+  "mergeCommit": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
+  "lastRecordedHead": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
+  "activeWorkOrder": null,
+  "activePullRequest": null,
+  "activeBranch": null,
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "HEDS found cross-capability replay gap; bounded binding correction applied; fresh exact-head gates pending",
-  "nextNecessaryAction": "Do not merge. Run fresh exact-head CI, CodeQL, Dependency Review and Cross-Platform plus benchmark after the capability-binding correction. Final HEDS only after all succeed.",
+  "activeSession": "S05.1 approved/merged; S05.2 host subject identity and passive evidence bridge next",
+  "nextNecessaryAction": "Create UADS2-WO-007 for M03 S05.2 Host Subject Identity & Passive Evidence Bridge. Keep subprocess/shell/network and vendor-specific active probes out of scope.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
+  "acceptedPriorities": [
+    "ADR-UADS2-009 dashboard-first event-backed real-time operations",
+    "ADR-UADS2-010 enterprise production-readiness contract with M27-M31",
+    "ADR-UADS2-011 Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze",
+    "ADR-UADS2-012 Proof-Carrying Host Capabilities",
+    "B-001 V2 structured analysis-event proof"
+  ],
   "m03": {
     "issue": 28,
-    "activeSlice": "S05.1",
-    "implementationHead": "0c96f6c4b74e73157fae3cb9533ffdd3f3254a44",
+    "completedSlices": [
+      "S05.1"
+    ],
+    "nextSlice": "S05.2 Host Subject Identity & Passive Evidence Bridge",
     "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED",
     "activeProbes": "NOT_IMPLEMENTED",
-    "runtimeFiles": [
-      "schemas/host-capability-proof.schema.json",
-      "src/kernel/host-capability-proof.ts",
-      "tests/host-capability-proof.test.ts"
-    ],
-    "verification": {
+    "vendorSpecificActiveProbes": "EXPERIMENT_NOT_AUTHORIZED",
+    "wo006": {
+      "approvedHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
+      "mergeCommit": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
+      "testsPassed": 463,
       "testFilesPassed": 52,
-      "testsPassed": 462,
-      "benchmarkB1P95Ms": 0.13411899999994148,
-      "benchmarkB3BytesPerHost": 10990,
+      "B1P95Ms": 0.14788499999997384,
+      "B3BytesPerHost": 10990,
       "B4ZeroDefects": true,
-      "B7Recovery": true
-    },
-    "hedsCorrection": "cross-capability-and-subject-path-proof-binding"
+      "B7Recovery": true,
+      "crossCapabilityReplayClosed": true
+    }
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
