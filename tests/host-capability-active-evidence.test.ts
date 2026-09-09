@@ -6,6 +6,7 @@ import {
   type ActiveEvidenceCurrentContext,
 } from "../src/kernel/host-capability-active-evidence.js";
 import {
+  compileHostCapabilityProofV11,
   computeHostCapabilityProofDigest,
   evaluateHostCapabilityProof,
   normalizeHostCapabilityProof,
@@ -53,12 +54,15 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     expect(result.proof).toBeNull();
   });
 
-  it("M03-T012 missing-host/current-context style absence cannot create UNSUPPORTED",()=>{
+  it("M03-T012 missing host/current context cannot create UNSUPPORTED",()=>{
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:null,nodeEnv:"test",schemaRoot:ROOT,
     });
+    expect(result.status).toBe("NO_EVIDENCE");
     expect(result.state).toBe("UNKNOWN");
     expect(result.proof).toBeNull();
+    expect(result.currentBasis).toBeNull();
+    expect(result.reasonCodes).toContain("ACTIVE_CURRENT_CONTEXT_MISSING");
   });
 
   it("M03-T013 blocked probe remains BLOCKED and non-enabling",async()=>{
@@ -202,6 +206,41 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     const {proofDigest:_two,...invalidUnsigned}=invalid;
     const resigned={...invalidUnsigned,proofDigest:computeHostCapabilityProofDigest(invalidUnsigned as never)};
     expect(()=>normalizeHostCapabilityProof(resigned,ROOT)).toThrow();
+  });
+
+  it("PCCR 1.1 complete-enumeration negative proof also requires E3",()=>{
+    const contract=getHostCapabilityActiveEvidenceContract("test.enumeration.structured-excluded.v1");
+    expect(()=>compileHostCapabilityProofV11({
+      capabilityId:"structuredOutput",
+      state:"UNSUPPORTED",
+      evidenceClass:"E2",
+      subjectDigest:SUBJECT,
+      adapterId:"generic-agent-skills",
+      runtimeVersion:null,
+      probeId:contract.probeId,
+      validityBasis:{
+        adapterContractDigest:ADAPTER_DIGEST,
+        probeDefinitionDigest:contract.descriptorDigest,
+        policyDigest:contract.policyDigest,
+        configurationDigest:CONFIG_DIGEST,
+      },
+      observedAt:"2026-09-09T20:00:00.000Z",
+      validUntil:"2026-09-09T20:01:00.000Z",
+      validityClass:"LEASED",
+      evidenceDigest:"b".repeat(64),
+      negativeProofKind:"complete-enumeration-exclusion",
+      reasonCodes:["TEST_COMPLETE_ENUMERATION"],
+    },ROOT)).toThrow(/E3 or stronger/);
+  });
+
+  it("forged receipt exceeding descriptor byte budget is rejected even with valid receipt digest",async()=>{
+    const r=await receipt("test.active-supported.v1");
+    const forged=resignReceipt(r,{stdoutBytes:1024});
+    const result=compileActiveEvidenceToPccr({
+      contractId:"test.active.tool-supported.v1",current:current(),receipt:forged,nodeEnv:"test",schemaRoot:ROOT,
+    });
+    expect(result.status).toBe("REJECTED");
+    expect(result.reasonCodes).toContain("ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
   });
 
   it("lease expiry and descriptor/policy/config/runtime drift become STALE",async()=>{

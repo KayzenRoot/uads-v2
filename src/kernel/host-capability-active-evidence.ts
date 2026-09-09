@@ -58,7 +58,7 @@ export type ActiveEvidenceCompileResult = {
   status: "COMPILED" | "NO_EVIDENCE" | "REJECTED" | "CONTRACT_BLOCKED";
   state: HostCapabilityProofState;
   proof: HostCapabilityProofRecord | null;
-  currentBasis: HostCapabilityCurrentBasis;
+  currentBasis: HostCapabilityCurrentBasis | null;
   reasonCodes: string[];
 };
 
@@ -99,6 +99,7 @@ export function compileActiveEvidenceContract(
   const descriptor=getHostCapabilityProbeDescriptor(input.probeId);
   if(descriptor.capabilityId!==input.capabilityId) throw new Error("active contract capability/descriptor mismatch");
   if(descriptor.parserId!==input.parserId) throw new Error("active contract parser/descriptor mismatch");
+  if(descriptor.availability!==input.availability) throw new Error("active contract availability/descriptor mismatch");
   for(const value of [...input.supportedSummaries,...input.unsupportedSummaries]){
     if(!SAFE_ID.test(value)||value.length>64) throw new Error("active contract summary is unsafe");
   }
@@ -110,6 +111,12 @@ export function compileActiveEvidenceContract(
   const policyDigest=digest({
     domain:"uads-m03-active-evidence-policy-v1",
     contractId:input.contractId,
+    availability:input.availability,
+    adapterId:input.adapterId,
+    capabilityId:input.capabilityId,
+    probeId:input.probeId,
+    descriptorDigest:descriptor.descriptorDigest,
+    parserId:input.parserId,
     resultMode:input.resultMode,
     supportedSummaries:sorted(input.supportedSummaries),
     unsupportedSummaries:sorted(input.unsupportedSummaries),
@@ -210,7 +217,13 @@ function assertCurrent(current:ActiveEvidenceCurrentContext):void {
   if(current.configurationDigest!==null) assertDigest(current.configurationDigest,"configurationDigest");
 }
 
-function coherentReceipt(receipt:HostCapabilityProbeReceipt):boolean {
+function coherentReceipt(
+  receipt:HostCapabilityProbeReceipt,
+  descriptor:ReturnType<typeof getHostCapabilityProbeDescriptor>,
+):boolean {
+  if(receipt.stdoutBytes>descriptor.maxStdoutBytes || receipt.stderrBytes>descriptor.maxStderrBytes){
+    return false;
+  }
   if(receipt.status==="SUCCEEDED"){
     return receipt.exitCode===0 &&
       receipt.signal===null &&
@@ -221,13 +234,22 @@ function coherentReceipt(receipt:HostCapabilityProbeReceipt):boolean {
       receipt.reasonCodes.includes("PROBE_EXECUTION_SUCCEEDED");
   }
   if(receipt.parsedSummary!==null) return false;
+  if(receipt.status==="BLOCKED"){
+    return receipt.executableIdentityBefore===null &&
+      receipt.executableIdentityAfter===null &&
+      receipt.exitCode===null &&
+      receipt.signal===null &&
+      receipt.stdoutBytes===0 &&
+      receipt.stderrBytes===0;
+  }
   if(receipt.status==="IDENTITY_DRIFT"){
     return receipt.executableIdentityBefore!==null &&
       receipt.executableIdentityAfter!==null &&
       receipt.executableIdentityBefore!==receipt.executableIdentityAfter &&
       receipt.reasonCodes.includes("EXECUTABLE_IDENTITY_DRIFT");
   }
-  return true;
+  return receipt.executableIdentityBefore!==null &&
+    receipt.executableIdentityAfter!==null;
 }
 
 function stateForReceipt(
@@ -256,12 +278,15 @@ function stateForReceipt(
 
 export function compileActiveEvidenceToPccr(input:{
   contractId:string;
-  current:ActiveEvidenceCurrentContext;
+  current?:ActiveEvidenceCurrentContext|null;
   receipt?:unknown|null;
   nodeEnv?:string;
   schemaRoot?:string;
 }):ActiveEvidenceCompileResult {
   const contract=getHostCapabilityActiveEvidenceContract(input.contractId);
+  if(input.current===undefined || input.current===null){
+    return {status:"NO_EVIDENCE",state:"UNKNOWN",proof:null,currentBasis:null,reasonCodes:["ACTIVE_CURRENT_CONTEXT_MISSING"]};
+  }
   assertCurrent(input.current);
   const currentBasis=basis(contract,input.current);
   if(contract.availability==="TEST_ONLY" && (input.nodeEnv??process.env.NODE_ENV)!=="test"){
@@ -287,7 +312,8 @@ export function compileActiveEvidenceToPccr(input:{
   if(receipt.capabilityId!==contract.capabilityId) return reject(contract,input.current,"ACTIVE_RECEIPT_CAPABILITY_MISMATCH");
   if(receipt.descriptorDigest!==contract.descriptorDigest) return reject(contract,input.current,"ACTIVE_RECEIPT_DESCRIPTOR_MISMATCH");
   if(receipt.parserId!==contract.parserId) return reject(contract,input.current,"ACTIVE_RECEIPT_PARSER_MISMATCH");
-  if(!coherentReceipt(receipt)) return reject(contract,input.current,"ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
+  const descriptor=getHostCapabilityProbeDescriptor(contract.probeId);
+  if(!coherentReceipt(receipt,descriptor)) return reject(contract,input.current,"ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
 
   const mapped=stateForReceipt(contract,receipt);
   const observedAt=receipt.finishedAt;

@@ -254,10 +254,11 @@ function assertProofSemantics(proof: Omit<HostCapabilityProofRecord, "proofDiges
       throw new Error("PCCR 1.0 UNSUPPORTED requires adapter-contract-impossible negative proof");
     }
     if (
-      proof.negativeProofKind === "active-probe-recognized-unsupported" &&
+      (proof.negativeProofKind === "active-probe-recognized-unsupported" ||
+        proof.negativeProofKind === "complete-enumeration-exclusion") &&
       EVIDENCE_RANK[proof.evidenceClass] < EVIDENCE_RANK.E3
     ) {
-      throw new Error("active-probe-recognized-unsupported requires E3 or stronger evidence");
+      throw new Error("active/enumeration UNSUPPORTED requires E3 or stronger evidence");
     }
     assertDigest(proof.validityBasis.adapterContractDigest, "adapterContractDigest");
   } else if (proof.negativeProofKind !== null) {
