@@ -28,7 +28,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M02",
@@ -44,7 +46,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M03",
@@ -57,7 +61,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M04",
@@ -72,7 +78,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M05",
@@ -89,7 +97,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M06",
@@ -106,7 +116,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M07",
@@ -119,7 +131,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M08",
@@ -142,7 +156,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M09",
@@ -158,7 +174,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M10",
@@ -173,7 +191,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M11",
@@ -189,7 +209,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
     },
     {
       "id": "M12",
@@ -204,7 +226,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
     },
     {
       "id": "M13",
@@ -223,7 +247,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
     },
     {
       "id": "M14",
@@ -236,7 +262,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
     },
     {
       "id": "M15",
@@ -253,7 +281,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M16",
@@ -270,7 +300,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M17",
@@ -283,7 +315,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M18",
@@ -300,7 +334,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M19",
@@ -313,7 +349,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M20",
@@ -328,7 +366,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M21",
@@ -345,7 +385,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M22",
@@ -365,7 +407,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M23",
@@ -380,7 +424,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
     },
     {
       "id": "M24",
@@ -395,7 +441,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
     },
     {
       "id": "M25",
@@ -408,7 +456,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
     },
     {
       "id": "M26",
@@ -425,7 +475,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
     },
     {
       "id": "M27",
@@ -440,7 +492,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M28",
@@ -455,7 +509,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M29",
@@ -468,7 +524,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M30",
@@ -481,7 +539,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     },
     {
       "id": "M31",
@@ -497,7 +557,9 @@
         "M29",
         "M30",
         "M31"
-      ]
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
     }
   ],
   "edges": [
@@ -1859,5 +1921,20 @@
     "boundedFoundationIsNotModuleFreeze": true,
     "m30State": "WO-003 delivered a bounded M30 foundation; M30 remains a module requiring its own later deep-discovery/S07 freeze before HARD dependents that require full M30 freeze may themselves freeze.",
     "rule": "A HARD predecessor requirement is satisfied only by S07 module freeze unless an explicit contract-first ADR creates a narrower exception."
+  },
+  "deliveryCriticalityRule": {
+    "rule": "A module that is not declared NECESSARY but is a HARD predecessor of a declared NECESSARY module receives effectiveDeliveryClass=NECESSARY_BY_HARD_DEPENDENCY for delivery ordering. Declared class remains unchanged.",
+    "elevatedModules": [
+      "M14",
+      "M23",
+      "M24",
+      "M25"
+    ],
+    "rationale": {
+      "M14": "HARD predecessor of M09/M22/M08",
+      "M23": "HARD predecessor of M15/M16/M18",
+      "M24": "HARD predecessor of M08",
+      "M25": "HARD predecessor of M05/M06/M09"
+    }
   }
 }

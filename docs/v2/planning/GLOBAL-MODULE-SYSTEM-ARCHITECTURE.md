@@ -125,3 +125,12 @@ Default every 4 completed module freezes, allowed at 3 for risk and never later 
 - `GLOBAL-MODULE-DEPENDENCY-GRAPH.md`
 - `GLOBAL-MODULE-DEPENDENCIES.json`
 - ADR-UADS2-011
+
+
+## Dependency-derived delivery criticality
+
+System architecture preserves each module's declared class and separately computes delivery criticality from HARD edges.
+
+M14, M23, M24 and M25 are `NECESSARY_BY_HARD_DEPENDENCY` because declared-NECESSARY modules cannot reach full freeze without them.
+
+This derived status affects planning/order only. It does not silently change the semantic scope or experimental status of a module.

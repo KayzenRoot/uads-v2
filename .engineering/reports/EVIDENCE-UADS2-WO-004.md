@@ -28,7 +28,8 @@ All 31 module discovery documents plus current Architecture, Decisions Ledger, M
 - bounded foundation state is distinguished from S07 module freeze;
 - only one module is selected for deep discovery at a time;
 - current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30;
-- next selected module is M03 for critical-path unlock and capability-safety reasons.
+- next selected module is M03 for critical-path unlock and capability-safety reasons;
+- delivery-criticality inheritance identifies M14, M23, M24 and M25 as NECESSARY_BY_HARD_DEPENDENCY while preserving their declared class.
 
 ## Deterministic graph validation
 Artifact: `.engineering/evidence/UADS2-WO-004/dependency-graph-validation.json`
@@ -42,6 +43,7 @@ Result:
 - selectedNext = M03;
 - validation PASS.
 - topological-layer correction: PASS; M10 is T1, not a root.
+- dependency-criticality reconciliation: PASS; 4 modules elevated for delivery ordering, declared classes unchanged.
 
 The manifest and machine-readable graph agree on `requiredPredecessorsForFreeze`.
 

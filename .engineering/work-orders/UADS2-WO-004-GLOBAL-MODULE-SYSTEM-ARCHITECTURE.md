@@ -23,6 +23,7 @@ Promote the owner-approved construction model and freeze enough system-level arc
 - HARD/SOFT_OPTIONAL/EVENT/GOVERNANCE/ENTERPRISE_CROSSCUTTING taxonomy;
 - acyclic HARD predecessor graph;
 - topological layers, dynamic S07 eligibility and one-module-at-a-time selection policy;
+- dependency-derived effective delivery criticality without overwriting declared module class;
 - mandatory S01.5 Technology Invention Radar;
 - vertical-slice rule;
 - Architecture Reconciliation Checkpoint every 3–5 completed modules;
@@ -54,6 +55,7 @@ Promote the owner-approved construction model and freeze enough system-level arc
 - [x] M27–M31 gates remain continuous;
 - [x] reconciliation checkpoint rule frozen at 3–5 modules, default 4;
 - [x] next eligible module is selected with rationale;
+- [x] non-NECESSARY HARD prerequisites of NECESSARY modules are reconciled through effective delivery criticality;
 - [x] no runtime source path changed;
 - [ ] exact-head mandatory CI gates pass;
 - [ ] HEDS APPROVED before deep discovery resumes.

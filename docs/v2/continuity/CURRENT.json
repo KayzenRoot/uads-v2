@@ -8,12 +8,12 @@
   "completedPullRequest": 22,
   "approvedHead": "553ec1e66a84444d9944b45220ecdfe2160ced6b",
   "mergeCommit": "e54f70fd40bdc9b58c9145036b920f59879f6d63",
-  "lastRecordedHead": "4cf3884876f95949bbc5f51167649eb196c89e19",
+  "lastRecordedHead": "10271e993f4d6cee40ec034cff42a936930f121c",
   "activeWorkOrder": "UADS2-WO-004",
   "activePullRequest": 25,
   "activeBranch": "work/uads2-wo-004-global-module-architecture",
   "activeModule": "GLOBAL M01-M31 SYSTEM ARCHITECTURE",
-  "activeSession": "WO-004 global architecture content frozen; fresh exact-head hosted gates and HEDS pending",
+  "activeSession": "WO-004 content frozen with dependency-derived delivery criticality; exact-head hosted gates and HEDS pending",
   "nextNecessaryAction": "Wait for exact-head CI, CodeQL, Dependency Review and Cross-Platform on the frozen PR #25 head, then run HEDS. No deep module implementation before APPROVED/MERGED.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
@@ -25,7 +25,7 @@
     "Issue #23 owner-approved Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze model"
   ],
   "moduleInventoryCount": 31,
-  "moduleInventoryState": "GLOBAL_SYSTEM_ARCHITECTURE_READY_FOR_HEDS",
+  "moduleInventoryState": "GLOBAL_SYSTEM_ARCHITECTURE_CONTENT_FROZEN_WITH_DERIVED_DELIVERY_CRITICALITY",
   "dependencyGraphValidation": {
     "nodeCount": 31,
     "hardEdgeCount": 60,
@@ -49,5 +49,11 @@
     "docs/v2/04-ARCHITECTURE.md",
     "docs/v2/02-REQUIREMENTS.md",
     "docs/v2/13-REVIEW-PROTOCOL.md"
+  ],
+  "deliveryCriticalityElevations": [
+    "M14",
+    "M23",
+    "M24",
+    "M25"
   ]
 }

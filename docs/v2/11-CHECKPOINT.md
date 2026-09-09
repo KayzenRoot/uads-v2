@@ -37,6 +37,8 @@ Deterministic validation: 31 nodes, 60 HARD edges, 0 missing references, 0 cycle
 
 Topological layers are not eligibility sets. Current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30. WO-003 delivered a bounded M30 foundation, not an S07 M30 module freeze.
 
+Dependency-derived delivery criticality: M14, M23, M24 and M25 are `NECESSARY_BY_HARD_DEPENDENCY` while their declared classes remain unchanged.
+
 First selected deep-discovery module after approval: **M03 Host Capability Detector**.
 
 ## Repository follow-up

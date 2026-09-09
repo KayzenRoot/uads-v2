@@ -106,3 +106,20 @@ Rationale:
 - required in SOLO and useful before adapter/worker deepening.
 
 Current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30. M03 is selected first. After every module S07 freeze, recalculate eligibility from the machine-readable graph. A bounded foundation such as WO-003 M30 does not by itself satisfy a HARD predecessor freeze requirement. Do not blindly follow a static numeric list.
+
+
+## Delivery criticality inheritance
+
+Declared module class is preserved, but dependency architecture can elevate delivery criticality.
+
+A module with declared class other than `NECESSARY` that is a HARD predecessor of a declared `NECESSARY` module receives:
+
+`effectiveDeliveryClass = NECESSARY_BY_HARD_DEPENDENCY`
+
+Current elevations:
+- M14 Context Radius Optimizer → required by M09/M22/M08;
+- M23 Capability Negotiation Layer → required by M15/M16/M18;
+- M24 Observability & Cost Ledger → required by M08;
+- M25 Configuration & Policy Profiles → required by M05/M06/M09.
+
+This does not rewrite the original product-priority class. It prevents critical-path prerequisites from being deprioritized below the necessary modules they block.
