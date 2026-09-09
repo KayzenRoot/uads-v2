@@ -1,12 +1,13 @@
 # Work Order — UADS2-WO-009
 
-Status: ACTIVE — M03 S05.4 CONTRACT FROZEN
+Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Slice: S05.4 — Active Evidence Contract & Generic PCCR Compiler
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-009-m03-active-evidence-compiler`
 Base SHA: `fbdd1927af7ea250fadac7db0725144dd4873b91`
 Issue: #34
+PR: #35
 Risk: HIGH
 ADR: ADR-UADS2-012 — ACCEPTED
 
@@ -164,3 +165,8 @@ STOP if:
 - test-only contract can run as production contract;
 - any vendor-specific host claim enters;
 - HIGH/CRITICAL defect remains.
+
+
+## Implementation snapshot
+Head: `c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55`
+55/55 test files and 526/526 tests PASS. B1 p95 0.377957 ms. B4 all zero. Fresh exact-head HEDS required after evidence commit.

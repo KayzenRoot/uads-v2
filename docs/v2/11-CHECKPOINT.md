@@ -1,28 +1,29 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-009 ACTIVE — M03 S05.4 CONTRACT FROZEN / DIRECT IMPLEMENTATION NEXT
+Status: UADS2-WO-009 PR #35 IMPLEMENTED / EVIDENCE FROZEN / EXACT-HEAD HEDS PENDING
 Date: 2026-09-09
 
 Completed Work Order: UADS2-WO-008
 Active Work Order: UADS2-WO-009
 Active Issue: #34
+Active PR: #35
 Active Branch: `work/uads2-wo-009-m03-active-evidence-compiler`
 Base SHA: `fbdd1927af7ea250fadac7db0725144dd4873b91`
-Active Module: M03 Host Capability Detector
-Active Session: S05.4
+Implementation head: `c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55`
 
-## Authorized slice
+Implemented:
+- PCCR 1.0 backward-compatible reader retained;
+- PCCR 1.1 active negative kinds added;
+- TEST_ONLY Active Evidence Contract registry;
+- generic safe ProbeReceipt -> PCCR 1.1 compiler;
+- T011-T017/T051/T052 strengthened;
+- no production/vendor capability claim.
 
-PCCR 1.1 backward-compatible negative-proof extension plus schema-closed TEST_ONLY Active Evidence Contract and generic ProbeReceipt -> PCCR compiler.
+Implementation-head proof:
+- 55/55 files PASS;
+- 526/526 tests PASS;
+- four hosted gates SUCCESS;
+- B1 p95 0.377957 ms <= 10 ms;
+- B4 all safety counters zero.
 
-## Hard boundary
-
-No production vendor contract.
-No Cursor/Codex-specific probe.
-No real local capability claim.
-No host-dispatch migration.
-No future capability IDs.
-
-## Next gate
-
-Direct implementation -> tests/benchmarks/evidence -> PR -> exact-head HEDS.
+Next: fresh exact-head four gates -> HEDS -> merge/promotion if approved.

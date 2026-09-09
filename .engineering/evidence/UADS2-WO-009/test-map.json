@@ -1,0 +1,99 @@
+{
+  "schema": "uads2.wo009.test-map",
+  "schemaVersion": "1.0.0",
+  "implementationHead": "c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55",
+  "sourceRunId": 34416641918,
+  "status": "PASS_IMPLEMENTATION_HEAD",
+  "focused": [
+    {
+      "id": "M03-T011",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T012",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T013",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T014",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T015",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T016",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T017",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T051",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T052",
+      "status": "PASS"
+    },
+    {
+      "id": "synthetic E3 SUPPORTED TEST_ONLY",
+      "status": "PASS"
+    },
+    {
+      "id": "subject binding",
+      "status": "PASS"
+    },
+    {
+      "id": "adapter binding",
+      "status": "PASS"
+    },
+    {
+      "id": "capability binding",
+      "status": "PASS"
+    },
+    {
+      "id": "probe binding",
+      "status": "PASS"
+    },
+    {
+      "id": "descriptor binding",
+      "status": "PASS"
+    },
+    {
+      "id": "parser binding",
+      "status": "PASS"
+    },
+    {
+      "id": "lease expiry",
+      "status": "PASS"
+    },
+    {
+      "id": "descriptor/policy/config/runtime drift",
+      "status": "PASS"
+    },
+    {
+      "id": "TEST_ONLY blocked outside test",
+      "status": "PASS"
+    },
+    {
+      "id": "production active registry empty",
+      "status": "PASS"
+    },
+    {
+      "id": "privacy-safe compiler",
+      "status": "PASS"
+    }
+  ],
+  "regression": {
+    "testFilesPassed": 55,
+    "testsPassed": 526,
+    "failed": 0,
+    "standardEvals": "PASS"
+  }
+}
