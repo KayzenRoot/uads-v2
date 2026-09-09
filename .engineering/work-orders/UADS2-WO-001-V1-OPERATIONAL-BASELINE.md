@@ -1,10 +1,10 @@
 # Work Order — `UADS2-WO-001`
 
-Status: `ACTIVE — B-001 AMENDMENT PENDING OWNER/AUDITOR DECISION`
+Status: `ACTIVE — B-001 AMENDMENT OWNER-APPROVED / FINAL HEDS PENDING`
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-001-v1-baseline`
 Baseline Git SHA: `3eedf833c00b18755ce2b105f4df8c6c13269055`
-Head Git SHA: `pending correction commit`
+Head Git SHA: `pending final-amendment exact-head audit`
 Scope class: `cross-cutting`
 Risk: `MEDIUM`
 
@@ -17,26 +17,27 @@ Reproduce representative UADS V1 operational review workloads against the frozen
 Canonical V1 lineage: `KayzenRoot/uads@312e32946798eb3abbb49a79af08e13efb7719dc`.
 UADS V2 bootstrap is approved and merged. This baseline is the mandatory gate named by `docs/v2/11-CHECKPOINT.md` and `docs/v2/06-TEST-BENCHMARK-PLAN.md`.
 
-## B-001 technical blocker and proposed amendment
+## B-001 approved amendment
 
 HEDS conditionally recommended the B-001 amendment on reviewed head
-`50b811bcad1435ce65e682d6fb46fda8e3857897`. The owner decision remains
-pending; no owner-decision evidence is recorded in this repository.
+`50b811bcad1435ce65e682d6fb46fda8e3857897`. The owner explicitly approved the
+amendment on 2026-09-09. The verbatim decision is retained in
+`.engineering/evidence/UADS2-WO-001/blocker-resolution/owner-amendment-decision.json`.
 
 The original Duplicate Analysis Rate proof obligation remains historically
-preserved. The exhaustive frozen-V1 inspection records
+preserved. Exhaustive frozen-V1 inspection records
 `ABSENT_ON_FROZEN_V1_SUPPORTED_PATHS` and `UNAVAILABLE` at `0/0` because no
 authoritative structured analysis-event stream exists. This is not an inferred
-zero and does not close the proposed future V2 proof obligation.
+zero.
 
-If explicitly approved, the proposed V2 obligation is mandatory: V2 must emit
+The approved replacement obligation is mandatory for V2: V2 must emit
 privacy-safe, identity-bound structured analysis events sufficient to calculate
-deterministic numerator, denominator, rate, and raw-event hashes before
-checkpoint promotion. The proposal does not authorize runtime implementation.
+deterministic numerator, denominator, rate, and raw-event hashes on the same
+bounded workloads before the relevant V2 comparison gate can pass.
 
 ## Included scope
 
-- Reproduce a representative set of LOW, STANDARD and ELEVATED review workloads using the frozen V1 behavior without modifying the V1 repository.
+- Reproduce a representative set of LOW, STANDARD and ELEVATED review workloads using frozen V1 behavior without modifying V1.
 - Capture worker/specialist spawn count per Work Order.
 - Capture maximum simultaneous specialist count.
 - Capture visible worker-conversation count.
@@ -45,11 +46,12 @@ checkpoint promotion. The proposal does not authorize runtime implementation.
 - Capture retries and correction-loop depth.
 - Capture selected model and reasoning effort for each execution when exposed by the host/runtime.
 - Capture context radius/size and cache/reuse evidence when exposed.
-- Measure duplicated analysis rate using deterministic/traceable comparison criteria; under the proposed B-001 amendment, record the frozen-V1 source as absent and retain the proposed V2 event-stream obligation.
+- Preserve the unchanged duplicate-analysis rule; record frozen-V1 source absence and `UNAVAILABLE` at `0/0` under the owner-approved B-001 amendment.
+- Carry the mandatory V2 structured analysis-event and deterministic rate-proof obligation forward.
 - Capture first-pass approval versus correction-required outcome.
-- Record defects caught before merge and known escaped defects for the sampled workloads when evidence exists.
-- Produce an Evidence Bundle, baseline dataset/report and proposed Checkpoint Delta.
-- Preserve all raw evidence needed to reproduce the measurements.
+- Record defects caught before merge and known escaped defects for sampled workloads when evidence exists.
+- Produce an Evidence Bundle, baseline dataset/report and Checkpoint Delta.
+- Preserve all raw evidence needed to reproduce measurements.
 
 ## Explicitly out of scope
 
@@ -91,23 +93,22 @@ checkpoint promotion. The proposal does not authorize runtime implementation.
 
 ## Acceptance criteria
 
-- [ ] At least one reproducible workload exists for each LOW, STANDARD and ELEVATED risk class.
-- [ ] Every workload has immutable identity, input fingerprint, start/end timestamps and final verdict.
-- [ ] Worker spawn count is measured for every workload.
-- [ ] Maximum concurrent workers is measured or explicitly marked UNAVAILABLE with proof of limitation.
-- [ ] Visible worker-conversation count is measured for every workload.
-- [ ] Token/quota amplification is measured where host telemetry exists; missing telemetry is explicitly recorded.
-- [ ] Review duration and TTTM components are recorded.
-- [ ] Retry count and correction depth are recorded.
-- [ ] Selected model and reasoning effort are recorded when exposed.
-- [ ] Context radius/size is recorded when exposed.
-- [ ] Original frozen-V1 Duplicate Analysis Rate criterion is numerically satisfied; the proposed B-001 amendment records why it is impossible on frozen V1.
-- [ ] B-001 V1 limitation is recorded with the unchanged rule, authoritative source absence, `UNAVAILABLE` status and `0/0` limitation; owner/auditor decision remains pending.
-- [ ] V2 structured analysis-event emission and non-zero-denominator rate proof is complete before checkpoint promotion.
-- [ ] First Pass Approval Rate is calculated for the sample set.
-- [ ] Baseline report contains no unsupported optimization target.
-- [ ] Evidence Bundle contains base/head SHA, commands or collection procedure, raw evidence references, derived metrics, limitations and risks.
-- [ ] HEDS audit returns APPROVED on the exact head before checkpoint promotion.
+- [x] At least one reproducible workload exists for each LOW, STANDARD and ELEVATED risk class.
+- [x] Every workload has immutable identity, input fingerprint, start/end timestamps and final verdict or explicit blocked-path result.
+- [x] Worker spawn count is measured on the observable UADS path; actual host concurrency is explicitly bounded where unavailable.
+- [x] Maximum concurrent workers is measured or explicitly marked UNAVAILABLE with proof of limitation.
+- [x] Visible worker-conversation count is measured on the persisted UADS path; host-visible state is explicitly bounded where unavailable.
+- [x] Token/quota amplification is measured where host telemetry exists; missing telemetry is explicitly recorded.
+- [x] Review duration and TTTM components are recorded where observable.
+- [x] Retry count and correction depth are recorded.
+- [x] Selected model and reasoning effort are recorded when exposed; otherwise `UNAVAILABLE`.
+- [x] Context radius/size is recorded when exposed.
+- [x] B-001 amendment approved: frozen-V1 analysis-event source absence is authoritative, Duplicate Analysis Rate remains `UNAVAILABLE` at `0/0`, and no synthetic denominator is permitted.
+- [ ] V2 structured analysis-event emission and deterministic non-zero-denominator rate proof must be satisfied at the relevant V2 comparison gate; this is a carried-forward V2 obligation, not a blocker to closing the frozen-V1 baseline after final HEDS approval.
+- [x] First Pass Approval Rate is calculated for the sample set.
+- [x] Baseline report contains no unsupported optimization target.
+- [x] Evidence Bundle contains base/head SHA, collection procedure, raw evidence references, derived metrics, limitations and risks.
+- [ ] HEDS audit returns APPROVED on the exact amended head before checkpoint promotion.
 
 ## Tests / verification
 
@@ -117,7 +118,7 @@ checkpoint promotion. The proposal does not authorize runtime implementation.
 - Verify no tracked V1 file changed.
 - Verify no V2 runtime behavior change is included in the PR.
 - Run existing repository CI gates applicable to documentation/tooling changes.
-- Independent HEDS audit against this Work Order, checkpoint, benchmark plan and DoD.
+- Independent HEDS audit against this amended Work Order, checkpoint, benchmark plan and DoD.
 
 ## Deliverables
 
@@ -126,6 +127,7 @@ checkpoint promotion. The proposal does not authorize runtime implementation.
 - `.engineering/reports/UADS2-WO-001-MEASUREMENT-METHOD.md`
 - `.engineering/reports/EVIDENCE-UADS2-WO-001.md`
 - `.engineering/checkpoints/CHECKPOINT-DELTA-UADS2-WO-001.md`
+- `.engineering/evidence/UADS2-WO-001/blocker-resolution/owner-amendment-decision.json`
 - PR containing only the bounded baseline/evidence increment.
 
 ## Review format
@@ -137,8 +139,8 @@ HEDS delta-first review. Verdict must be exactly one of `APPROVED`, `CORRECTION 
 - Context becomes stale because checkpoint, Scope, DoD, Architecture or an accepted relevant ADR changes.
 - Frozen V1 lineage cannot be reproduced or validated.
 - Measurement procedure alters the behavior being measured in a material way.
-- Required raw evidence is unavailable such that a mandatory metric cannot be measured or transparently bounded; stop and submit the B-001 amendment for owner/auditor decision.
-- Scope expansion into V2 runtime implementation is requested before baseline approval.
+- Unsupported telemetry or a fabricated historical denominator is introduced.
+- Scope expands into V2 runtime implementation before baseline approval.
 - Any unresolved HIGH/CRITICAL defect invalidates the sampled baseline.
 
 ## Autonomy boundary
