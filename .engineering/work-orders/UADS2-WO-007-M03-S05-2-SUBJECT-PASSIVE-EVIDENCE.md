@@ -1,12 +1,13 @@
 # Work Order — UADS2-WO-007
 
-Status: ACTIVE — M03 S05.2 CONTRACT FREEZE
+Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Slice: S05.2 — Host Subject Identity & Passive Evidence Bridge
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-007-m03-subject-passive-evidence`
 Base SHA: `384e24ba947382d68a8215f494041cee7cf15670`
 Issue: #30
+PR: #31
 Risk: MEDIUM-HIGH
 ADRs: ADR-UADS2-011 / ADR-UADS2-012 — ACCEPTED
 
@@ -256,3 +257,32 @@ STOP with BLOCKED/CORRECTION REQUIRED if:
 - WO-006 subject/capability replay hardening is bypassed;
 - accepted ADR-UADS2-012 must be weakened;
 - HIGH/CRITICAL defect remains.
+
+
+## Implementation evidence snapshot
+
+Implementation head: `3683c3d125d32558409f2362ef722b414114fb14`
+CI run: `34411074895`
+CI job: `102665372314`
+
+Runtime scope:
+- `src/kernel/host-capability-subject.ts`
+- `src/adapters/host-capability-passive.ts`
+- `tests/host-capability-passive.test.ts`
+
+Hosted implementation-head result:
+- 53/53 test files PASS;
+- 489/489 tests PASS;
+- lint/typecheck/build PASS;
+- all evals PASS;
+- Dependency Review SUCCESS;
+- CodeQL SUCCESS;
+- Cross-Platform Linux/Windows SUCCESS.
+
+Benchmark sample:
+- U007-B1 compile p95 = 2.639622 ms <= 25 ms;
+- U007-B2 compile+persist+project p95 = 3.453904 ms <= 100 ms;
+- U007-B3 = 11,728 bytes/host <= 65,536;
+- U007-B4 all safety counters = 0.
+
+Final exact HEDS head will be auditor-bound after this evidence-only commit. Do not self-embed a mutable final SHA.

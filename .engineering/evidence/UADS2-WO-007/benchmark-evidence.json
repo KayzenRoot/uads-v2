@@ -1,0 +1,70 @@
+{
+  "schema": "uads2.wo007.benchmark-evidence",
+  "schemaVersion": "1.0.0",
+  "status": "IMPLEMENTATION_HEAD_VERIFIED_FINAL_HEDS_HEAD_PENDING",
+  "implementationHead": "3683c3d125d32558409f2362ef722b414114fb14",
+  "sourceRunId": 34411074895,
+  "sourceJobId": 102665372314,
+  "environment": "GitHub Actions Linux / Node 20 CI",
+  "method": {
+    "compileIterations": 500,
+    "persistProjectIterations": 40,
+    "note": "Synthetic passive host facts in isolated temporary homes. Development/CI measurements are not universal production SLO claims."
+  },
+  "testFilesPassed": 53,
+  "testsPassed": 489,
+  "samples": [
+    {
+      "B1": {
+        "p50Ms": 1.347385999999915,
+        "p95Ms": 2.639622000000031,
+        "targetP95Ms": 25,
+        "pass": true
+      },
+      "B2": {
+        "p50Ms": 2.22208999999998,
+        "p95Ms": 3.453903999999966,
+        "targetP95Ms": 100,
+        "pass": true
+      },
+      "B3": {
+        "bytesPerHost": 11728,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "inferredPositiveTrue": 0,
+        "absenceUnsupported": 0,
+        "replayAccepted": 0,
+        "driftMisses": 0,
+        "pass": true
+      }
+    },
+    {
+      "B1": {
+        "p50Ms": 1.3314550000000054,
+        "p95Ms": 2.5833350000000337,
+        "targetP95Ms": 25,
+        "pass": true
+      },
+      "B2": {
+        "p50Ms": 2.2271729999999934,
+        "p95Ms": 3.4402350000000297,
+        "targetP95Ms": 100,
+        "pass": true
+      },
+      "B3": {
+        "bytesPerHost": 11728,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "inferredPositiveTrue": 0,
+        "absenceUnsupported": 0,
+        "replayAccepted": 0,
+        "driftMisses": 0,
+        "pass": true
+      }
+    }
+  ]
+}

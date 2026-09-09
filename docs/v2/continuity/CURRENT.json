@@ -3,18 +3,18 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_007_M03_S05_2_CONTRACT_FROZEN_EXECUTOR_NEXT",
+  "programState": "UADS2_WO_007_PR31_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
   "completedWorkOrder": "UADS2-WO-006",
   "completedPullRequest": 29,
   "approvedHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
   "mergeCommit": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
-  "lastRecordedHead": "384e24ba947382d68a8215f494041cee7cf15670",
+  "lastRecordedHead": "3683c3d125d32558409f2362ef722b414114fb14",
   "activeWorkOrder": "UADS2-WO-007",
-  "activePullRequest": null,
+  "activePullRequest": 31,
   "activeBranch": "work/uads2-wo-007-m03-subject-passive-evidence",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.2 Host Subject Identity & Passive Evidence Bridge contract frozen; executor next",
-  "nextNecessaryAction": "Execute WO-007 on the same branch. No child process/shell/network or vendor-specific active probe. Produce tests/evidence/PR then exact-head HEDS.",
+  "activeSession": "S05.2 implemented; evidence frozen; fresh exact-head HEDS gates pending",
+  "nextNecessaryAction": "Wait for PR #31 fresh exact-head CI, CodeQL, Dependency Review and Cross-Platform SUCCESS, then HEDS. Do not merge/start active probes before APPROVED.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
@@ -23,11 +23,19 @@
       "S05.1"
     ],
     "activeSlice": "S05.2",
-    "issue": 30,
-    "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED",
+    "implementationHead": "3683c3d125d32558409f2362ef722b414114fb14",
+    "tests": {
+      "filesPassed": 53,
+      "testsPassed": 489
+    },
+    "benchmark": {
+      "B1P95Ms": 2.639622000000031,
+      "B2P95Ms": 3.453903999999966,
+      "B3Bytes": 11728,
+      "B4AllZero": true
+    },
     "passiveSupportedPath": false,
-    "activeProbes": "NOT_AUTHORIZED",
-    "nextAfterApproval": "recompute M03 S05 remaining slices from S04 and architecture; active-probe work remains separate gated experiment"
+    "activeProbes": "NOT_AUTHORIZED"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
