@@ -1,24 +1,33 @@
 # CHECKPOINT DELTA — UADS2-WO-006
 
-Status: ACTIVE / NOT PROMOTED
+Status: IMPLEMENTED / HOSTED VERIFICATION PENDING
 Module: M03 S05.1
 Issue: #28
+Implementation head: `d6a355106f600be43c53746a7a4cb6866473b458`
 
-## Intended promotion only after exact-head HEDS APPROVED
+## Implemented candidate promotion
 
-- PCCR runtime core implemented.
-- Existing ten legacy capability IDs gain proof-aware conservative projection.
-- Legacy runtime capability schema remains unchanged.
-- E1 never enables SUPPORTED.
-- NPC static adapter-contract negative path implemented.
-- proof integrity/freshness/drift evaluation implemented for Slice 1.
-- global sidecar proof storage implemented.
-- M30-compatible best-effort evidence lifecycle telemetry implemented without event-schema expansion.
-- applicable S04 tests and B1/B3/B4/B7 evidence pass.
+- PCCR core runtime implemented.
+- Closed proof schema limited to existing ten legacy capability IDs.
+- E2 global proof floor enforced.
+- Slice-1 NPC `adapter-contract-impossible` enforced.
+- proof integrity/freshness/drift evaluation implemented.
+- global sidecar proof persistence implemented.
+- conservative legacy RuntimeCapabilitySnapshot projector implemented.
+- legacy TRUE without valid PCCR becomes UNKNOWN.
+- M30 best-effort evidence lifecycle telemetry implemented without event-schema expansion.
+- applicable S04 tests T001-T010, T018-T030, T045-T060 implemented.
+- B1/B3/B4/B7 benchmark harness implemented.
+
+## Pending
+
+- exact-head hosted verification;
+- benchmark values copied from exact-head test logs;
+- PR HEDS.
 
 ## Not promoted
 
-- no vendor-specific active probes;
-- no new six capability IDs in legacy runtime;
-- no M03 S07 module freeze;
-- no M01/M02/M04/M06/M23 implementation.
+- no vendor-specific active probe;
+- no future six capability IDs;
+- no M03 S07 freeze;
+- no other module implementation.

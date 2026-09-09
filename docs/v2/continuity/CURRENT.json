@@ -3,42 +3,32 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_006_M03_S05_SLICE1_READY_FOR_EXECUTOR",
+  "programState": "UADS2_WO_006_IMPLEMENTED_HOSTED_VERIFICATION_PENDING",
   "completedWorkOrder": "UADS2-WO-005",
   "completedPullRequest": 27,
   "approvedHead": "f6915633f2722ac7258e0c04e3931a90178b8e05",
   "mergeCommit": "91da3704dff14e6cb1bd81ba0370be20cde7cddc",
-  "lastRecordedHead": "36b2019fc22b4d6c5d250e41edf12e737c4ddcfa",
+  "lastRecordedHead": "d6a355106f600be43c53746a7a4cb6866473b458",
   "activeWorkOrder": "UADS2-WO-006",
   "activePullRequest": null,
   "activeBranch": "work/uads2-wo-006-m03-pccr-core",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05 Slice 1 PCCR core implementation contract frozen; executor next",
-  "nextNecessaryAction": "Execute UADS2-WO-006 on branch work/uads2-wo-006-m03-pccr-core, create evidence and PR, then exact-head HEDS. Do not implement vendor-specific active probes.",
+  "activeSession": "S05.1 PCCR core implemented; hosted verification and PR next",
+  "nextNecessaryAction": "Open PR for UADS2-WO-006, run exact-head hosted gates, capture benchmark line, update evidence, rerun exact-head gates if head changes, then HEDS.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
   "m03": {
     "issue": 28,
-    "sessionsFrozen": [
-      "S00",
-      "S01",
-      "S01.5",
-      "S02",
-      "S03",
-      "S04"
-    ],
     "activeSlice": "S05.1",
-    "acceptedArchitecture": [
-      "PCCR",
-      "CEL",
-      "NPC",
-      "CLDS",
-      "PBF"
-    ],
+    "implementationHead": "d6a355106f600be43c53746a7a4cb6866473b458",
     "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED",
-    "slice1": "PCCR core + passive/deterministic-local proof + compatibility projector",
-    "activeProbes": "OUT_OF_SCOPE"
+    "activeProbes": "NOT_IMPLEMENTED",
+    "runtimeFiles": [
+      "schemas/host-capability-proof.schema.json",
+      "src/kernel/host-capability-proof.ts",
+      "tests/host-capability-proof.test.ts"
+    ]
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
