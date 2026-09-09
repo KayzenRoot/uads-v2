@@ -1,0 +1,83 @@
+{
+  "schema": "uads2.wo-001.authoritative-analysis-event-inspection",
+  "schemaVersion": "1.0.0",
+  "findingId": "B-001",
+  "workOrderId": "UADS2-WO-001",
+  "v1Source": {
+    "repository": "KayzenRoot/uads",
+    "ref": "312e32946798eb3abbb49a79af08e13efb7719dc",
+    "tree": "b2a6763045fc1dbb81b6ba2880bf1f77167d7133"
+  },
+  "supportedPathsInspected": [
+    {
+      "pathClass": "frozen-v1-tracked-source",
+      "scope": "src, core, adapters, agents, scripts, tests, schemas, evals, docs",
+      "result": "NO_EXACT_ANALYSIS_EVENT_MATCH",
+      "exactTermFileCount": 0
+    },
+    {
+      "pathClass": "v1-host-adapters",
+      "adapters": ["codex", "cursor", "generic-agent-skills"],
+      "operations": ["list", "detect", "explain"],
+      "result": "PREPARE_DETECT_HANDOFF_RECEIPT_ONLY",
+      "providerInvocation": false,
+      "analysisEventStream": false
+    },
+    {
+      "pathClass": "v1-uads-sidecar",
+      "stores": [
+        "execution-runs",
+        "reviews",
+        "review-evidence",
+        "evidence",
+        "host-dispatch",
+        "host-execution",
+        "model-routing",
+        "specialist-routing",
+        "context",
+        "cost"
+      ],
+      "result": "NO_ANALYSIS_EVENT_STORE"
+    },
+    {
+      "pathClass": "local-host-homes-and-sampled-runs",
+      "labels": ["codex", "cursor", "generic", "uads", "sampled"],
+      "exactAnalysisEventTermFileCount": 0,
+      "namedEventArtifactFileCount": 0,
+      "result": "NO_AUTHORITATIVE_ANALYSIS_EVENT_ARTIFACT"
+    },
+    {
+      "pathClass": "v1-review-and-assurance-records",
+      "result": "FINDINGS_AND_VERDICTS_ONLY",
+      "analysisEventFields": false,
+      "duplicateRuleFields": false
+    }
+  ],
+  "searchTerms": [
+    "analysis-event",
+    "analysis event",
+    "event-stream",
+    "review-analysis",
+    "analysisEvents",
+    "analysisRecords",
+    "findingCode",
+    "eventType",
+    "EventEmitter"
+  ],
+  "observedAdapterState": {
+    "codex": {"status": "SUPPORTED", "usageTelemetry": "unknown", "parallelAgents": "unknown"},
+    "cursor": {"status": "SUPPORTED", "usageTelemetry": "unknown", "parallelAgents": "unknown"},
+    "generic-agent-skills": {"status": "SUPPORTED", "usageTelemetry": "unknown", "parallelAgents": false}
+  },
+  "conclusion": "NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM_ON_FROZEN_V1_SUPPORTED_PATHS",
+  "duplicateAnalysisRate": {
+    "ruleId": "normalized-structured-analysis-signature-v1",
+    "numerator": 0,
+    "denominator": 0,
+    "rate": null,
+    "status": "UNAVAILABLE",
+    "reason": "The frozen V1 supported paths expose assignments, findings and verdicts, but no authoritative structured analysis events."
+  },
+  "requiredAction": "PROPOSE_WORK_ORDER_AMENDMENT_AND_STOP_FOR_OWNER_AUDITOR_DECISION",
+  "fabricatedTelemetry": false
+}

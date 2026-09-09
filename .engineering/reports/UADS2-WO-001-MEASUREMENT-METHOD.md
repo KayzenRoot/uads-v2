@@ -85,6 +85,24 @@ similarity, reviewer assignment, specialist role, or shared input text never
 counts as a duplicate. The current V1 sidecar exposes none of these analysis
 events, so numerator and denominator are zero and rate is `UNAVAILABLE`.
 
+## B-001 blocker-resolution inspection
+
+The frozen V1 tracked source, all supported adapters (`codex`, `cursor`, and
+`generic-agent-skills`), their list/detect/explain/prepare/handoff/receipt
+paths, the V1 sidecar stores, review/assurance records, local supported host
+homes, and sampled UADS runs were inspected. Exact searches covered
+`analysis-event`, `analysis event`, `event-stream`, `review-analysis`,
+`analysisEvents`, `analysisRecords`, `findingCode`, `eventType`, and
+`EventEmitter`. No authoritative event stream or named event artifact was
+found. The raw inspection is
+`.engineering/evidence/UADS2-WO-001/blocker-resolution/authoritative-analysis-event-inspection.json`.
+
+This does not resolve the original acceptance criterion. It records the
+objective frozen-V1 impossibility and triggers the proposed amendment
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, whose
+status is pending owner/auditor approval. The rule and `0/0` unavailable rate
+are intentionally unchanged.
+
 ## Telemetry policy
 
 Provider input/output tokens, quota, billing, selected concrete model, and

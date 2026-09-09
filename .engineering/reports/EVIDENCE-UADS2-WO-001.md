@@ -1,5 +1,8 @@
 # EVIDENCE-UADS2-WO-001
 
+This bundle includes the B-001 blocker-resolution inspection. It does not
+claim that the mandatory duplicate-analysis denominator was obtained.
+
 ## Scope and provenance
 
 - Work Order: `UADS2-WO-001`.
@@ -50,9 +53,27 @@ Raw evidence is under `.engineering/evidence/UADS2-WO-001/`:
 - `samples/ELEVATED-E7/`: plan, blocked checkpoint, and cost sidecars;
 - `samples/LOW-X6-CORRECTION/`: plan, dispatch, two-attempt execution,
   six evidence records, correction/final review, and cost sidecars.
+- `blocker-resolution/`: exhaustive supported-path inspection in JSON and
+  sanitized command transcript.
 
 The complete repository-relative path and SHA-256 inventory is embedded under
 `rawEvidence` for every sample in `UADS2-WO-001-BASELINE-DATA.json`.
+The blocker inspection files and their hashes are embedded under
+`blockerResolution.rawEvidence`.
+
+## B-001 resolution
+
+The inspection found no authoritative structured analysis-event stream on the
+frozen V1 supported paths. V1 exposes routing assignments, findings/verdicts,
+execution state, cost/model snapshots, and host receipts; none is an analysis
+event under the approved duplicate rule. The rate therefore remains
+`UNAVAILABLE` with `0/0`, and no assignment or verdict is reinterpreted as an
+analysis event.
+
+The required response is the proposed amendment at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, with
+status `PROPOSED_PENDING_OWNER_AUDITOR_APPROVAL`. This is not a self-approved
+contract change.
 
 ## Sample evidence
 
@@ -121,6 +142,8 @@ V2 checks after evidence generation:
 | Dataset recomputation twice | PASS; byte-identical SHA-256 `690021F...AA93E59C` |
 | Host-path scan over evidence/docs/scripts | PASS; clean |
 | Runtime scope/diff inspection | PASS; no V2 runtime source path changed |
+| B-001 supported-path inspection | PASS as an exhaustive inspection; required result is no authoritative event stream |
+| Pre-resolution exact-head CI (`d93a226...`) | PASS; CI, CodeQL, Dependency Review, Compatibility all completed successfully |
 
 ## Deterministic recomputation checks
 
@@ -149,15 +172,17 @@ are `UNAVAILABLE`. This is a measurement boundary, not an inferred zero.
 
 ## Scope proof
 
-The only intended V2 changes are the five required reports/checkpoint delta,
-the machine-readable dataset, raw evidence, and the standalone baseline
-recomputation utility. No files under `src/`, `core/`, `adapters/`, or other
-V2 runtime implementation paths are changed. The exact V1 source remains
-clean and its required ref/tree remain verifiable.
+The only intended V2 changes are the required reports/checkpoint delta, the
+machine-readable dataset, raw evidence, the standalone baseline
+recomputation utility, and the proposed Work Order Amendment. No files under
+`src/`, `core/`, `adapters/`, or other V2 runtime implementation paths are
+changed. The exact V1 source remains clean and its required ref/tree remain
+verifiable.
 
 ## Proposed checkpoint delta
 
-The proposed delta is evidence-only: record the completed V1 baseline, preserve
-the `NO_ELIGIBLE_MODEL` and telemetry limitations, and keep V2 executor work
-gated. It does not promote the checkpoint, start M01/S00, fix BUG-UADS2-001..004,
-or assert HEDS approval.
+The proposed delta is evidence-only: record the completed V1 baseline,
+preserve the `NO_ELIGIBLE_MODEL` and telemetry limitations, record B-001 as
+blocked, and submit the amendment for owner/auditor decision. It does not
+promote the checkpoint, start M01/S00, fix BUG-UADS2-001..004, or assert HEDS
+approval.

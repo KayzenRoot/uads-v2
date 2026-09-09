@@ -1,0 +1,28 @@
+UADS2-WO-001 B-001 authoritative analysis-event inspection
+V1 ref: KayzenRoot/uads@312e32946798eb3abbb49a79af08e13efb7719dc
+V1 tree: b2a6763045fc1dbb81b6ba2880bf1f77167d7133
+
+Supported V1 host adapters inspected: codex, cursor, generic-agent-skills.
+Adapter operations inspected: list, detect, explain; source operations also
+inspected: prepare, handoff, receipt.
+Result: adapters prepare/detect/handoff/receipt state only. They do not invoke
+a provider and no analysis-event stream is persisted.
+
+Exact repository search terms:
+analysis-event | analysis event | event-stream | review-analysis |
+analysisEvents | analysisRecords | findingCode | eventType | EventEmitter
+Result over frozen tracked V1 source: 0 exact analysis-event files.
+
+Sidecar stores inspected from the V1 workspace layout:
+execution-runs, reviews, review-evidence, evidence, host-dispatch,
+host-execution, model-routing, specialist-routing, context, cost.
+Result: findings/verdicts/routing/receipts exist; no analysis-event store.
+
+Local supported homes and sampled UADS runs were searched by exact event terms
+and artifact names. Result: 0 exact analysis-event files and 0 named event
+artifact files in each inspected path class.
+
+Conclusion: NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM_ON_FROZEN_V1_SUPPORTED_PATHS.
+The approved duplicate rule remains unchanged. Numerator=0, denominator=0,
+rate=UNAVAILABLE. A Work Order Amendment is required; no criterion is
+weakened or self-approved.

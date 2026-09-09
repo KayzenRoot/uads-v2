@@ -1,9 +1,9 @@
 # UADS2-WO-001 — V1 Operational Baseline Report
 
 This report records the bounded, reproducible V1 baseline requested by
-`UADS2-WO-001`. It measures the observable UADS sidecar and CLI state; it does
-not claim provider execution, host telemetry, HEDS approval, or V2 runtime
-implementation.
+`UADS2-WO-001` and the B-001 blocker-resolution inspection. It measures the
+observable UADS sidecar and CLI state; it does not claim provider execution,
+host telemetry, HEDS approval, or V2 runtime implementation.
 
 ## WORK ORDER
 
@@ -18,10 +18,20 @@ V2 base `3eedf833c00b18755ce2b105f4df8c6c13269055`. The frozen V1 source is
 
 `3eedf833c00b18755ce2b105f4df8c6c13269055`
 
+## B-001 RESOLUTION
+
+`BLOCKED — NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM_ON_FROZEN_V1_SUPPORTED_PATHS`.
+The exhaustive supported-path inspection found no authoritative structured
+analysis-event stream or artifact. The approved duplicate rule is preserved;
+the rate remains `UNAVAILABLE` with denominator zero. A proposed Work Order
+Amendment is recorded at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md` and is
+pending explicit owner/auditor approval.
+
 ## HEAD SHA
 
-`cf19c3a048bb92442966fa5c6d5ba2431a63421f` — pushed baseline artifact
-commit. The final handoff records the branch tip after this metadata update.
+`d93a2267cd2f4d2ac8958f4bf7dc01e5b5f622f1` — pre-resolution branch tip. The
+final handoff records the branch tip after the blocker-resolution commit.
 
 ## SAMPLES
 
@@ -57,8 +67,10 @@ dataset reports:
 - retries/correction depth: E5 `0/0`, E2 `0/0`, E7 `0/0`, X6 `1/1`;
 - first-pass approval: `1/2 = 0.5` among samples reaching a final review
   verdict; blocked samples are excluded;
-- duplicate-analysis rate: `UNAVAILABLE` because no V1 analysis-event stream
-  was exposed;
+- analysis event source: absent on frozen V1 supported paths; no provider or
+  host event source was inferred;
+- duplicate-analysis rate: `UNAVAILABLE` (`0/0`) because no V1 analysis-event
+  stream was exposed;
 - token/quota amplification: `UNAVAILABLE` because provider token counts and
   `agentCallsReported` were null;
 - observed dispatch-to-final-review intervals for completed samples: E5
@@ -74,9 +86,10 @@ Required deliverables:
 - `.engineering/reports/UADS2-WO-001-MEASUREMENT-METHOD.md`
 - `.engineering/reports/EVIDENCE-UADS2-WO-001.md`
 - `.engineering/checkpoints/CHECKPOINT-DELTA-UADS2-WO-001.md`
+- `.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`
 
 Raw evidence is under `.engineering/evidence/UADS2-WO-001/`, partitioned by
-sample and phase. The recomputation utility is
+sample, phase, and `blocker-resolution/`. The recomputation utility is
 `scripts/baseline/recompute-wo001.mjs`; it is an evidence tool and is not a
 UADS runtime path.
 
@@ -107,20 +120,26 @@ V2 repository checks:
   result after startup and was stopped in the bounded foreground run;
 - deterministic recomputation and host-path scan: PASS;
 - scope/diff inspection: PASS; no V2 runtime source was changed.
+- exhaustive B-001 supported-path inspection: PASS as an inspection, with the
+  required result `NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM`;
+- exact-head CI on the pre-resolution head `d93a226...`: all four required
+  workflows completed successfully; the final evidence commit requires its
+  own exact-head CI run.
 
 ## EVIDENCE
 
 The evidence document records commands, exact SHAs, source-tree proof, raw
-sidecar inventory, formulas, validation results, errors/corrections, and
-unavailable telemetry. The JSON dataset is the machine-readable source for
-all derived values in this report.
+sidecar inventory, exhaustive B-001 inspection, formulas, validation results,
+errors/corrections, and unavailable telemetry. The JSON dataset is the
+machine-readable source for all derived values in this report.
 
 ## LIMITATIONS
 
 V1’s dispatch path creates an execution packet but does not invoke a provider
-from this CLI baseline. Consequently, actual host worker count, visible worker
-conversations, provider model/reasoning effort, provider token usage, quota,
-and production escaped defects cannot be measured here. The LOW-E5
+from this CLI baseline. Consequently, the required B-001 structured analysis
+event source, actual host worker count, visible worker conversations, provider
+model/reasoning effort, provider token usage, quota, and production escaped
+defects cannot be measured here. The LOW-E5
 `uads review` packaging attempt also failed closed because its default
 inspector required validation files outside this bounded baseline; this does
 not alter the persisted execution/review sample result.
@@ -141,19 +160,20 @@ not fixes in this work order.
 ## CHECKPOINT DELTA
 
 `CHECKPOINT-DELTA-UADS2-WO-001.md` records the proposed evidence-only delta:
-the V1 baseline is locally measured and ready for independent HEDS audit;
-V2 implementation remains gated and unchanged; no checkpoint promotion or
+B-001 remains blocked, the amendment is pending owner/auditor decision, V2
+implementation remains gated and unchanged, and no checkpoint promotion or
 HEDS approval is asserted.
 
 ## PR
 
 Existing PR: `#17`. This work stays on the existing branch and uses a normal
-push. The final state will record whether the PR summary update succeeded or
-was blocked by unavailable GitHub CLI/authentication.
+push. The final state must wait for exact-head CI before requesting another
+HEDS audit; the current pre-resolution head had all four required workflows
+green.
 
 ## STOP CONDITION
 
-Stop after the evidence-only baseline is committed and pushed to PR #17, with
-the acceptance evidence and limitations available for independent HEDS audit.
-Do not start M01/S00, implement the sequential executor, modify V1, or claim
-HEDS approval from this baseline.
+Stop now after the blocker evidence and proposed amendment are committed and
+pushed to PR #17. Await explicit owner/auditor decision on the amendment. Do
+not request another HEDS audit until exact-head CI is green, and do not start
+M01/S00, implement the sequential executor, modify V1, or claim HEDS approval.

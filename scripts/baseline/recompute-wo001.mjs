@@ -252,7 +252,23 @@ function rawEvidenceFor(definition, reviews) {
   return files.map((relative) => ({ path: relative, sha256: sha256(fs.readFileSync(path.join(root, ".engineering", "evidence", "UADS2-WO-001", relative), "utf8")) }));
 }
 
+function blockerResolutionEvidence() {
+  const relativeFiles = [
+    "blocker-resolution/authoritative-analysis-event-inspection.json",
+    "blocker-resolution/authoritative-analysis-event-inspection.txt",
+  ];
+  const inspection = readJson(relativeFiles[0]);
+  return {
+    ...inspection,
+    rawEvidence: relativeFiles.map((relative) => ({
+      path: `blocker-resolution/${path.basename(relative)}`,
+      sha256: sha256(fs.readFileSync(path.join(evidenceRoot, relative), "utf8")),
+    })),
+  };
+}
+
 const samples = definitions.map(buildSample);
+const blockerResolution = blockerResolutionEvidence();
 const completedReviewed = samples.filter((sample) => sample.verdict === "APPROVED" && sample.timestamps.finalReviewAt);
 const firstPassDenominator = samples.filter((sample) => sample.verdict === "APPROVED" && sample.timestamps.finalReviewAt).length;
 const firstPassNumerator = samples.filter((sample) => sample.quality.firstPassApproved === true).length;
@@ -265,11 +281,18 @@ const output = {
   repository: "KayzenRoot/uads-v2",
   baseSha: "3eedf833c00b18755ce2b105f4df8c6c13269055",
   v1Source: { repository: "KayzenRoot/uads", ref: sourceRef, tree: sourceTree, fingerprint: sourceFingerprint },
+  analysisEventSource: {
+    status: "ABSENT_ON_FROZEN_V1_SUPPORTED_PATHS",
+    authoritative: false,
+    inspectionEvidence: "blocker-resolution/authoritative-analysis-event-inspection.json",
+    reason: "Exhaustive supported-path inspection found no structured analysis-event stream or named event artifact.",
+  },
   duplicateAnalysisRule: {
     ruleId: "normalized-structured-analysis-signature-v1",
     procedure: "Compare canonicalized structured review-analysis events by event type, gate, normalized subject path, normalized finding code and evidence digest. Exact repeated signatures count as duplicates; semantic similarity is never used.",
     currentV1Limitation: "No V1 provider/analysis event stream was exposed, so the rate is UNAVAILABLE rather than inferred from specialist assignments.",
   },
+  blockerResolution,
   samples,
   derivedMetrics: {
     workerSpawnCountPerSample: samples.map((sample) => ({ sampleId: sample.sampleId, value: sample.concurrency.workerSpawnCountObserved.value, status: sample.concurrency.workerSpawnCountObserved.status })),

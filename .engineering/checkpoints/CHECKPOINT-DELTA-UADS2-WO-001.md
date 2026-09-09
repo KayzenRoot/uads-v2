@@ -2,9 +2,9 @@
 
 ## Proposed status
 
-`READY_FOR_REVIEW` for independent HEDS audit of the evidence-only V1
-baseline. This is a proposed delta; it does not self-promote the canonical
-checkpoint and does not assert HEDS approval.
+`BLOCKED` on B-001 with a proposed Work Order Amendment pending explicit
+owner/auditor approval. This is a proposed delta; it does not self-promote the
+canonical checkpoint and does not assert HEDS approval.
 
 ## Evidence basis
 
@@ -21,10 +21,16 @@ checkpoint and does not assert HEDS approval.
 - full V1 `npm test` and cost evaluation remain explicitly inconclusive after
   bounded foreground runs and are not treated as acceptance passes;
 - no V1 tracked file and no V2 runtime implementation path was modified.
+- exhaustive inspection found no authoritative structured analysis-event stream
+  on any supported frozen-V1 path; raw inspection is retained in the evidence
+  tree;
+- proposed amendment is
+  `.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`.
 
 ## Gate interpretation
 
-This delta closes only the V1 measurement/bootstrap slice. The default V2
+This delta records the V1 measurement/bootstrap result and the B-001 blocker;
+it does not close the duplicate-analysis acceptance criterion. The default V2
 executor, M01/S00, BUG-UADS2-001..004, dashboard work, and any production
 routing remain out of scope and gated by the canonical checkpoint and HEDS.
 
@@ -38,6 +44,7 @@ baseline evidence, not successful execution evidence.
 
 ## Proposed next decision
 
-Send the committed, normally pushed evidence on existing PR #17 for
-independent HEDS audit. Do not merge, promote, or begin the next gated slice
-from this delta alone.
+Owner/auditor must explicitly approve or reject the proposed amendment, or
+provide a supported frozen-V1 path with authoritative analysis events. Do not
+request another HEDS audit, merge, promote, or begin the next gated slice from
+this delta alone.
