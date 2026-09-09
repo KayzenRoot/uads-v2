@@ -3,7 +3,7 @@
 This report records the bounded, reproducible V1 baseline requested by
 `UADS2-WO-001` and the B-001 blocker-resolution inspection. It measures the
 observable UADS sidecar and CLI state; it does not claim provider execution,
-host telemetry, HEDS approval, or V2 runtime implementation.
+host telemetry, final HEDS approval, or V2 runtime implementation.
 
 ## WORK ORDER
 
@@ -20,18 +20,20 @@ V2 base `3eedf833c00b18755ce2b105f4df8c6c13269055`. The frozen V1 source is
 
 ## B-001 RESOLUTION
 
-`BLOCKED — NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM_ON_FROZEN_V1_SUPPORTED_PATHS`.
+`AMENDMENT_APPLIED — FINAL_HEDS_PENDING`.
 The exhaustive supported-path inspection found no authoritative structured
 analysis-event stream or artifact. The approved duplicate rule is preserved;
-the rate remains `UNAVAILABLE` with denominator zero. A proposed Work Order
-Amendment is recorded at
-`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md` and is
-pending explicit owner/auditor approval.
+the rate remains `UNAVAILABLE` with denominator zero. The owner explicitly
+approved the HEDS-recommended amendment, which is recorded at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`; final
+HEDS approval remains pending.
 
 ## HEAD SHA
 
-`d93a2267cd2f4d2ac8958f4bf7dc01e5b5f622f1` — pre-resolution branch tip. The
-final handoff records the branch tip after the blocker-resolution commit.
+`50b811bcad1435ce65e682d6fb46fda8e3857897` — reviewed head for HEDS's
+conditional amendment decision and the owner's assent. The owner-assent
+canonical metadata commit is the amended head that still requires exact-head
+CI and final HEDS audit.
 
 ## SAMPLES
 
@@ -122,9 +124,9 @@ V2 repository checks:
 - scope/diff inspection: PASS; no V2 runtime source was changed.
 - exhaustive B-001 supported-path inspection: PASS as an inspection, with the
   required result `NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM`;
-- exact-head CI on the pre-resolution head `d93a226...`: all four required
-  workflows completed successfully; the final evidence commit requires its
-  own exact-head CI run.
+- exact-head CI on reviewed head `50b811bc...`: all four required workflows
+  completed successfully; the amended metadata commit requires its own
+  exact-head CI run.
 
 ## EVIDENCE
 
@@ -159,21 +161,21 @@ not fixes in this work order.
 
 ## CHECKPOINT DELTA
 
-`CHECKPOINT-DELTA-UADS2-WO-001.md` records the proposed evidence-only delta:
-B-001 remains blocked, the amendment is pending owner/auditor decision, V2
+`CHECKPOINT-DELTA-UADS2-WO-001.md` records the applied evidence-only delta:
+the owner-approved B-001 amendment is applied, final HEDS remains pending, V2
 implementation remains gated and unchanged, and no checkpoint promotion or
-HEDS approval is asserted.
+final HEDS approval is asserted.
 
 ## PR
 
 Existing PR: `#17`. This work stays on the existing branch and uses a normal
 push. The final state must wait for exact-head CI before requesting another
-HEDS audit; the current pre-resolution head had all four required workflows
-green.
+HEDS audit; the reviewed head `50b811bc...` had all four required workflows
+green, while the amended head requires its own exact-head CI.
 
 ## STOP CONDITION
 
-Stop now after the blocker evidence and proposed amendment are committed and
-pushed to PR #17. Await explicit owner/auditor decision on the amendment. Do
-not request another HEDS audit until exact-head CI is green, and do not start
-M01/S00, implement the sequential executor, modify V1, or claim HEDS approval.
+Stop after the amended metadata is committed and pushed to PR #17, exact-head
+CI is green, and final HEDS audit is requested. Do not start M01/S00, implement
+the sequential executor, modify V1, or claim HEDS approval before that final
+audit.

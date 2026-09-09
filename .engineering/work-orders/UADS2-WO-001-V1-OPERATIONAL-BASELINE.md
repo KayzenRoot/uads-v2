@@ -1,10 +1,10 @@
 # Work Order — `UADS2-WO-001`
 
-Status: `ACTIVE`
+Status: `ACTIVE — B-001 AMENDMENT OWNER-APPROVED; FINAL HEDS PENDING`
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-001-v1-baseline`
 Baseline Git SHA: `3eedf833c00b18755ce2b105f4df8c6c13269055`
-Head Git SHA: `pending`
+Head Git SHA: `pending final amendment commit`
 Scope class: `cross-cutting`
 Risk: `MEDIUM`
 
@@ -17,6 +17,25 @@ Reproduce representative UADS V1 operational review workloads against the frozen
 Canonical V1 lineage: `KayzenRoot/uads@312e32946798eb3abbb49a79af08e13efb7719dc`.
 UADS V2 bootstrap is approved and merged. This baseline is the mandatory gate named by `docs/v2/11-CHECKPOINT.md` and `docs/v2/06-TEST-BENCHMARK-PLAN.md`.
 
+## Approved Amendment B-001
+
+HEDS issued `CONDITIONAL APPROVAL OF AMENDMENT` for B-001 on reviewed head
+`50b811bcad1435ce65e682d6fb46fda8e3857897`. The owner explicitly assented:
+`Aprovo a emenda B-001 do UADS2-WO-001.` The decision is recorded in
+`.engineering/evidence/UADS2-WO-001/blocker-resolution/owner-amendment-decision.json`.
+
+The original Duplicate Analysis Rate proof obligation remains historically
+preserved. For frozen V1, the amended acceptance records
+`ABSENT_ON_FROZEN_V1_SUPPORTED_PATHS` and `UNAVAILABLE` at `0/0` because no
+authoritative structured analysis-event stream exists. This is not an inferred
+zero and does not close the future V2 proof obligation.
+
+The amended V2 obligation is mandatory: V2 must emit privacy-safe,
+identity-bound structured analysis events sufficient to calculate deterministic
+numerator, denominator, rate, and raw-event hashes before checkpoint promotion.
+Final HEDS audit and exact-head CI remain pending; this amendment does not
+authorize runtime implementation.
+
 ## Included scope
 
 - Reproduce a representative set of LOW, STANDARD and ELEVATED review workloads using the frozen V1 behavior without modifying the V1 repository.
@@ -28,7 +47,7 @@ UADS V2 bootstrap is approved and merged. This baseline is the mandatory gate na
 - Capture retries and correction-loop depth.
 - Capture selected model and reasoning effort for each execution when exposed by the host/runtime.
 - Capture context radius/size and cache/reuse evidence when exposed.
-- Measure duplicated analysis rate using deterministic/traceable comparison criteria.
+- Measure duplicated analysis rate using deterministic/traceable comparison criteria; under approved B-001 amendment, record the frozen-V1 source as absent and retain the V2 event-stream obligation.
 - Capture first-pass approval versus correction-required outcome.
 - Record defects caught before merge and known escaped defects for the sampled workloads when evidence exists.
 - Produce an Evidence Bundle, baseline dataset/report and proposed Checkpoint Delta.
@@ -84,7 +103,9 @@ UADS V2 bootstrap is approved and merged. This baseline is the mandatory gate na
 - [ ] Retry count and correction depth are recorded.
 - [ ] Selected model and reasoning effort are recorded when exposed.
 - [ ] Context radius/size is recorded when exposed.
-- [ ] Duplicate Analysis Rate is calculated using a documented reproducible rule.
+- [ ] Original frozen-V1 Duplicate Analysis Rate criterion is numerically satisfied; the approved B-001 amendment records why it is impossible on frozen V1.
+- [x] Amended B-001 V1 criterion is recorded with the unchanged rule, authoritative source absence, `UNAVAILABLE` status, `0/0` limitation, and owner/HEDS decision evidence.
+- [ ] V2 structured analysis-event emission and non-zero-denominator rate proof is complete before checkpoint promotion.
 - [ ] First Pass Approval Rate is calculated for the sample set.
 - [ ] Baseline report contains no unsupported optimization target.
 - [ ] Evidence Bundle contains base/head SHA, commands or collection procedure, raw evidence references, derived metrics, limitations and risks.
@@ -118,7 +139,7 @@ HEDS delta-first review. Verdict must be exactly one of `APPROVED`, `CORRECTION 
 - Context becomes stale because checkpoint, Scope, DoD, Architecture or an accepted relevant ADR changes.
 - Frozen V1 lineage cannot be reproduced or validated.
 - Measurement procedure alters the behavior being measured in a material way.
-- Required raw evidence is unavailable such that a mandatory metric cannot be measured or transparently bounded.
+- Required raw evidence is unavailable without an approved transparent B-001 amendment; after the amendment, the frozen-V1 loss remains bounded and the V2 replacement proof is mandatory.
 - Scope expansion into V2 runtime implementation is requested before baseline approval.
 - Any unresolved HIGH/CRITICAL defect invalidates the sampled baseline.
 

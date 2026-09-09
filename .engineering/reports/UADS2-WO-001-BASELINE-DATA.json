@@ -129,6 +129,32 @@
     },
     "requiredAction": "PROPOSE_WORK_ORDER_AMENDMENT_AND_STOP_FOR_OWNER_AUDITOR_DECISION",
     "fabricatedTelemetry": false,
+    "ownerDecision": {
+      "schema": "uads2.wo-001.owner-amendment-decision",
+      "schemaVersion": "1.0.0",
+      "workOrderId": "UADS2-WO-001",
+      "findingId": "B-001",
+      "reviewedHead": "50b811bcad1435ce65e682d6fb46fda8e3857897",
+      "ownerDecision": "APPROVE_AMENDMENT",
+      "ownerDecisionText": "Aprovo a emenda B-001 do UADS2-WO-001.",
+      "ownerDecisionReceived": true,
+      "ownerDecisionDate": "2026-09-09",
+      "hedsDecision": "CONDITIONAL_APPROVAL_OF_AMENDMENT",
+      "effectiveContract": {
+        "v1AnalysisEventSource": "ABSENT_ON_FROZEN_V1_SUPPORTED_PATHS",
+        "v1DuplicateAnalysisRate": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null,
+          "status": "UNAVAILABLE"
+        },
+        "v2AnalysisEventObligation": "MANDATORY_PRIVACY_SAFE_IDENTITY_BOUND_STRUCTURED_EVENTS",
+        "v2RateProof": "MANDATORY_BEFORE_CHECKPOINT_PROMOTION"
+      },
+      "status": "OWNER_APPROVED_HEDS_CONDITIONAL_FINAL_HEDS_PENDING",
+      "checkpointPromotion": false,
+      "runtimeImplementationAuthorized": false
+    },
     "rawEvidence": [
       {
         "path": "blocker-resolution/authoritative-analysis-event-inspection.json",
@@ -137,6 +163,10 @@
       {
         "path": "blocker-resolution/authoritative-analysis-event-inspection.txt",
         "sha256": "3c17e6e49d532dca7242b0fa2959040d6484f618fcd9691ca60af312214793b7"
+      },
+      {
+        "path": "blocker-resolution/owner-amendment-decision.json",
+        "sha256": "6b41e92f686c63e5961ddac3a825b49847a1cd388c66eab282a16a2564c4ad9c"
       }
     ]
   },

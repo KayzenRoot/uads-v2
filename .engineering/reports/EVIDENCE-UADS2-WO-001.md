@@ -1,7 +1,9 @@
 # EVIDENCE-UADS2-WO-001
 
-This bundle includes the B-001 blocker-resolution inspection. It does not
-claim that the mandatory duplicate-analysis denominator was obtained.
+This bundle includes the B-001 blocker-resolution inspection and the recorded
+owner assent to the HEDS-conditional amendment. It does not claim that the
+mandatory duplicate-analysis denominator was obtained or that final HEDS
+approval has been granted.
 
 ## Scope and provenance
 
@@ -53,13 +55,13 @@ Raw evidence is under `.engineering/evidence/UADS2-WO-001/`:
 - `samples/ELEVATED-E7/`: plan, blocked checkpoint, and cost sidecars;
 - `samples/LOW-X6-CORRECTION/`: plan, dispatch, two-attempt execution,
   six evidence records, correction/final review, and cost sidecars.
-- `blocker-resolution/`: exhaustive supported-path inspection in JSON and
-  sanitized command transcript.
+- `blocker-resolution/`: exhaustive supported-path inspection, sanitized
+  command transcript, and owner amendment decision.
 
 The complete repository-relative path and SHA-256 inventory is embedded under
 `rawEvidence` for every sample in `UADS2-WO-001-BASELINE-DATA.json`.
-The blocker inspection files and their hashes are embedded under
-`blockerResolution.rawEvidence`.
+The blocker inspection and owner-decision files and their hashes are embedded
+under `blockerResolution.rawEvidence`.
 
 ## B-001 resolution
 
@@ -70,10 +72,12 @@ event under the approved duplicate rule. The rate therefore remains
 `UNAVAILABLE` with `0/0`, and no assignment or verdict is reinterpreted as an
 analysis event.
 
-The required response is the proposed amendment at
-`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, with
-status `PROPOSED_PENDING_OWNER_AUDITOR_APPROVAL`. This is not a self-approved
-contract change.
+The required response is the amendment at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, now
+owner-approved after HEDS conditional approval. The canonical Work Order,
+checkpoint, continuity metadata, and decision evidence record that state.
+Final HEDS audit remains pending; this is not checkpoint promotion or runtime
+authorization.
 
 ## Sample evidence
 
@@ -139,11 +143,13 @@ V2 checks after evidence generation:
 | Focused V2 Vitest selection | 4 files, 77/77 PASS |
 | `npm run validate:engineering` | PASS; 23 required files, 6 schemas, 6 records |
 | `npm run validate` | INCONCLUSIVE; full test phase produced no result after startup and was stopped in bounded foreground run |
-| Dataset recomputation twice | PASS; byte-identical SHA-256 `690021F...AA93E59C` |
+| Dataset recomputation twice | PASS; byte-identical SHA-256 `CD5C848F5A1BE48A421EE90FE48D63BF08526F433E109887A20A1D561ACB8270` |
 | Host-path scan over evidence/docs/scripts | PASS; clean |
 | Runtime scope/diff inspection | PASS; no V2 runtime source path changed |
 | B-001 supported-path inspection | PASS as an exhaustive inspection; required result is no authoritative event stream |
 | Pre-resolution exact-head CI (`d93a226...`) | PASS; CI, CodeQL, Dependency Review, Compatibility all completed successfully |
+| Owner amendment decision | PASS; exact assent recorded for reviewed head `50b811bc...` |
+| Amended canonical metadata head CI | PENDING until the owner-assent amendment commit is pushed |
 
 ## Deterministic recomputation checks
 
@@ -179,10 +185,11 @@ recomputation utility, and the proposed Work Order Amendment. No files under
 changed. The exact V1 source remains clean and its required ref/tree remain
 verifiable.
 
-## Proposed checkpoint delta
+## Applied checkpoint delta
 
-The proposed delta is evidence-only: record the completed V1 baseline,
-preserve the `NO_ELIGIBLE_MODEL` and telemetry limitations, record B-001 as
-blocked, and submit the amendment for owner/auditor decision. It does not
-promote the checkpoint, start M01/S00, fix BUG-UADS2-001..004, or assert HEDS
-approval.
+The applied delta is evidence-only: record the completed V1 baseline, preserve
+the `NO_ELIGIBLE_MODEL` and telemetry limitations, retain the frozen-V1
+duplicate rate as `UNAVAILABLE` (`0/0`), and record the owner-approved B-001
+amendment. It does not promote the checkpoint, start M01/S00, fix
+BUG-UADS2-001..004, or assert final HEDS approval. The mandatory V2 structured
+analysis-event stream and rate proof remain required before promotion.
