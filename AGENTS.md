@@ -2,6 +2,17 @@
 
 This repository builds **UADS V2** using the existing globally installed UADS runtime while V2 itself is under development.
 
+## Fresh-chat / fresh-session continuity
+
+If the user says **“vamos continuar do chat antigo”**, **“continue do chat anterior”**, or equivalent:
+1. reconcile current GitHub `main`, open PRs and active branch;
+2. read `docs/v2/continuity/CURRENT.json`;
+3. follow `docs/v2/operations/CHAT-CONTINUITY-PROTOCOL.md`;
+4. use `docs/v2/operations/RESPONSE-AND-PROGRESS-STANDARD.md` for the same graphical status/progress format;
+5. do not ask the user to re-explain project history that Git can resolve.
+
+GitHub is canonical project memory. Chat memory is not project truth.
+
 ## Mandatory source order
 
 1. `docs/v2/11-CHECKPOINT.md`
@@ -14,7 +25,13 @@ This repository builds **UADS V2** using the existing globally installed UADS ru
 8. inherited V1 canonical docs when not superseded;
 9. active Work Order / Context Lock / Evidence Bundle / PR.
 
-Never treat chat memory as canonical project truth.
+## Module/session planning
+
+All module inventory lives under `docs/v2/modules/`. Planning follows `docs/v2/operations/MODULE-SESSION-LIFECYCLE.md`.
+
+An idea is `CANDIDATE` until approved. After every approved session, update the module source plus all affected Requirements/Architecture/ADRs/Backlog/Checkpoint and `docs/v2/continuity/CURRENT.json` before continuing.
+
+UADS V2 is **standalone-first**. `SOLO` mode is mandatory; Hive integration is optional through the M18 bridge and may not become a core runtime dependency.
 
 ## UADS runtime bootstrap
 
@@ -44,6 +61,7 @@ During implementation:
 - change only Work Order scope;
 - prefer deterministic Git/AST/static/test evidence over LLM inference;
 - preserve modular boundaries;
+- design tests with architecture, not after it;
 - do not perform broad cleanup;
 - do not mutate UADS V1;
 - never invent host/model capabilities.
