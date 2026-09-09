@@ -1,10 +1,11 @@
 # Work Order — `UADS2-WO-001`
 
-Status: `ACTIVE — B-001 AMENDMENT OWNER-APPROVED / FINAL HEDS PENDING`
+Status: `COMPLETED — HEDS APPROVED / MERGED`
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-001-v1-baseline`
 Baseline Git SHA: `3eedf833c00b18755ce2b105f4df8c6c13269055`
-Head Git SHA: `pending final-amendment exact-head audit`
+Approved Head Git SHA: `8f585caf15c2a3ccd217439bd989a1ba9309d8be`
+Merge Git SHA: `6ec3a4c025532ceafb67df79f07daf1b7c7042ad`
 Scope class: `cross-cutting`
 Risk: `MEDIUM`
 
@@ -108,7 +109,7 @@ bounded workloads before the relevant V2 comparison gate can pass.
 - [x] First Pass Approval Rate is calculated for the sample set.
 - [x] Baseline report contains no unsupported optimization target.
 - [x] Evidence Bundle contains base/head SHA, collection procedure, raw evidence references, derived metrics, limitations and risks.
-- [ ] HEDS audit returns APPROVED on the exact amended head before checkpoint promotion.
+- [x] HEDS audit returned APPROVED on exact head `8f585caf15c2a3ccd217439bd989a1ba9309d8be` before trusted merge.
 
 ## Tests / verification
 
@@ -154,3 +155,16 @@ HEDS delta-first review. Verdict must be exactly one of `APPROVED`, `CORRECTION 
 - PR title: `baseline(UADS2-WO-001): reproduce V1 operational fan-out baseline`
 - Evidence Bundle: `.engineering/reports/EVIDENCE-UADS2-WO-001.md`
 - Checkpoint Delta: `.engineering/checkpoints/CHECKPOINT-DELTA-UADS2-WO-001.md`
+
+
+## Completion record
+
+- Final HEDS verdict: `APPROVED`
+- Approved exact head: `8f585caf15c2a3ccd217439bd989a1ba9309d8be`
+- Mandatory exact-head gates: CI SUCCESS; CodeQL SUCCESS; Dependency Review SUCCESS; UADS Cross-Platform Compatibility SUCCESS.
+- Unresolved review threads: 0.
+- PR #17 merged to `main` as `6ec3a4c025532ceafb67df79f07daf1b7c7042ad`.
+- Issue #16 closed as completed.
+- B-001 amendment: owner-approved and effective.
+- Carried-forward obligation: V2 structured analysis events and deterministic Duplicate Analysis Rate proof at the relevant V2 comparison gate.
+- Next step: bounded planning Work Order before runtime implementation.
