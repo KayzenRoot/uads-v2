@@ -1,30 +1,52 @@
-# UADS Cursor rules
+# UADS V2 Cursor rules
 
-UADS (Universal Autonomous Development Studio) is a NexLabs project.
+UADS V2 is a NexLabs project and a controlled continuation of UADS V1.
 
-## Architecture Freeze v0.2
+## Source of truth
 
-- Global-first: operational state under `~/.uads/`, never in the managed project by default.
-- Zero project footprint: no caches, work orders, indexes, or review ZIPs in-repo unless explicitly opted in.
-- Evidence-first: completion claims need commands, outputs, or files.
-- Review ZIPs must exclude secrets and heavy directories.
-- Do not implement the full orchestrator, specialist agents, marketplace, or deep UGAS integration in Prompt 001 leftovers.
+Before material work, read in this order:
+1. `docs/v2/11-CHECKPOINT.md`
+2. `docs/v2/10-DECISIONS-LEDGER.md`
+3. `docs/v2/03-SCOPE.md`
+4. `docs/v2/09-DEFINITION-OF-DONE.md`
+5. `docs/v2/04-ARCHITECTURE.md`
+6. `docs/v2/02-REQUIREMENTS.md`
+7. `docs/v2/13-REVIEW-PROTOCOL.md`
+8. active Work Order / Context Lock / Evidence Bundle.
 
-## Governed engineering delivery
+Inherited V1 docs remain authoritative where the V2 overlay does not explicitly supersede them. Git/repository evidence prevails over conversational memory.
 
-- Before editing, inspect the repository and read the applicable canonical docs, checkpoint/status, scope, architecture, Definition of Done, and decisions.
-- Use one Work Order identity for the branch, Context Lock, Evidence Bundle, and Checkpoint Delta. The first adoption is `ENG-PROTOCOL-ADOPTION-001`.
-- Freeze the exact baseline Git SHA and run the existing validation gates before and after the change. Distinguish pre-existing failures from regressions.
-- Implement only the bounded Work Order. Do not perform broad cleanup, delete suspected-unused production material, upgrade dependencies, alter migrations, or change product behavior without a new explicit Work Order.
-- Mark Context Lock `STALE` when a critical source changes; re-inspect and relock before continuing.
-- Stop on scope expansion, unknown destructive effects, unresolved HIGH/CRITICAL risk, unresolvable source conflict, or unproven cleanup safety.
-- Commit and push focused work, open/update the PR, and provide an Evidence Bundle. Do not promote checkpoint or canonical truth alone.
-- Preserve global-first and zero-project-footprint behavior. `.engineering/` contains static governance records only; UADS runtime state remains in the global sidecar.
+## Use the globally installed UADS
 
-## CLI
+- Prefer the globally installed UADS V1 runtime/skill for engineering execution while UADS V2 is under construction.
+- Start with `uads doctor` and `uads status` when host execution is available.
+- Use `skills/uads-orchestrator/SKILL.md` and the global Cursor adapter contract.
+- Runtime state stays under `~/.uads/`; do not create project-local caches, runtime work orders, indexes, model state or review archives.
+- Repository `.engineering/` files are static governance/evidence only.
+- Do not assume a V2 feature is available before its Work Order is APPROVED and merged.
 
-Foundation commands: `uads --help`, `uads doctor`, `uads status`, `uads review`. Cache/cost visibility: `uads cache status`, `uads cost status`.
+## Temporary V2 construction guard
 
-## Docs
+Until BUG-UADS2-001 is implemented and validated, do not manually fan out parallel review/specialist agents for this repository. Keep coordinator work plus at most one specialist active at a time when the host permits that control.
 
-Normative docs live in `docs/`. Extra ideas go to `docs/14-BACKLOG.md`.
+Until BUG-UADS2-004 is implemented and validated, do not claim automatic model/effort routing exists merely because it is planned.
+
+## Governed delivery
+
+- Use one stable Work Order identity across branch, PR, Context Lock, evidence, corrections and checkpoint delta.
+- Freeze exact base/head identities.
+- Implement only the active Work Order.
+- No broad cleanup, dependency upgrade, migration, destructive action or product-scope expansion without explicit scope.
+- If a critical canonical source changes, mark Context Lock STALE, re-inspect and relock.
+- Run selected verification based on risk/impact and capture evidence.
+- Review using HEDS-compatible delta-first progressive disclosure.
+- Verdict is exactly APPROVED, CORRECTION REQUIRED or BLOCKED.
+- CORRECTION REQUIRED stays in the same Work Order/PR when safe.
+- Never advance with a known HIGH/CRITICAL defect.
+- Checkpoint promotion occurs only after objective approval.
+
+## Current bootstrap
+
+Active bootstrap Work Order: `UADS2-BOOTSTRAP-001`.
+
+Runtime V2 module implementation is not authorized until this bootstrap is APPROVED and merged.
