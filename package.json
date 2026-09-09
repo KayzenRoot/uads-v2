@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.8",
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.4.1",
     "typescript": "^5.7.2",
     "vitest": "^4.1.11"
   }
