@@ -1,0 +1,36 @@
+{
+  "schema": "uads.m30-benchmark",
+  "schemaVersion": "1.0.0",
+  "environment": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "isolatedUadsHome": true
+  },
+  "method": "synchronous local sidecar writes and bounded reads measured with performance.now()",
+  "sampleCount": 24,
+  "writeThroughputEventsPerSecond": 28.12,
+  "writeLatency": {
+    "p50Ms": 33.387,
+    "p95Ms": 47.059,
+    "samples": 24
+  },
+  "boundedReadLatency": {
+    "p50Ms": 30.412,
+    "p95Ms": 38.117,
+    "samples": 24
+  },
+  "dashboardSnapshotLatency": {
+    "p50Ms": 1501.025,
+    "p95Ms": 2018.625,
+    "samples": 24
+  },
+  "retentionCap": 1000,
+  "retainedEventCount": 24,
+  "limitations": [
+    "single Windows developer host",
+    "no production SLO inferred",
+    "synchronous filesystem path",
+    "benchmark uses bounded 24-event sample"
+  ]
+}

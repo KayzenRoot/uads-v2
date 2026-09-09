@@ -45,6 +45,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
     "capture-evidence": "node scripts/validate/capture-evidence.mjs",
+    "benchmark:m30": "node scripts/benchmark/m30-event-dashboard.mjs",
+    "evidence:m30-b001": "node scripts/benchmark/m30-b001-proof.mjs",
     "test": "vitest run --maxWorkers=1",
     "test:security-proof": "vitest run --maxWorkers=1 tests/release-security-proof.test.ts",
     "eval:orchestrator": "node dist/eval/run.js",

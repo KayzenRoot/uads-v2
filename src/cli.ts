@@ -12,6 +12,11 @@ import { runPlanCommand } from "./commands/plan.js";
 import { runResumeCommand } from "./commands/resume.js";
 import { runReview } from "./commands/review.js";
 import { runStatus } from "./commands/status.js";
+import {
+  runDashboardEventsCommand,
+  runDashboardStartCommand,
+  runDashboardStatusCommand,
+} from "./commands/dashboard.js";
 import { runCacheExplainCommand, runCacheStatusCommand } from "./commands/cache.js";
 import { runCostExplainCommand, runCostStatusCommand } from "./commands/cost.js";
 import { runVerifyCommand } from "./commands/verify.js";
@@ -490,6 +495,48 @@ cost
   .option("--json", "JSON output")
   .action((options: { json?: boolean }) => {
     process.stdout.write(runCostStatusCommand({ json: options.json }));
+  });
+
+const dashboard = program.command("dashboard").description("Loopback-only M30 operator dashboard and objective event projection");
+dashboard
+  .command("start")
+  .description("Start the local M30 dashboard on loopback")
+  .option("--host <host>", "bind host (only 127.0.0.1 is accepted)", "127.0.0.1")
+  .option("--port <port>", "listen port", "8765")
+  .action(async (options: { host?: string; port?: string }) => {
+    await runDashboardStartCommand({ host: options.host, port: Number(options.port) });
+  });
+dashboard
+  .command("status")
+  .description("Show the objective M30 dashboard snapshot")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runDashboardStatusCommand({ json: options.json }));
+  });
+dashboard
+  .command("events")
+  .description("Show bounded persisted M30 events")
+  .option("--limit <n>", "maximum events to show", "50")
+  .option("--json", "JSON output")
+  .action((options: { limit?: string; json?: boolean }) => {
+    process.stdout.write(runDashboardEventsCommand({ limit: Number(options.limit), json: options.json }));
+  });
+
+const observability = program.command("observability").description("Bounded M30 observability inspection aliases");
+observability
+  .command("status")
+  .description("Show the objective M30 observability status")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runDashboardStatusCommand({ json: options.json }));
+  });
+observability
+  .command("events")
+  .description("Show bounded persisted operational events")
+  .option("--limit <n>", "maximum events to show", "50")
+  .option("--json", "JSON output")
+  .action((options: { limit?: string; json?: boolean }) => {
+    process.stdout.write(runDashboardEventsCommand({ limit: Number(options.limit), json: options.json }));
   });
 cost
   .command("explain")

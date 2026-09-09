@@ -1,0 +1,52 @@
+{
+  "schema": "uads.m30-b001-proof",
+  "schemaVersion": "1.0.0",
+  "workOrder": "UADS2-WO-003",
+  "source": "two persisted review.analysis events reloaded from an isolated temporary UADS_HOME",
+  "transportOnly": true,
+  "notM08SemanticAnalysis": true,
+  "canonicalSignature": "eventType | gate | normalizedSubjectPath | normalizedFindingCode | evidenceDigest",
+  "signatureVersion": "normalized-structured-analysis-signature-v1",
+  "persistedEvents": [
+    {
+      "eventId": "3f6dd012-a0ce-490b-936c-6f7aaba9b17e",
+      "eventHash": "0f792c0c035bb5fe93854a6dbaab0849058aee57d34831745ab284a6b1991cfa",
+      "eventType": "review.analysis",
+      "gate": "focused-review",
+      "normalizedSubjectPath": "src/kernel/operational-events.ts",
+      "normalizedFindingCode": "B-001",
+      "evidenceDigest": "a0949209a4fb1d21086eb4c6c4a5a90dc01c32188276e80fc1363bc7c65fbe79"
+    },
+    {
+      "eventId": "92143adf-edf1-4358-9c45-2439afb43b21",
+      "eventHash": "af79974e71e8d6a843978504ba8bcab08a5e506c118f22c48cba75c4bf0f34e3",
+      "eventType": "review.analysis",
+      "gate": "focused-review",
+      "normalizedSubjectPath": "src/kernel/operational-events.ts",
+      "normalizedFindingCode": "B-001",
+      "evidenceDigest": "a0949209a4fb1d21086eb4c6c4a5a90dc01c32188276e80fc1363bc7c65fbe79"
+    }
+  ],
+  "metrics": {
+    "signature": "normalized-structured-analysis-signature-v1",
+    "numerator": 1,
+    "denominator": 2,
+    "rate": 0.5,
+    "rawEventHashes": [
+      "0f792c0c035bb5fe93854a6dbaab0849058aee57d34831745ab284a6b1991cfa",
+      "af79974e71e8d6a843978504ba8bcab08a5e506c118f22c48cba75c4bf0f34e3"
+    ]
+  },
+  "assertions": {
+    "atLeastTwoPersistedEvents": true,
+    "denominatorNonZero": true,
+    "duplicateNumeratorDeterministic": true,
+    "rateDeterministic": true,
+    "hashesReloadedFromDisk": true
+  },
+  "limitations": [
+    "proves M30 transport/schema preservation only",
+    "does not claim M08 semantic review integration",
+    "temporary local sidecar evidence"
+  ]
+}

@@ -41,6 +41,9 @@ export type UadsPaths = {
   hostExecution: string;
   currentHostExecutionReceipt: string;
   hostExecutionReceiptHistory: string;
+  observability: string;
+  observabilityEvents: string;
+  observabilityHealth: string;
   profile: string;
   currentState: string;
   repositoryMap: string;
@@ -99,6 +102,9 @@ export function getUadsPaths(projectId: string, uadsHome?: string): UadsPaths {
     hostExecution: path.join(workspace, "host-execution"),
     currentHostExecutionReceipt: path.join(workspace, "host-execution", "current.json"),
     hostExecutionReceiptHistory: path.join(workspace, "host-execution", "history"),
+    observability: path.join(workspace, "observability"),
+    observabilityEvents: path.join(workspace, "observability", "events"),
+    observabilityHealth: path.join(workspace, "observability", "health.json"),
     profile: path.join(workspace, "profile.json"),
     currentState: path.join(workspace, "state", "current.json"),
     repositoryMap: path.join(workspace, "index", "repository-map.json"),
@@ -151,6 +157,8 @@ export function ensureWorkspace(projectId: string, uadsHome?: string): UadsPaths
     paths.hostDispatchHistory,
     paths.hostExecution,
     paths.hostExecutionReceiptHistory,
+    paths.observability,
+    paths.observabilityEvents,
     path.join(paths.context, "impact-reports"),
     path.join(paths.context, "packs"),
     path.join(paths.context, "diagnostic-packs"),
