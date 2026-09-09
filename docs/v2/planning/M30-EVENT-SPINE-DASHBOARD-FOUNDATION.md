@@ -1,6 +1,6 @@
 # M30 S00/S02 — Event Spine & Dashboard Operator Foundation
 
-Status: PREFLIGHT DESIGN
+Status: IMPLEMENTED — LOCAL VALIDATION / FINAL HEDS PENDING
 Work Order: UADS2-WO-003
 
 ## Technology decision for this slice
@@ -84,3 +84,21 @@ without lossy transformation, while M24 retains Work Order attribution.
 ## Extension boundary
 
 Future modules emit through a small M30 event API. They must not write dashboard-specific state directly. The dashboard is a projection of objective events/state, not a second source of truth.
+
+## Implemented bounded surface
+
+- `src/kernel/operational-events.ts` owns schema validation, sanitization,
+  canonical SHA-256 integrity, immutable one-file creation, bounded reads,
+  retention and health projection.
+- `src/commands/dashboard.ts` owns the loopback-only Node HTTP operator surface
+  (`/api/snapshot`, `/api/events`, `/api/stream`) and the dependency-free dark
+  operator shell.
+- `dashboard status/events` and `observability status/events` expose only
+  bounded objective projections; no arbitrary event injection command exists.
+- The local evidence proof persists two `review.analysis` events and
+  recomputes the unchanged B-001 signature with denominator `2`, numerator `1`
+  and rate `0.5`. This remains transport/schema proof only; M08 semantics are
+  not implemented here.
+
+The implementation snapshot is `e156bd2`; hosted exact-head gates and final
+HEDS approval remain pending before merge.

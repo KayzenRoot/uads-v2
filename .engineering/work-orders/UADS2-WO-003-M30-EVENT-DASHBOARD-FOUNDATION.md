@@ -1,6 +1,6 @@
 # Work Order — `UADS2-WO-003`
 
-Status: `ACTIVE — PREFLIGHT / RUNTIME IMPLEMENTATION NOT YET EXECUTED`
+Status: `ACTIVE — IMPLEMENTATION COMPLETE / FINAL HEDS AUDIT PENDING`
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-003-m30-event-dashboard-foundation`
 Base Git SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
@@ -149,28 +149,28 @@ Acceptance:
 
 ## Acceptance criteria
 
-- [ ] Event JSON Schema is closed, versioned and validated through existing AJV infrastructure.
-- [ ] Event hash recomputes identically after persistence/reload.
-- [ ] Event IDs are unique and stable after persistence.
-- [ ] Sanitization prevents secret-bearing operational strings from durable event storage.
-- [ ] Unsafe/oversized payloads fail closed.
-- [ ] Event store is contained inside the correct global sidecar workspace.
-- [ ] Valid event records survive process restart/reload.
-- [ ] Corrupt/unsupported records cause degraded state, not process crash.
-- [ ] Read/query limits and retention bounds are enforced.
-- [ ] Dashboard binds only to loopback.
-- [ ] Dashboard exposes objective snapshot data and real-time updates.
-- [ ] Errors/diagnostics are first-class and visible.
-- [ ] Missing telemetry appears as `UNAVAILABLE`/degraded.
-- [ ] B-001 review-analysis schema fields are mandatory for that event type.
-- [ ] B-001 duplicate signature can be recomputed deterministically from persisted test events with non-zero denominator.
-- [ ] No full M08/M01 runtime behavior is implemented.
-- [ ] No runtime dependency is added.
-- [ ] SOLO works with Hive absent.
-- [ ] Existing lint/typecheck/build/test/evals remain green.
-- [ ] New focused M30 tests pass.
-- [ ] M30 overhead benchmark is reported with method and limitations.
-- [ ] Evidence Bundle binds exact base/head SHA, tests, benchmark, changed paths and limitations.
+- [x] Event JSON Schema is closed, versioned and validated through existing AJV infrastructure.
+- [x] Event hash recomputes identically after persistence/reload.
+- [x] Event IDs are unique and stable after persistence.
+- [x] Sanitization prevents secret-bearing operational strings from durable event storage.
+- [x] Unsafe/oversized payloads fail closed.
+- [x] Event store is contained inside the correct global sidecar workspace.
+- [x] Valid event records survive process restart/reload.
+- [x] Corrupt/unsupported records cause degraded state, not process crash.
+- [x] Read/query limits and retention bounds are enforced.
+- [x] Dashboard binds only to loopback.
+- [x] Dashboard exposes objective snapshot data and real-time updates.
+- [x] Errors/diagnostics are first-class and visible.
+- [x] Missing telemetry appears as `UNAVAILABLE`/degraded.
+- [x] B-001 review-analysis schema fields are mandatory for that event type.
+- [x] B-001 duplicate signature can be recomputed deterministically from persisted test events with non-zero denominator.
+- [x] No full M08/M01 runtime behavior is implemented.
+- [x] No runtime dependency is added.
+- [x] SOLO works with Hive absent.
+- [ ] Existing full lint/typecheck/build/test/evals remain green (full Vitest runner did not return; see evidence).
+- [x] New focused M30 tests pass.
+- [x] M30 overhead benchmark is reported with method and limitations.
+- [ ] Evidence Bundle binds the final exact PR head and hosted gates (implementation snapshot is recorded; final HEDS remains pending).
 - [ ] Exact-head CI, CodeQL, Dependency Review and Cross-Platform Compatibility pass.
 - [ ] HEDS returns `APPROVED` before merge.
 
@@ -204,3 +204,10 @@ STOP if:
 ## Review
 
 HEDS delta-first exact-head review. Runtime implementation starts only after preflight source/contract review is acceptable.
+
+## Implementation checkpoint
+
+The implementation snapshot is `e156bd2` and adds the bounded event spine,
+immutable sidecar records, health projection, loopback dashboard/SSE surface,
+CLI inspection commands, focused tests, B-001 proof and isolated benchmark.
+The branch remains unmerged and is ready for a new exact-head HEDS final audit.

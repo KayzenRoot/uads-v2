@@ -1,6 +1,6 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-002 APPROVED / MERGED; UADS2-WO-003 PREFLIGHT ACTIVE
+Status: UADS2-WO-002 APPROVED / MERGED; UADS2-WO-003 IMPLEMENTATION COMPLETE / FINAL HEDS PENDING
 Date: 2026-09-09
 Completed Work Order: UADS2-WO-002
 Active Work Order: UADS2-WO-003
@@ -9,6 +9,7 @@ Active PR: #22
 Active Branch: `work/uads2-wo-003-m30-event-dashboard-foundation`
 UADS2-WO-003 base SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
 Preflight artifact commit: `d9cd18502c2b2a9284ef44eb7cf34800c931ea2b`
+Implementation snapshot: `e156bd2`
 
 ## Canonical truth
 
@@ -20,7 +21,9 @@ B-001 preserves frozen-V1 Duplicate Analysis Rate as `UNAVAILABLE (0/0)` and req
 
 `UADS2-WO-003 — M30 Event Spine & Dashboard Operator Foundation`.
 
-This is the first bounded V2 runtime implementation slice. Preflight artifacts are under exact-head HEDS review before executor implementation.
+This is the first bounded V2 runtime implementation slice. Local implementation,
+focused proof and evidence are complete; the branch is awaiting exact-head
+hosted gates and final HEDS audit before any merge.
 
 ## Technology boundary
 
@@ -48,7 +51,8 @@ User-facing execution copy must be delivered as PDF after preflight HEDS approva
 
 ## Guardrail
 
-No implementation begins until the preflight source lock/Work Order is HEDS-reviewed. No merge until final exact-head HEDS `APPROVED`.
+Preflight HEDS approved implementation on the locked branch. No merge until
+final exact-head HEDS `APPROVED` and all required hosted gates are successful.
 
 ## Repository follow-up
 
