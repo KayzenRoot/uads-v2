@@ -25,7 +25,7 @@ jobs:
           ref: bootstrap/uads2-foundation-001
           fetch-depth: 0
 
-      - name: Import exact UADS V1 snapshot
+      - name: Import exact UADS V1 snapshot excluding workflow files
         shell: bash
         env:
           SOURCE_REPOSITORY: KayzenRoot/uads
@@ -40,12 +40,15 @@ jobs:
           actual="$(git -C "$tmp/uads-v1" rev-parse HEAD)"
           test "$actual" = "$SOURCE_SHA"
 
-          # Replace working tree with the exact V1 snapshot while preserving
-          # the target repository's .git metadata and authenticated remote.
-          rsync -a --delete --exclude='.git/' "$tmp/uads-v1/" ./
+          # Preserve target .git and omit workflow files because GitHub's
+          # ephemeral Actions token is intentionally unable to modify workflows.
+          rsync -a --delete             --exclude='.git/'             --exclude='.github/workflows/'             "$tmp/uads-v1/" ./
 
-          # Prove every source-tracked file was copied byte-for-byte.
+          # Prove every imported source-tracked non-workflow file byte-for-byte.
           while IFS= read -r -d '' file; do
+            case "$file" in
+              .github/workflows/*) continue ;;
+            esac
             cmp -- "$tmp/uads-v1/$file" "$file"
           done < <(git -C "$tmp/uads-v1" ls-files -z)
 
@@ -53,7 +56,7 @@ jobs:
           cat > .engineering/migrations/UADS2-V1-SNAPSHOT.md <<'EOF'
           # UADS V2 V1 Snapshot Provenance
 
-          Status: IMPORTED_BASELINE
+          Status: IMPORTED_BASELINE_PART_1
           Source repository: KayzenRoot/uads
           Source ref: main
           Source SHA: 312e32946798eb3abbb49a79af08e13efb7719dc
@@ -64,16 +67,15 @@ jobs:
           This snapshot establishes UADS V2 as a controlled continuation of UADS V1.
           UADS V1 remains untouched and independently usable.
 
-          Imported source files are preserved byte-for-byte. Historical source
-          formatting is baseline evidence and is not rewritten during migration.
+          Imported non-workflow source files are preserved byte-for-byte.
+          Files under .github/workflows/ are intentionally excluded from this
+          Actions-token commit and must be restored through the authorized GitHub
+          integration before the bootstrap Work Order can be approved.
           EOF
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-
-          # Only the provenance document is new UADS V2-authored content in this import.
           git diff --cached --check -- .engineering/migrations/UADS2-V1-SNAPSHOT.md
-
           git commit -m "chore(UADS2-BOOTSTRAP-001): import UADS V1 frozen baseline"
           git push origin "HEAD:$TARGET_BRANCH"
