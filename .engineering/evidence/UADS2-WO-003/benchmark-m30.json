@@ -1,0 +1,46 @@
+{
+  "schema": "uads.m30-benchmark",
+  "schemaVersion": "1.0.0",
+  "environment": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "isolatedUadsHome": true
+  },
+  "method": "synchronous local sidecar writes and bounded reads measured with performance.now()",
+  "sampleCount": 24,
+  "writeThroughputEventsPerSecond": 26.04,
+  "writeLatency": {
+    "p50Ms": 35.402,
+    "p95Ms": 58.961,
+    "samples": 24
+  },
+  "boundedReadLatency": {
+    "p50Ms": 37.066,
+    "p95Ms": 50.903,
+    "samples": 24
+  },
+  "dashboardSnapshotLatency": {
+    "p50Ms": 1659.012,
+    "p95Ms": 2174.484,
+    "samples": 24
+  },
+  "retentionCap": 1000,
+  "retainedEventCount": 24,
+  "retentionProbe": {
+    "configuredCap": 8,
+    "inputEventCount": 10,
+    "retainedEventCount": 8,
+    "removedEventCount": 2,
+    "withinCap": true,
+    "oldestRemoved": true,
+    "newestRetained": true,
+    "health": "HEALTHY"
+  },
+  "limitations": [
+    "single Windows developer host",
+    "no production SLO inferred",
+    "synchronous filesystem path",
+    "latency sample uses 24 events; retention probe uses an explicit bounded cap of 8 to exercise over-cap cleanup deterministically"
+  ]
+}
