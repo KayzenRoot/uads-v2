@@ -3,18 +3,18 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_007_APPROVED_MERGED_M03_S05_3_NEXT",
+  "programState": "UADS2_WO_008_M03_S05_3_CONTRACT_FROZEN_DIRECT_IMPLEMENTATION_NEXT",
   "completedWorkOrder": "UADS2-WO-007",
   "completedPullRequest": 31,
   "approvedHead": "f20a5a2b5354c69886a6c0ca39fe301f3e87103f",
   "mergeCommit": "a6b5e247065067d860627258fba7d123e465a78b",
-  "lastRecordedHead": "a6b5e247065067d860627258fba7d123e465a78b",
-  "activeWorkOrder": null,
+  "lastRecordedHead": "f320243d28d95037f9e270e2d500606e791855c3",
+  "activeWorkOrder": "UADS2-WO-008",
   "activePullRequest": null,
-  "activeBranch": null,
+  "activeBranch": "work/uads2-wo-008-m03-probe-budget-fence",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.2 approved/merged; S05.3 Probe Budget Fence core next",
-  "nextNecessaryAction": "Create UADS2-WO-008 for generic schema-closed READ_ONLY_LOCAL probe registry/executor. Use synthetic/cross-platform fixtures only; no Cursor/Codex-specific active probe or local-machine capability claim.",
+  "activeSession": "S05.3 Probe Budget Fence contract frozen; direct implementation next",
+  "nextNecessaryAction": "Implement generic fixed-registry Node-current READ_ONLY_LOCAL probe executor directly. No vendor-specific probe/local-machine claim.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
@@ -23,32 +23,14 @@
       "S05.1",
       "S05.2"
     ],
-    "nextSlice": "S05.3 Probe Budget Fence Core & Generic Safe Probe Executor",
-    "activeProbes": "GENERIC_SUBSTRATE_NEXT_VENDOR_SPECIFIC_NOT_AUTHORIZED",
+    "activeSlice": "S05.3",
+    "issue": 32,
     "localMachineRequired": false,
-    "wo007": {
-      "approvedHead": "f20a5a2b5354c69886a6c0ca39fe301f3e87103f",
-      "mergeCommit": "a6b5e247065067d860627258fba7d123e465a78b",
-      "testFilesPassed": 53,
-      "testsPassed": 489,
-      "B1P95Ms": 2.178032999999971,
-      "B2P95Ms": 2.715252999999848,
-      "B3Bytes": 11728,
-      "B4AllZero": true
-    }
+    "vendorSpecificProbes": "NOT_AUTHORIZED"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
     "SOLO",
     "HIVE_CONNECTED"
-  ],
-  "sourceOrder": [
-    "docs/v2/11-CHECKPOINT.md",
-    "docs/v2/10-DECISIONS-LEDGER.md",
-    "docs/v2/03-SCOPE.md",
-    "docs/v2/09-DEFINITION-OF-DONE.md",
-    "docs/v2/04-ARCHITECTURE.md",
-    "docs/v2/02-REQUIREMENTS.md",
-    "docs/v2/13-REVIEW-PROTOCOL.md"
   ]
 }
