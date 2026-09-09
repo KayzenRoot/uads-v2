@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/runtime-capability-snapshot.schema.json",
+  "title": "UADS Runtime Capability Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "runtimeId", "adapterId", "adapterVersion", "runtimeVersion", "capabilities", "provenance", "identityDigest"],
+  "properties": {
+    "schema": { "const": "uads.runtime-capability-snapshot" },
+    "schemaVersion": { "const": "0.8.0" },
+    "runtimeId": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,128}$" },
+    "adapterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "adapterVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "runtimeVersion": { "type": ["string", "null"], "maxLength": 128 },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modelSelection", "toolCalling", "structuredOutput", "promptCache", "explicitCache", "persistentContext", "subagents", "parallelAgents", "usageTelemetry", "visionInput"],
+      "properties": {
+        "modelSelection": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "toolCalling": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "structuredOutput": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "promptCache": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "explicitCache": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "persistentContext": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "subagents": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "parallelAgents": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "usageTelemetry": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+        "visionInput": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "confidence"],
+      "properties": {
+        "source": { "enum": ["adapter", "explicit-config", "test-fixture"] },
+        "confidence": { "enum": ["proven", "declared", "unknown"] }
+      }
+    },
+    "identityDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

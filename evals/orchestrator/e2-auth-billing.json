@@ -1,0 +1,15 @@
+{
+  "id": "E2",
+  "name": "authentication endpoint",
+  "request": "Add an authenticated API endpoint that exposes a user's billing profile.",
+  "expect": {
+    "domainsInclude": ["api", "security", "backend"],
+    "domainsExclude": ["web3", "smart-contracts", "tokenomics"],
+    "riskIn": ["MEDIUM", "HIGH", "CRITICAL"],
+    "specialistsInclude": ["test-engineer", "security-reviewer", "independent-reviewer"],
+    "specialistsExclude": ["ugas", "game-assets"],
+    "gatesInclude": ["static", "security-review"],
+    "gatesExclude": ["web3-fuzz"],
+    "assuranceInclude": ["independent-reviewer", "security-reviewer"]
+  }
+}

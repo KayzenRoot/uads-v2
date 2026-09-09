@@ -1,0 +1,12 @@
+{
+  "id": "E3",
+  "name": "destructive database migration",
+  "request": "Remove a production column and migrate its data.",
+  "expect": {
+    "domainsInclude": ["database", "reliability"],
+    "riskIn": ["HIGH", "CRITICAL"],
+    "gatesInclude": ["database-migration", "rollback-validation"],
+    "requiresApprovalContains": ["destructive production database"],
+    "assuranceInclude": ["independent-reviewer"]
+  }
+}

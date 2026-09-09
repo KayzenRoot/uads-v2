@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/model-profile-registry.schema.json",
+  "title": "UADS Model Profile Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "profiles", "registryDigest"],
+  "properties": {
+    "schema": { "const": "uads.model-profile-registry" },
+    "schemaVersion": { "const": "0.8.0" },
+    "profiles": { "type": "array", "maxItems": 256, "uniqueItems": true, "items": { "$ref": "#/$defs/profile" } },
+    "registryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "schemaVersion", "profileId", "providerId", "modelId", "status", "capabilityClass", "reasoningClass", "contextWindowTokens", "maxOutputTokens", "relativeCostClass", "relativeLatencyClass", "supports", "constraints", "notes", "source", "adapterId", "adapterVersion", "profileDigest"],
+      "properties": {
+        "schema": { "const": "uads.model-profile" },
+        "schemaVersion": { "const": "0.8.0" },
+        "profileId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._/-]{0,127}$" },
+        "providerId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "modelId": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "status": { "enum": ["enabled", "disabled", "experimental"] },
+        "capabilityClass": { "enum": ["economy", "balanced", "strong", "critical"] },
+        "reasoningClass": { "enum": ["basic", "standard", "advanced", "deep"] },
+        "contextWindowTokens": { "type": ["integer", "null"], "minimum": 1 },
+        "maxOutputTokens": { "type": ["integer", "null"], "minimum": 1 },
+        "relativeCostClass": { "enum": ["very-low", "low", "medium", "high", "very-high", "unknown"] },
+        "relativeLatencyClass": { "enum": ["very-low", "low", "medium", "high", "very-high", "unknown"] },
+        "supports": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["toolCalling", "structuredOutput", "vision", "promptCache", "explicitCache", "persistentContext", "usageTelemetry"],
+          "properties": {
+            "toolCalling": { "type": "boolean" },
+            "structuredOutput": { "type": "boolean" },
+            "vision": { "type": "boolean" },
+            "promptCache": { "type": "boolean" },
+            "explicitCache": { "type": "boolean" },
+            "persistentContext": { "type": "boolean" },
+            "usageTelemetry": { "type": "boolean" }
+          }
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "maxConcurrency": { "type": ["integer", "null"], "minimum": 1 } }
+        },
+        "notes": { "type": ["string", "null"], "maxLength": 2000 },
+        "source": { "enum": ["builtin-fixture", "user-config", "adapter", "imported"] },
+        "adapterId": { "type": ["string", "null"], "maxLength": 128 },
+        "adapterVersion": { "type": ["string", "null"], "maxLength": 64 },
+        "profileDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

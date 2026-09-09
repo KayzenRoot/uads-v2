@@ -1,0 +1,11 @@
+{
+  "id": "E7",
+  "name": "financial numerical logic",
+  "request": "Change fee accrual and rounding for a financial ledger.",
+  "expect": {
+    "domainsInclude": ["finance-economics", "backend"],
+    "riskIn": ["HIGH"],
+    "gatesInclude": ["financial-numerical-validation"],
+    "assuranceInclude": ["independent-reviewer", "security-reviewer"]
+  }
+}

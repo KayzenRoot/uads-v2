@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/checkpoint.schema.json",
+  "title": "UADS Checkpoint",
+  "description": "Durable orchestrator checkpoint stored in the global sidecar workspace.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "checkpointId",
+    "projectId",
+    "createdAt",
+    "updatedAt",
+    "phase",
+    "status",
+    "nextAction",
+    "workOrderId",
+    "routingDecisionId",
+    "completedSteps",
+    "blockers",
+    "evidenceRefs",
+    "repositoryMapDigest",
+    "contextPlanRef",
+    "resumeCursor"
+  ],
+  "properties": {
+    "schema": { "const": "uads.checkpoint" },
+    "schemaVersion": { "const": "0.2.0" },
+    "checkpointId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": ["string", "null"] },
+    "routingDecisionId": { "type": ["string", "null"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "phase": {
+      "type": "string",
+      "enum": ["intake", "classify", "plan", "implement", "verify", "review", "stopped"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "blocked", "completed", "failed"]
+    },
+    "completedSteps": { "type": "array", "items": { "type": "string" } },
+    "nextAction": { "type": "string" },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "repositoryMapDigest": { "type": ["string", "null"] },
+    "contextPlanRef": { "type": ["string", "null"] },
+    "resumeCursor": { "type": "string" }
+  }
+}

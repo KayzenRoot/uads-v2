@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/work-order.schema.json",
+  "title": "UADS Work Order",
+  "description": "Normalized unit of planned work. Stored in the sidecar workspace. schemaVersion 0.2.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "workOrderId",
+    "projectId",
+    "title",
+    "objective",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "scopeClass",
+    "riskLevel",
+    "nextAction",
+    "intakeRef",
+    "routingDecisionId",
+    "includedScope",
+    "outOfScope",
+    "recommendations",
+    "riskReasons",
+    "domains",
+    "affectedAreas",
+    "specialists",
+    "assuranceReviewers",
+    "qualityGates",
+    "contextRadius",
+    "tokenBudget",
+    "dependencies",
+    "acceptanceCriteria",
+    "requiredEvidence",
+    "stopConditions",
+    "autonomyBoundary"
+  ],
+  "properties": {
+    "schema": { "const": "uads.work-order" },
+    "schemaVersion": { "const": "0.2.0" },
+    "workOrderId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "objective": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "planned", "active", "blocked", "completed", "cancelled"]
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "intakeRef": { "type": "string" },
+    "routingDecisionId": { "type": "string" },
+    "scopeClass": {
+      "type": "string",
+      "enum": ["trivial", "local", "cross-cutting", "architectural"]
+    },
+    "includedScope": { "type": "array", "items": { "type": "string" } },
+    "outOfScope": { "type": "array", "items": { "type": "string" } },
+    "recommendations": { "type": "array", "items": { "type": "string" } },
+    "riskLevel": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    },
+    "riskReasons": { "type": "array", "items": { "type": "string" } },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "requestedArtifacts": { "type": "array", "items": { "type": "string" } },
+    "destructiveSignals": { "type": "array", "items": { "type": "string" } },
+    "domains": { "type": "array", "items": { "type": "string" } },
+    "affectedAreas": { "type": "array", "items": { "type": "string" } },
+    "specialists": { "type": "array", "items": { "type": "string" } },
+    "assuranceReviewers": { "type": "array", "items": { "type": "string" } },
+    "specialistSelectionPlanId": { "type": "string", "pattern": "^sp_[a-f0-9]{16}$" },
+    "specialistSelectionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "specialistRegistryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "specialistPolicyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "specialistChangeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistImpactDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistGateContractDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistRiskSignals": { "type": "array", "items": { "type": "string" } },
+    "specialistDependencySignals": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["crossCutting", "source"],
+      "properties": {
+        "crossCutting": { "type": "boolean" },
+        "source": { "enum": ["scope-classifier", "impact-report", "host-structured"] }
+      }
+    },
+    "specialistAssignments": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["specialistId", "role", "objective", "coveredDomains", "relevantAffectedAreas", "relevantFiles", "relevantGates", "evidenceObligations", "riskLevel", "forbiddenScope", "dependencyGroup", "parallelEligible"],
+        "properties": {
+          "specialistId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+          "role": { "type": "string", "minLength": 1, "maxLength": 240 },
+          "objective": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "coveredDomains": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 64 } },
+          "relevantAffectedAreas": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 160 } },
+          "relevantFiles": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 240 } },
+          "relevantGates": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 96 } },
+          "evidenceObligations": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 160 } },
+          "riskLevel": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+          "forbiddenScope": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 240 } },
+          "dependencyGroup": { "type": "integer", "minimum": 1, "maximum": 8 },
+          "parallelEligible": { "type": "boolean" }
+        }
+      }
+    },
+    "qualityGates": { "type": "array", "items": { "type": "string" } },
+    "contextRadius": {
+      "type": "string",
+      "enum": ["C0", "C1", "C2", "C3", "C4", "C5"]
+    },
+    "tokenBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["softLimit", "hardLimit", "capabilityClass", "cachePreference", "expansionPolicy"],
+      "properties": {
+        "softLimit": { "type": "integer", "minimum": 0 },
+        "hardLimit": { "type": "integer", "minimum": 0 },
+        "capabilityClass": {
+          "type": "string",
+          "enum": ["economy", "balanced", "strong", "critical"]
+        },
+        "cachePreference": { "type": "string", "enum": ["prefer-cache", "refresh"] },
+        "expansionPolicy": { "type": "string" }
+      }
+    },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+    "requiredEvidence": { "type": "array", "items": { "type": "string" } },
+    "stopConditions": { "type": "array", "items": { "type": "string" } },
+    "autonomyBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safeAutonomous", "requiresApproval"],
+      "properties": {
+        "safeAutonomous": { "type": "array", "items": { "type": "string" } },
+        "requiresApproval": { "type": "array", "items": { "type": "string" } },
+        "activeApprovalGatedActions": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "production deployment",
+              "destructive production database operation",
+              "spending money / material-cost external infrastructure action",
+              "rotating real credentials",
+              "destructive Git history rewrite",
+              "publishing package/release when not already authorized",
+              "transferring assets/funds",
+              "on-chain transaction execution"
+            ]
+          }
+        },
+        "activeApprovalIntentAmbiguous": { "type": "boolean" }
+      }
+    },
+    "nextAction": { "type": "string" }
+  }
+}

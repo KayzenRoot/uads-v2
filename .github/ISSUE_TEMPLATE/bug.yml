@@ -1,0 +1,84 @@
+name: Bug report
+description: Report a reproducible UADS defect or regression.
+title: "[Bug]: "
+labels:
+  - type:bug
+body:
+  - type: input
+    id: uads-version
+    attributes:
+      label: UADS version
+      placeholder: 0.7.0 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: work-order
+    attributes:
+      label: Work Order / Context Lock
+      description: Use the protocol identity and relative record paths when this defect is handled through governed delivery.
+      placeholder: ENG-EXAMPLE-001; .engineering/context-locks/...
+  - type: input
+    id: platform
+    attributes:
+      label: OS and platform
+      placeholder: Windows 11, Ubuntu 24.04, macOS 15
+    validations:
+      required: true
+  - type: input
+    id: node-npm
+    attributes:
+      label: Node and npm versions
+      placeholder: node --version; npm --version
+    validations:
+      required: true
+  - type: dropdown
+    id: installation-mode
+    attributes:
+      label: Installation mode
+      options:
+        - global-first installer
+        - from source
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or action performed
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove tokens, keys, passwords, personal paths, and customer data.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence Bundle or reproduction evidence
+      description: Include commands and bounded outputs; never attach secrets or absolute host paths.
+  - type: checkboxes
+    id: secrets
+    attributes:
+      label: Secret handling
+      options:
+        - label: I removed secrets and sensitive data from this report.
+          required: true

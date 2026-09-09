@@ -1,0 +1,16 @@
+{
+  "id": "E1",
+  "name": "simple frontend style",
+  "request": "Change the primary button color.",
+  "expect": {
+    "domainsInclude": ["frontend"],
+    "domainsExclude": ["web3", "smart-contracts", "finance-economics", "database", "tokenomics"],
+    "riskIn": ["LOW"],
+    "scopeIn": ["trivial", "local"],
+    "specialistsExclude": ["security-reviewer", "performance-reviewer", "software-architect"],
+    "gatesInclude": ["static"],
+    "gatesExclude": ["web3-fuzz", "web3-unit", "web3-invariant", "database-migration"],
+    "contextIn": ["C1", "C2"],
+    "maxSpecialists": 8
+  }
+}

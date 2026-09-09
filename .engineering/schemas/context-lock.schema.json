@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/context-lock.schema.json",
+  "title": "Engineering Context Lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "workOrderId", "repository", "baselineGitSha", "state", "fingerprints", "staleEvents"],
+  "properties": {
+    "schema": { "const": "uads.engineering-context-lock" },
+    "schemaVersion": { "const": "1.0.0" },
+    "workOrderId": { "type": "string", "pattern": "^ENG-[A-Z0-9-]+-[0-9]{3}$" },
+    "repository": { "type": "string" },
+    "baselineGitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "state": { "type": "string", "enum": ["FRESH", "STALE", "RELOCKED", "BLOCKED"] },
+    "fingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkpoint", "decisions", "scope", "definitionOfDone", "architecture"],
+      "properties": {
+        "checkpoint": { "type": ["string", "null"] },
+        "decisions": { "type": ["string", "null"] },
+        "scope": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "definitionOfDone": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "architecture": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "projectOverview": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "qualityGates": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "executorRules": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "staleEvents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "reason"],
+        "properties": { "source": { "type": "string" }, "reason": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/model-execution-plan.schema.json",
+  "title": "UADS Model Execution Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "planId", "projectId", "workOrderId", "workOrderDigest", "changeDigest", "risk", "scopeClass", "complexity", "uncertainty", "requiredCapabilityClass", "requiredCapabilities", "runtimeIdentityDigest", "registryDigest", "policyDigest", "candidates", "eligibleCandidates", "rejections", "selectedProfileId", "selectedProviderId", "selectedModelId", "roleSelections", "selectionReasonCodes", "fallbackProfileIds", "escalation", "cacheHints", "execution", "budget", "selectionMode", "status", "blockedReason"],
+  "properties": {
+    "schema": { "const": "uads.model-execution-plan" },
+    "schemaVersion": { "const": "0.8.0" },
+    "planId": { "type": "string", "pattern": "^mrp_[a-f0-9]{16}$" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": "string", "minLength": 1 },
+    "workOrderDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "changeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "risk": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "scopeClass": { "enum": ["trivial", "local", "cross-cutting", "architectural"] },
+    "complexity": { "enum": ["trivial", "moderate", "complex", "critical"] },
+    "uncertainty": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "requiredCapabilityClass": { "enum": ["economy", "balanced", "strong", "critical"] },
+    "requiredCapabilities": { "type": "array", "maxItems": 16, "uniqueItems": true, "items": { "type": "string" } },
+    "runtimeIdentityDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "registryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "policyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "candidates": { "type": "array", "maxItems": 256, "items": { "$ref": "#/$defs/candidate" } },
+    "eligibleCandidates": { "type": "array", "maxItems": 256, "uniqueItems": true, "items": { "type": "string" } },
+    "rejections": { "type": "array", "maxItems": 256, "items": { "$ref": "#/$defs/rejection" } },
+    "selectedProfileId": { "type": ["string", "null"] },
+    "selectedProviderId": { "type": ["string", "null"] },
+    "selectedModelId": { "type": ["string", "null"] },
+    "roleSelections": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/roleSelection" } },
+    "selectionReasonCodes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "fallbackProfileIds": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "escalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["floor", "currentTier", "reasonCodes"],
+      "properties": {
+        "floor": { "enum": ["economy", "balanced", "strong", "critical"] },
+        "currentTier": { "enum": ["economy", "balanced", "strong", "critical"] },
+        "reasonCodes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "cacheHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["staticLayerDigest", "semiStableLayerDigest", "dynamicLayerDigest", "promptCacheUsable", "explicitCacheUsable", "persistentContextUsable"],
+      "properties": {
+        "staticLayerDigest": { "type": ["string", "null"] },
+        "semiStableLayerDigest": { "type": ["string", "null"] },
+        "dynamicLayerDigest": { "type": ["string", "null"] },
+        "promptCacheUsable": { "type": "boolean" },
+        "explicitCacheUsable": { "type": "boolean" },
+        "persistentContextUsable": { "type": "boolean" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parallel", "roleDispatch", "usageTelemetryAvailable"],
+      "properties": {
+        "parallel": { "type": "boolean" },
+        "roleDispatch": { "enum": ["subagents", "role-cycling"] },
+        "usageTelemetryAvailable": { "type": ["boolean", "null"] }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hardLimit", "softLimit", "estimatedInputTokens", "requiredOutputTokens", "selectedContextWindowTokens"],
+      "properties": {
+        "hardLimit": { "type": "integer", "minimum": 0 },
+        "softLimit": { "type": "integer", "minimum": 0 },
+        "estimatedInputTokens": { "type": "integer", "minimum": 0 },
+        "requiredOutputTokens": { "type": "integer", "minimum": 0 },
+        "selectedContextWindowTokens": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    },
+    "selectionMode": { "enum": ["router", "host-managed"] },
+    "status": { "enum": ["SELECTED", "BLOCKED"] },
+    "blockedReason": { "type": ["string", "null"] }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profileId", "providerId", "modelId", "capabilityClass", "reasoningClass", "relativeCostClass", "relativeLatencyClass"],
+      "properties": {
+        "profileId": { "type": "string" },
+        "providerId": { "type": "string" },
+        "modelId": { "type": "string" },
+        "capabilityClass": { "enum": ["economy", "balanced", "strong", "critical"] },
+        "reasoningClass": { "enum": ["basic", "standard", "advanced", "deep"] },
+        "relativeCostClass": { "enum": ["very-low", "low", "medium", "high", "very-high", "unknown"] },
+        "relativeLatencyClass": { "enum": ["very-low", "low", "medium", "high", "very-high", "unknown"] }
+      }
+    },
+    "rejection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profileId", "reasonCodes", "reasons"],
+      "properties": {
+        "profileId": { "type": "string" },
+        "reasonCodes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "reasons": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    },
+    "roleSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "profileId", "providerId", "modelId", "status", "reasonCodes"],
+      "properties": {
+        "role": { "enum": ["implementation", "review", "testing", "assurance"] },
+        "profileId": { "type": ["string", "null"] },
+        "providerId": { "type": ["string", "null"] },
+        "modelId": { "type": ["string", "null"] },
+        "status": { "enum": ["selected", "host-managed", "blocked"] },
+        "reasonCodes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    }
+  }
+}

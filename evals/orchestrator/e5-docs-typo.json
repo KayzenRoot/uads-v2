@@ -1,0 +1,15 @@
+{
+  "id": "E5",
+  "name": "documentation typo",
+  "request": "Fix a typo in the README.",
+  "expect": {
+    "domainsInclude": ["documentation"],
+    "domainsExclude": ["web3", "finance-economics", "database"],
+    "riskIn": ["LOW"],
+    "scopeIn": ["trivial"],
+    "specialistsExclude": ["security-reviewer", "performance-reviewer", "software-architect"],
+    "gatesExclude": ["web3-fuzz", "integration-test"],
+    "contextIn": ["C1"],
+    "maxSpecialists": 8
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KayzenRoot/uads/schemas/ci-binding.schema.json",
+  "title": "UADS exact CI binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "repository", "workflow", "runId", "headSha", "event", "status", "conclusion", "htmlUrl"],
+  "properties": {
+    "schema": { "const": "uads.ci-binding" },
+    "schemaVersion": { "const": "0.7.1" },
+    "repository": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+    "workflow": { "const": "CI" },
+    "runId": { "type": "integer", "minimum": 1 },
+    "headSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "event": { "type": "string", "minLength": 1 },
+    "status": { "const": "completed" },
+    "conclusion": { "const": "success" },
+    "htmlUrl": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/actions/runs/[0-9]+$" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

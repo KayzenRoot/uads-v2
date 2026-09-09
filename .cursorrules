@@ -1,0 +1,30 @@
+# UADS Cursor rules
+
+UADS (Universal Autonomous Development Studio) is a NexLabs project.
+
+## Architecture Freeze v0.2
+
+- Global-first: operational state under `~/.uads/`, never in the managed project by default.
+- Zero project footprint: no caches, work orders, indexes, or review ZIPs in-repo unless explicitly opted in.
+- Evidence-first: completion claims need commands, outputs, or files.
+- Review ZIPs must exclude secrets and heavy directories.
+- Do not implement the full orchestrator, specialist agents, marketplace, or deep UGAS integration in Prompt 001 leftovers.
+
+## Governed engineering delivery
+
+- Before editing, inspect the repository and read the applicable canonical docs, checkpoint/status, scope, architecture, Definition of Done, and decisions.
+- Use one Work Order identity for the branch, Context Lock, Evidence Bundle, and Checkpoint Delta. The first adoption is `ENG-PROTOCOL-ADOPTION-001`.
+- Freeze the exact baseline Git SHA and run the existing validation gates before and after the change. Distinguish pre-existing failures from regressions.
+- Implement only the bounded Work Order. Do not perform broad cleanup, delete suspected-unused production material, upgrade dependencies, alter migrations, or change product behavior without a new explicit Work Order.
+- Mark Context Lock `STALE` when a critical source changes; re-inspect and relock before continuing.
+- Stop on scope expansion, unknown destructive effects, unresolved HIGH/CRITICAL risk, unresolvable source conflict, or unproven cleanup safety.
+- Commit and push focused work, open/update the PR, and provide an Evidence Bundle. Do not promote checkpoint or canonical truth alone.
+- Preserve global-first and zero-project-footprint behavior. `.engineering/` contains static governance records only; UADS runtime state remains in the global sidecar.
+
+## CLI
+
+Foundation commands: `uads --help`, `uads doctor`, `uads status`, `uads review`. Cache/cost visibility: `uads cache status`, `uads cost status`.
+
+## Docs
+
+Normative docs live in `docs/`. Extra ideas go to `docs/14-BACKLOG.md`.

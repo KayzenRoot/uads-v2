@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/diagnosis-report.schema.json",
+  "title": "UADS Diagnosis Report",
+  "description": "Ranked fault hypotheses. schemaVersion 0.5.0. Heuristic ranking, not verified root cause.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "diagnosisId",
+    "failureRecordId",
+    "projectId",
+    "workOrderId",
+    "executionRunId",
+    "createdAt",
+    "failureSignature",
+    "indexDigest",
+    "changeDigest",
+    "initialRadius",
+    "recommendedRadius",
+    "status",
+    "rankedCandidates",
+    "evidenceUsed",
+    "unresolved",
+    "nextEvidence",
+    "escalationReason",
+    "contextPackRef",
+    "memoryMatches",
+    "loopState"
+  ],
+  "properties": {
+    "schema": { "const": "uads.diagnosis-report" },
+    "schemaVersion": { "const": "0.5.0" },
+    "diagnosisId": { "type": "string", "minLength": 1 },
+    "failureRecordId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": ["string", "null"] },
+    "executionRunId": { "type": ["string", "null"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "failureSignature": { "type": "string", "minLength": 1 },
+    "indexDigest": { "type": "string", "minLength": 1 },
+    "changeDigest": { "type": ["string", "null"] },
+    "initialRadius": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+    "recommendedRadius": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+    "status": { "type": "string", "enum": ["localized", "ambiguous", "needs-evidence", "blocked"] },
+    "rankedCandidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "score", "confidence", "signals", "reason"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+          "signals": { "type": "array", "items": { "type": "string" } },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "evidenceUsed": { "type": "array", "items": { "type": "string" } },
+    "unresolved": { "type": "array", "items": { "type": "string" } },
+    "nextEvidence": { "type": "array", "items": { "type": "string" } },
+    "escalationReason": { "type": ["string", "null"] },
+    "contextPackRef": { "type": ["string", "null"] },
+    "memoryMatches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["failureSignature", "kind", "reason"],
+        "properties": {
+          "failureSignature": { "type": "string" },
+          "kind": { "type": "string", "enum": ["reusable", "historical"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "loopState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected", "occurrences", "sameChangeDigest", "recommendedAction"],
+      "properties": {
+        "detected": { "type": "boolean" },
+        "occurrences": { "type": "integer", "minimum": 0 },
+        "sameChangeDigest": { "type": "boolean" },
+        "recommendedAction": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/impact-report.schema.json",
+  "title": "UADS Impact Report",
+  "description": "Bounded impact analysis bound to index identity. schemaVersion 0.4.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "impactReportId",
+    "projectId",
+    "workOrderId",
+    "executionRunId",
+    "indexDigest",
+    "gitHead",
+    "dirtyDigest",
+    "generatedAt",
+    "contextRadius",
+    "seeds",
+    "inScopeCandidates",
+    "supportingContext",
+    "possibleImpact",
+    "excluded",
+    "unresolved",
+    "stale",
+    "indexConfidence"
+  ],
+  "properties": {
+    "schema": { "const": "uads.impact-report" },
+    "schemaVersion": { "const": "0.4.0" },
+    "impactReportId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": ["string", "null"] },
+    "executionRunId": { "type": ["string", "null"] },
+    "indexDigest": { "type": "string", "minLength": 1 },
+    "gitHead": { "type": ["string", "null"] },
+    "dirtyDigest": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "contextRadius": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+    "seeds": { "type": "array", "items": { "type": "string" } },
+    "inScopeCandidates": { "$ref": "#/$defs/items" },
+    "supportingContext": { "$ref": "#/$defs/items" },
+    "possibleImpact": { "$ref": "#/$defs/items" },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "specifier", "reason", "method", "confidence", "sourceDigest"],
+        "properties": {
+          "source": { "type": "string" },
+          "specifier": { "type": "string" },
+          "reason": { "type": "string" },
+          "method": { "type": "string" },
+          "confidence": { "type": "number" },
+          "line": { "type": "integer" },
+          "sourceDigest": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "stale": { "type": "boolean" },
+    "indexConfidence": { "type": "string", "enum": ["high", "reduced"] }
+  },
+  "$defs": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "relation", "reason", "confidence", "hops"],
+        "properties": {
+          "path": { "type": "string" },
+          "relation": {
+            "type": "string",
+            "enum": ["direct", "dependency", "dependent", "test", "interface", "documentation", "config"]
+          },
+          "reason": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "hops": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

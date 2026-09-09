@@ -1,0 +1,90 @@
+{
+  "name": "uads",
+  "version": "0.12.1",
+  "description": "UADS - Universal Autonomous Development Studio by NexLabs. Global-first autonomous software engineering orchestration framework.",
+  "license": "Apache-2.0",
+  "author": "NexLabs",
+  "homepage": "https://github.com/KayzenRoot/uads",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KayzenRoot/uads.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KayzenRoot/uads/issues"
+  },
+  "keywords": [
+    "uads",
+    "nexlabs",
+    "orchestration",
+    "agents",
+    "architecture",
+    "cli"
+  ],
+  "type": "module",
+  "bin": {
+    "uads": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "schemas",
+    "skills",
+    "agents",
+    "evals",
+    "scripts",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "VERSION"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "capture-evidence": "node scripts/validate/capture-evidence.mjs",
+    "test": "vitest run --maxWorkers=1",
+    "test:security-proof": "vitest run --maxWorkers=1 tests/release-security-proof.test.ts",
+    "eval:orchestrator": "node dist/eval/run.js",
+    "eval:execution": "node dist/eval/execution.js",
+    "eval:context": "node dist/eval/context.js",
+    "eval:fault": "node dist/eval/fault.js",
+    "eval:cost": "node dist/eval/cost.js",
+    "eval:model-routing": "node dist/eval/model-routing.js",
+    "eval:specialist-routing": "node dist/eval/specialist-routing.js",
+    "eval:adapters": "node dist/eval/adapters.js",
+    "eval:host-execution": "vitest run --maxWorkers=1 tests/host-execution.test.ts",
+    "eval:assurance": "node dist/eval/assurance.js",
+    "eval:fault-injection": "node dist/eval/fault-injection.js",
+    "validate:direct-review": "node scripts/github/validate-direct-review.mjs",
+    "validate:ci-receipt": "node scripts/github/validate-ci-gate-receipt.mjs",
+    "validate:skills": "node scripts/validate/validate-skills.mjs",
+    "validate:actions": "node scripts/validate/validate-action-pins.mjs",
+    "validate:engineering": "node scripts/validate/validate-engineering-protocol.mjs",
+    "validate": "node scripts/validate/validate-foundation.mjs",
+    "release:validate": "node scripts/release/run-validation.mjs",
+    "release:verify": "node scripts/release/verify-release.mjs",
+    "release:build": "node scripts/release/build-release.mjs",
+    "release:historical": "node scripts/release/reconstruct-historical.mjs",
+    "release:publish": "node scripts/release/publish-release.mjs",
+    "github:configure": "node scripts/github/configure-repository.mjs",
+    "github:audit": "node scripts/github/audit-repository.mjs",
+    "review": "node dist/cli.js review",
+    "review:release": "node scripts/review/create-release-review.mjs",
+    "uads": "node dist/cli.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.11"
+  }
+}

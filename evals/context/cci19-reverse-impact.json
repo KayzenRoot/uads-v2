@@ -1,0 +1,5 @@
+{
+  "id": "CCI19",
+  "name": "Reverse docs and config impact",
+  "scenario": "reverse-impact"
+}

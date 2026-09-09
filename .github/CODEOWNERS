@@ -1,0 +1,10 @@
+* @KayzenRoot
+/src/kernel/ @KayzenRoot
+/schemas/ @KayzenRoot
+/.github/workflows/ @KayzenRoot
+/.github/ @KayzenRoot
+/scripts/release/ @KayzenRoot
+/scripts/github/ @KayzenRoot
+/SECURITY.md @KayzenRoot
+/GOVERNANCE.md @KayzenRoot
+/RELEASING.md @KayzenRoot

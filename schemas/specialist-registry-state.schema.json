@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/specialist-registry-state.schema.json",
+  "title": "UADS Specialist Registry State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "registryDigest", "policyVersion", "profileCount"],
+  "properties": {
+    "schema": { "const": "uads.specialist-registry-state" },
+    "schemaVersion": { "const": "0.9.0" },
+    "registryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "policyVersion": { "const": "0.9.0" },
+    "profileCount": { "type": "integer", "minimum": 1, "maximum": 64 }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KayzenRoot/uads/schemas/ci-gate-receipt.schema.json",
+  "title": "UADS exact-SHA CI gate receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "repository", "branch", "commitSha", "gitTreeSha", "version", "generatedAt", "event", "workflow", "comparison", "requiredGates", "validation", "provenance", "finalVerdict", "reasonCodes", "evidenceContractDigest"],
+  "properties": {
+    "schema": { "const": "uads.ci-gate-receipt" },
+    "schemaVersion": { "const": "0.8.0" },
+    "repository": { "type": ["string", "null"], "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+    "branch": { "type": ["string", "null"], "maxLength": 128 },
+    "commitSha": { "$ref": "#/$defs/shaOrNull" },
+    "gitTreeSha": { "$ref": "#/$defs/shaOrNull" },
+    "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "event": { "type": ["string", "null"], "maxLength": 80 },
+    "workflow": { "$ref": "#/$defs/workflow" },
+    "comparison": { "$ref": "#/$defs/comparison" },
+    "requiredGates": { "type": "array", "minItems": 20, "maxItems": 20, "items": { "$ref": "#/$defs/gate" } },
+    "validation": { "$ref": "#/$defs/validation" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "finalVerdict": { "enum": ["PASS", "FAIL", "INCOMPLETE", "BLOCKED"] },
+    "reasonCodes": { "type": "array", "maxItems": 128, "items": { "type": "string", "pattern": "^[A-Z0-9_:-]{1,120}$" } },
+    "evidenceContractDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "$defs": {
+    "shaOrNull": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+    "outcome": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+    "workflow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["runId", "runAttempt", "workflowName", "jobName", "htmlUrl", "startedAt", "completedAt"],
+      "properties": {
+        "runId": { "type": "integer", "minimum": 1 },
+        "runAttempt": { "type": "integer", "minimum": 1 },
+        "workflowName": { "type": "string", "maxLength": 128 },
+        "jobName": { "type": "string", "maxLength": 128 },
+        "htmlUrl": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/actions/runs/[0-9]+$" },
+        "startedAt": { "type": ["string", "null"], "format": "date-time" },
+        "completedAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["baseSha", "headSha", "changedFileCount", "changedPaths", "changedPathsDigest", "changedPathsTruncated", "comparisonStatus", "comparisonReasonCode"],
+      "properties": {
+        "baseSha": { "$ref": "#/$defs/shaOrNull" },
+        "headSha": { "$ref": "#/$defs/shaOrNull" },
+        "changedFileCount": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "changedPaths": { "type": ["array", "null"], "maxItems": 500, "items": { "type": "string", "pattern": "^[A-Za-z0-9._/-]+$", "maxLength": 240 } },
+        "changedPathsDigest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "changedPathsTruncated": { "type": "boolean" },
+        "comparisonStatus": { "enum": ["complete", "truncated", "unavailable", "not-applicable"] },
+        "comparisonReasonCode": { "type": ["string", "null"], "pattern": "^[A-Z0-9_:-]{1,120}$" }
+      }
+    },
+    "gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "outcome", "required"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]{1,80}$" },
+        "outcome": { "$ref": "#/$defs/outcome" },
+        "required": { "const": true }
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["passed", "failed", "total"],
+      "properties": {
+        "passed": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "failed": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "total": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 }
+      }
+    },
+    "validation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["testFilesPassed", "testsPassed", "testsFailed", "orchestrator", "execution", "context", "fault", "cost", "modelRouting", "specialistRouting", "adapters", "assurance", "faultInjection", "specialistPolicyDigest", "builtinSpecialistCatalogDigest", "npmAudit", "packaging"],
+      "properties": {
+        "testFilesPassed": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "testsPassed": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "testsFailed": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "orchestrator": { "$ref": "#/$defs/summary" }, "execution": { "$ref": "#/$defs/summary" }, "context": { "$ref": "#/$defs/summary" },
+        "fault": { "$ref": "#/$defs/summary" }, "cost": { "$ref": "#/$defs/summary" }, "modelRouting": { "$ref": "#/$defs/summary" }, "specialistRouting": { "$ref": "#/$defs/summary" }, "adapters": { "$ref": "#/$defs/summary" }, "assurance": { "$ref": "#/$defs/summary" }, "faultInjection": { "$ref": "#/$defs/summary" },
+        "specialistPolicyDigest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "builtinSpecialistCatalogDigest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "npmAudit": { "type": "object", "additionalProperties": false, "required": ["outcome", "highOrGreaterVulnerabilities"], "properties": { "outcome": { "$ref": "#/$defs/outcome" }, "highOrGreaterVulnerabilities": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 } } },
+        "packaging": { "type": "object", "additionalProperties": false, "required": ["outcome"], "properties": { "outcome": { "$ref": "#/$defs/outcome" } } }
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["generatedByScript", "evidenceContractDigest", "sourceRunSha", "sourceRunId", "sourceRunAttempt"],
+      "properties": {
+        "generatedByScript": { "const": "scripts/github/generate-ci-gate-receipt.mjs" },
+        "evidenceContractDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "sourceRunSha": { "$ref": "#/$defs/shaOrNull" },
+        "sourceRunId": { "type": "integer", "minimum": 1 },
+        "sourceRunAttempt": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

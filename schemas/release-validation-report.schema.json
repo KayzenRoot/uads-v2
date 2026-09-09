@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KayzenRoot/uads/schemas/release-validation-report.schema.json",
+  "title": "UADS release validation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "generatedAt", "version", "commit", "ciBinding", "commands", "summary"],
+  "properties": {
+    "schema": { "const": "uads.release-validation-report" },
+    "schemaVersion": { "enum": ["0.7.0", "0.7.1", "0.8.0", "0.8.1", "0.9.0", "0.9.1", "0.10.0", "0.11.0", "0.11.1"] },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "version": { "type": "string", "minLength": 5 },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "ciBinding": { "type": ["string", "null"], "not": { "pattern": "^(tmp|\\.tmp|release)(/|\\\\)" } },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "command", "startedAt", "endedAt", "durationMs", "exitCode", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "command": { "type": "string" },
+          "startedAt": { "type": "string", "format": "date-time" },
+          "endedAt": { "type": "string", "format": "date-time" },
+          "durationMs": { "type": "integer", "minimum": 0 },
+          "exitCode": { "type": "integer", "minimum": 0 },
+          "status": { "enum": ["PASS", "FAIL"] }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "passed", "failed"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

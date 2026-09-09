@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/execution-packet.schema.json",
+  "title": "UADS Execution Packet",
+  "description": "Compact provider-neutral host packet for a dispatched Work Order. schemaVersion 0.3.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "executionRunId",
+    "workOrderId",
+    "objective",
+    "includedScope",
+    "outOfScope",
+    "riskLevel",
+    "domains",
+    "contextRadius",
+    "contextCandidates",
+    "specialists",
+    "assuranceReviewers",
+    "selectedGates",
+    "acceptanceCriteria",
+    "requiredEvidence",
+    "safeAutonomousActions",
+    "approvalGatedActions",
+    "stopConditions",
+    "baselineGitHead",
+    "nextAction"
+  ],
+  "properties": {
+    "schema": { "const": "uads.execution-packet" },
+    "schemaVersion": { "const": "0.3.0" },
+    "executionRunId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": "string", "minLength": 1 },
+    "objective": { "type": "string" },
+    "includedScope": { "type": "array", "items": { "type": "string" } },
+    "outOfScope": { "type": "array", "items": { "type": "string" } },
+    "riskLevel": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "domains": { "type": "array", "items": { "type": "string" } },
+    "contextRadius": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+    "contextCandidates": { "type": "array", "items": { "type": "string" } },
+    "specialists": { "type": "array", "items": { "type": "string" } },
+    "assuranceReviewers": { "type": "array", "items": { "type": "string" } },
+    "specialistSelectionPlanId": { "type": ["string", "null"], "pattern": "^sp_[a-f0-9]{16}$" },
+    "specialistSelectionDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistAssignments": { "type": ["array", "null"], "maxItems": 32, "items": { "type": "object", "additionalProperties": false, "required": ["specialistId", "role", "objective", "coveredDomains", "relevantAffectedAreas", "relevantFiles", "relevantGates", "evidenceObligations", "riskLevel", "forbiddenScope", "dependencyGroup", "parallelEligible"], "properties": { "specialistId": { "type": "string" }, "role": { "type": "string" }, "objective": { "type": "string" }, "coveredDomains": { "type": "array", "items": { "type": "string" } }, "relevantAffectedAreas": { "type": "array", "items": { "type": "string" } }, "relevantFiles": { "type": "array", "items": { "type": "string" } }, "relevantGates": { "type": "array", "items": { "type": "string" } }, "evidenceObligations": { "type": "array", "items": { "type": "string" } }, "riskLevel": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] }, "forbiddenScope": { "type": "array", "items": { "type": "string" } }, "dependencyGroup": { "type": "integer", "minimum": 1, "maximum": 8 }, "parallelEligible": { "type": "boolean" } } } },
+    "selectedGates": { "type": "array", "items": { "type": "string" } },
+    "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+    "requiredEvidence": { "type": "array", "items": { "type": "string" } },
+    "safeAutonomousActions": { "type": "array", "items": { "type": "string" } },
+    "approvalGatedActions": { "type": "array", "items": { "type": "string" } },
+    "stopConditions": { "type": "array", "items": { "type": "string" } },
+    "baselineGitHead": { "type": ["string", "null"] },
+    "nextAction": { "type": "string" },
+    "contextPackId": { "type": ["string", "null"] },
+    "impactReportId": { "type": ["string", "null"] },
+    "indexDigest": { "type": ["string", "null"] }
+    ,"modelPlanId": { "type": ["string", "null"] }
+    ,"selectedProfileId": { "type": ["string", "null"] }
+    ,"selectedProviderId": { "type": ["string", "null"] }
+    ,"selectedModelId": { "type": ["string", "null"] }
+    ,"selectionMode": { "enum": ["router", "host-managed"] }
+    ,"modelExecutionStrategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parallel", "roleDispatch", "usageTelemetryAvailable"],
+      "properties": {
+        "parallel": { "type": "boolean" },
+        "roleDispatch": { "enum": ["subagents", "role-cycling"] },
+        "usageTelemetryAvailable": { "type": ["boolean", "null"] }
+      }
+    }
+  }
+}

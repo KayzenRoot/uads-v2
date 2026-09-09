@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KayzenRoot/uads/schemas/host-adapter-state.schema.json",
+  "title": "UADS host adapter state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "adapterId",
+    "contractVersion",
+    "targetLabel",
+    "detection",
+    "installStatus",
+    "ownershipStatus",
+    "rootBinding",
+    "resources",
+    "manifestRelativeTarget",
+    "manifestDigest",
+    "updatedAt",
+    "stateDigest"
+  ],
+  "properties": {
+    "schema": { "const": "uads.host-adapter-state" },
+    "schemaVersion": { "const": "0.10.0" },
+    "adapterId": { "enum": ["cursor", "codex", "generic-agent-skills"] },
+    "contractVersion": { "const": "0.10.0" },
+    "targetLabel": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+    "detection": { "$ref": "#/$defs/detection" },
+    "installStatus": { "enum": ["INSTALLED", "NOT_INSTALLED"] },
+    "ownershipStatus": { "enum": ["CLEAN", "CONFLICT", "STALE", "UNKNOWN"] },
+    "rootBinding": { "$ref": "#/$defs/rootBindingOrNull" },
+    "resources": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/resource" }
+    },
+    "manifestRelativeTarget": { "$ref": "#/$defs/relativePath" },
+    "manifestDigest": { "$ref": "#/$defs/digestOrNull" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "stateDigest": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "digestOrNull": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "relativePath": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*\\.\\.).+$" },
+    "capability": { "type": ["boolean", "string"], "enum": [true, false, "unknown"] },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modelSelection", "toolCalling", "structuredOutput", "promptCache", "explicitCache", "persistentContext", "subagents", "parallelAgents", "usageTelemetry", "visionInput"],
+      "properties": {
+        "modelSelection": { "$ref": "#/$defs/capability" },
+        "toolCalling": { "$ref": "#/$defs/capability" },
+        "structuredOutput": { "$ref": "#/$defs/capability" },
+        "promptCache": { "$ref": "#/$defs/capability" },
+        "explicitCache": { "$ref": "#/$defs/capability" },
+        "persistentContext": { "$ref": "#/$defs/capability" },
+        "subagents": { "$ref": "#/$defs/capability" },
+        "parallelAgents": { "$ref": "#/$defs/capability" },
+        "usageTelemetry": { "$ref": "#/$defs/capability" },
+        "visionInput": { "$ref": "#/$defs/capability" }
+      }
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapterId", "status", "version", "detectionMethod", "targetLabel", "provenCapabilities", "reasonCodes", "detectedAt"],
+      "properties": {
+        "adapterId": { "enum": ["cursor", "codex", "generic-agent-skills"] },
+        "status": { "enum": ["SUPPORTED", "UNAVAILABLE", "UNPROVEN", "BLOCKED"] },
+        "version": { "type": ["string", "null"], "maxLength": 64 },
+        "detectionMethod": { "type": "string", "pattern": "^[a-z0-9-]{1,96}$" },
+        "targetLabel": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+        "provenCapabilities": { "$ref": "#/$defs/capabilities" },
+        "reasonCodes": { "type": "array", "maxItems": 16, "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Z0-9_:-]{1,120}$" } },
+        "detectedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceRef", "relativeTarget", "sourceDigest", "installedDigest"],
+      "properties": {
+        "sourceRef": { "$ref": "#/$defs/relativePath" },
+        "relativeTarget": { "$ref": "#/$defs/relativePath" },
+        "sourceDigest": { "$ref": "#/$defs/digest" },
+        "installedDigest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "rootBindingOrNull": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["targetRootDigest", "rootKind", "sourceClass", "bindingVersion"],
+      "properties": {
+        "targetRootDigest": { "$ref": "#/$defs/digest" },
+        "rootKind": { "enum": ["system-user-home", "synthetic-user-home", "adapter-root"] },
+        "sourceClass": { "enum": ["default", "explicit-override", "uads-environment", "native-environment"] },
+        "bindingVersion": { "enum": ["1", "2"] }
+      }
+    }
+  }
+}

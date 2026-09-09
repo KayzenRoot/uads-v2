@@ -1,0 +1,5 @@
+{
+  "id": "CCI11",
+  "name": "Clean commit-to-commit refresh",
+  "scenario": "commit-identity"
+}

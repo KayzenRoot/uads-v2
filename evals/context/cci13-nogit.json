@@ -1,0 +1,5 @@
+{
+  "id": "CCI13",
+  "name": "No-git freshness revalidation",
+  "scenario": "git-unavailable"
+}

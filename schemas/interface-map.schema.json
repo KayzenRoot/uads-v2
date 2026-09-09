@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/interface-map.schema.json",
+  "title": "UADS Interface Map",
+  "description": "Conservative explicit contracts. schemaVersion 0.4.0. Heuristics are not guaranteed public API.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "indexDigest", "generatedAt", "contracts"],
+  "properties": {
+    "schema": { "const": "uads.interface-map" },
+    "schemaVersion": { "const": "0.4.0" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "indexDigest": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "evidence", "confidence"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "kind": { "type": "string", "enum": ["schema", "cli", "export", "config", "type"] },
+          "evidence": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    }
+  }
+}

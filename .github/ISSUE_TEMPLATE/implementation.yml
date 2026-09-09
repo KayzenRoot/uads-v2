@@ -1,0 +1,80 @@
+name: Implementation work order
+description: Propose a bounded implementation increment under the engineering delivery protocol.
+title: "[Implementation]: "
+body:
+  - type: input
+    id: protocol-identity
+    attributes:
+      label: Protocol identity
+      description: Use a new immutable identity, for example ENG-EXAMPLE-001.
+      placeholder: ENG-EXAMPLE-001
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: State one bounded, observable objective.
+    validations:
+      required: true
+  - type: textarea
+    id: included-scope
+    attributes:
+      label: Included scope
+      description: List exact files, modules, contracts, and commands in scope.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Explicitly out of scope
+      description: Name cleanup, migrations, dependency upgrades, product behavior, or external actions not authorized.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope-class
+    attributes:
+      label: Scope class
+      options:
+        - trivial
+        - local
+        - cross-cutting
+        - architectural
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk level
+      options:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - CRITICAL
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and required evidence
+      description: List exact gates, commands, outputs, reviewers, and artifact references.
+    validations:
+      required: true
+  - type: textarea
+    id: stop-conditions
+    attributes:
+      label: Stop conditions
+      description: Include stale context, scope expansion, destructive ambiguity, and unresolved HIGH/CRITICAL risk.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety acknowledgements
+      options:
+        - label: I will preserve global-first and zero-project-footprint behavior.
+          required: true
+        - label: I will not delete suspected-unused production material in this increment.
+          required: true
+        - label: I will not include credentials, customer data, or absolute host paths in evidence.
+          required: true
