@@ -3,49 +3,41 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_005_APPROVED_MERGED_M03_S05_SLICE1_NEXT",
+  "programState": "UADS2_WO_006_PR29_HEDS_CORRECTION_APPLIED_EXACT_HEAD_REVERIFY_PENDING",
   "completedWorkOrder": "UADS2-WO-005",
   "completedPullRequest": 27,
   "approvedHead": "f6915633f2722ac7258e0c04e3931a90178b8e05",
   "mergeCommit": "91da3704dff14e6cb1bd81ba0370be20cde7cddc",
-  "lastRecordedHead": "91da3704dff14e6cb1bd81ba0370be20cde7cddc",
-  "activeWorkOrder": null,
-  "activePullRequest": null,
-  "activeBranch": null,
+  "lastRecordedHead": "a0b0f5ebd5cfc0b1b0322967697a2af5a233b51a",
+  "activeWorkOrder": "UADS2-WO-006",
+  "activePullRequest": 29,
+  "activeBranch": "work/uads2-wo-006-m03-pccr-core",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S00-S04 frozen; ADR-UADS2-012 accepted; first S05 implementation slice next",
-  "nextNecessaryAction": "Create UADS2-WO-006 for M03 S05 Slice 1: PCCR core + passive/deterministic-local proof + compatibility projector. Keep vendor-specific active probes out of scope.",
+  "activeSession": "HEDS found cross-capability replay gap; bounded binding correction applied; fresh exact-head gates pending",
+  "nextNecessaryAction": "Do not merge. Run fresh exact-head CI, CodeQL, Dependency Review and Cross-Platform plus benchmark after the capability-binding correction. Final HEDS only after all succeed.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
-  "acceptedPriorities": [
-    "ADR-UADS2-009 dashboard-first event-backed real-time operations",
-    "ADR-UADS2-010 enterprise production-readiness contract with M27-M31",
-    "ADR-UADS2-011 Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze",
-    "ADR-UADS2-012 Proof-Carrying Host Capabilities",
-    "B-001 V2 structured analysis-event proof"
-  ],
   "m03": {
-    "issue": 26,
-    "sessionsFrozen": [
-      "S00",
-      "S01",
-      "S01.5",
-      "S02",
-      "S03",
-      "S04"
-    ],
-    "runtimeImplementationAuthorizedOnlyViaBoundedWorkOrder": true,
-    "acceptedArchitecture": [
-      "PCCR",
-      "CEL",
-      "NPC",
-      "CLDS",
-      "PBF"
-    ],
+    "issue": 28,
+    "activeSlice": "S05.1",
+    "implementationHead": "0c96f6c4b74e73157fae3cb9533ffdd3f3254a44",
     "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED",
-    "firstS05Slice": "PCCR core + passive/deterministic-local proof + compatibility projector",
-    "vendorSpecificActiveProbes": "EXPERIMENT_OUT_OF_SCOPE_FOR_SLICE1"
+    "activeProbes": "NOT_IMPLEMENTED",
+    "runtimeFiles": [
+      "schemas/host-capability-proof.schema.json",
+      "src/kernel/host-capability-proof.ts",
+      "tests/host-capability-proof.test.ts"
+    ],
+    "verification": {
+      "testFilesPassed": 52,
+      "testsPassed": 462,
+      "benchmarkB1P95Ms": 0.13411899999994148,
+      "benchmarkB3BytesPerHost": 10990,
+      "B4ZeroDefects": true,
+      "B7Recovery": true
+    },
+    "hedsCorrection": "cross-capability-and-subject-path-proof-binding"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [

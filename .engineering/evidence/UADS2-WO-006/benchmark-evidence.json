@@ -1,0 +1,43 @@
+{
+  "schema": "uads2.wo-006.benchmark-evidence",
+  "schemaVersion": "1.0.0",
+  "issue": 28,
+  "pullRequest": 29,
+  "sourceHead": "0c96f6c4b74e73157fae3cb9533ffdd3f3254a44",
+  "sourceRunId": 34407137445,
+  "sourceJobId": 102652707730,
+  "testFilesPassed": 52,
+  "testsPassed": 462,
+  "B1": {
+    "sample1": {
+      "p50Ms": 0.06329399999992802,
+      "p95Ms": 0.13411899999994148
+    },
+    "sample2": {
+      "p50Ms": 0.05312800000001516,
+      "p95Ms": 0.12987300000003188
+    },
+    "targetP95Ms": 50,
+    "pass": true
+  },
+  "B3": {
+    "bytesPerHost": 10990,
+    "targetBytes": 65536,
+    "pass": true
+  },
+  "B4": {
+    "unsafeTrue": 0,
+    "tamperReplayAccepted": 0,
+    "driftMisses": 0,
+    "absenceUnsupported": 0,
+    "pass": true
+  },
+  "B7": {
+    "corruptAccepted": 0,
+    "recovered": true,
+    "pass": true
+  },
+  "note": "Historical pre-HEDS-correction measurements from 0c96f6c4. Runtime capability/subject binding correction requires fresh exact-head benchmark and hosted gates before approval.",
+  "status": "SUPERSEDED_BY_HEDS_RUNTIME_CORRECTION_PENDING_EXACT_HEAD_RERUN",
+  "historical": true
+}

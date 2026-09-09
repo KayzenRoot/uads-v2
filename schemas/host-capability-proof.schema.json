@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.local/schemas/host-capability-proof.schema.json",
+  "title": "UADS Host Capability Proof",
+  "description": "Closed, privacy-safe per-capability proof record for M03 PCCR Slice 1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "capabilityId",
+    "state",
+    "evidenceClass",
+    "subjectDigest",
+    "adapterId",
+    "runtimeVersion",
+    "probeId",
+    "validityBasis",
+    "observedAt",
+    "validUntil",
+    "validityClass",
+    "evidenceDigest",
+    "negativeProofKind",
+    "reasonCodes",
+    "proofDigest"
+  ],
+  "properties": {
+    "schema": { "const": "uads.host-capability-proof" },
+    "schemaVersion": { "const": "1.0.0" },
+    "capabilityId": {
+      "type": "string",
+      "enum": [
+        "modelSelection",
+        "toolCalling",
+        "structuredOutput",
+        "promptCache",
+        "explicitCache",
+        "persistentContext",
+        "subagents",
+        "parallelAgents",
+        "usageTelemetry",
+        "visionInput"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED", "STALE"]
+    },
+    "evidenceClass": {
+      "type": "string",
+      "enum": ["E0", "E1", "E2", "E3", "E4"]
+    },
+    "subjectDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "adapterId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._:-]+$"
+    },
+    "runtimeVersion": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "minLength": 1, "maxLength": 128 }
+      ]
+    },
+    "probeId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._:-]+$"
+    },
+    "validityBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapterContractDigest",
+        "probeDefinitionDigest",
+        "policyDigest",
+        "configurationDigest"
+      ],
+      "properties": {
+        "adapterContractDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "probeDefinitionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "policyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "configurationDigest": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          ]
+        }
+      }
+    },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "validUntil": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "validityClass": {
+      "type": "string",
+      "enum": ["IDENTITY_BOUND", "LEASED"]
+    },
+    "evidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "negativeProofKind": {
+      "enum": [null, "adapter-contract-impossible"]
+    },
+    "reasonCodes": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[A-Z0-9._:-]+$"
+      }
+    },
+    "proofDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

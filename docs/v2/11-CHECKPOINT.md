@@ -1,66 +1,65 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-005 APPROVED / MERGED; M03 S05 SLICE 1 NEXT
+Status: UADS2-WO-006 PR #29 HEDS CORRECTION APPLIED / FRESH EXACT-HEAD GATES PENDING
 Date: 2026-09-09
 
 Completed Work Order: UADS2-WO-005
-Completed PR: #27
-Approved head: `f6915633f2722ac7258e0c04e3931a90178b8e05`
-Merge SHA: `91da3704dff14e6cb1bd81ba0370be20cde7cddc`
+Active Work Order: UADS2-WO-006
+Active Issue: #28
+Active PR: #29
+Active Branch: `work/uads2-wo-006-m03-pccr-core`
+Base main SHA: `36b2019fc22b4d6c5d250e41edf12e737c4ddcfa`
+Implementation-equivalent verified head: `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`
+Active Module: M03 Host Capability Detector
+Active Session: S05.1
 
-## M03 deep-discovery freeze
+## Implemented slice
 
-S00–S04 are objectively frozen:
-- S00 problem, capability vocabulary and success metrics;
-- S01 Technology Radar;
-- S01.5 Technology Invention Radar;
-- S02 detailed architecture and ownership;
-- S03 failure/security/resilience model;
-- S04 66-test benchmark design before implementation.
+**PCCR Core + Passive/Deterministic-Local Proof + Conservative Compatibility Projector**
 
-ADR-UADS2-012 is ACCEPTED.
+Runtime scope remains exactly:
+- `schemas/host-capability-proof.schema.json`
+- `src/kernel/host-capability-proof.ts`
+- `tests/host-capability-proof.test.ts`
 
-## M03 accepted architecture
+No existing runtime/schema/package/workflow file was modified.
 
-**Proof-Carrying Host Capabilities**
+## Objective verification
 
-Primary targets:
-- PCCR — Proof-Carrying Capability Record;
-- CEL — Capability Evidence Ladder;
-- NPC — Negative Proof Contract;
-- CLDS — Capability Lease & Drift Sentinel;
-- PBF — Probe Budget Fence.
+On `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`:
+- 52/52 test files PASS;
+- 462/462 tests PASS;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Cross-Platform SUCCESS;
+- B1 p95 0.134119 ms <= 50 ms;
+- B3 10,990 bytes/host <= 65,536;
+- B4 all unsafe/tamper/drift/absence counters = 0;
+- B7 corruptAccepted=0 and recovered=true.
 
-Hard invariants:
-- E1 DECLARED is discovery input only and never produces SUPPORTED;
-- every enabling SUPPORTED proof requires at least E2 DETERMINISTIC_LOCAL_FACT;
-- UNKNOWN, BLOCKED and STALE never project to TRUE;
-- absence, timeout, permission denial or unrecognized output never imply UNSUPPORTED;
-- no arbitrary shell/user-command probing;
-- initial automatic active probing is bounded READ_ONLY_LOCAL only;
-- M03 proves host capability facts and does not steal M04/M05/M06/M23 authority.
+## Correction record
 
-## Next NECESSARY increment
+An earlier run failed only T049 because the test used a fake GitHub token shorter than the existing canonical secret-pattern threshold. The fixture was corrected. Runtime code was unchanged.
 
-Create **UADS2-WO-006 — M03 S05 Slice 1: PCCR Core + Passive/Deterministic-Local Proof + Compatibility Projector**.
+## Final gate
 
-Slice 1 MUST remain compatibility-first:
-1. introduce rich proof schema/types/store;
-2. implement passive/E2 deterministic-local proof compilation;
-3. implement freshness/integrity validation needed by that bounded path;
-4. project valid rich states into the legacy tri-state surface;
-5. emit M30-compatible lifecycle signals where the existing event contract permits or through a bounded versioned extension;
-6. satisfy the S04 tests applicable to Slice 1.
+The evidence/checkpoint metadata is now frozen.
+Run all four hosted gates on the final PR head, confirm zero unresolved threads, then HEDS.
 
-Vendor-specific Cursor/Codex active probes remain EXPERIMENT and are OUT OF SCOPE for Slice 1.
+No active host probe or next module may start before UADS2-WO-006 is APPROVED/MERGED.
 
-## Global construction rule
 
-ADR-UADS2-011 remains authoritative:
-Global Architecture → Deep Module Discovery → Vertical Implementation → Integration Freeze.
+## HEDS correction record
 
-M03 is not S07-frozen merely because S00-S04 are complete.
+Exact-head audit on `a0b0f5ebd5cfc0b1b0322967697a2af5a233b51a` found a cross-capability replay gap: proof `capabilityId` was not checked against the projector/storage key.
 
-## Repository follow-up
+The bounded runtime correction adds:
+- subject/path binding enforcement on proof reads;
+- capability/path binding enforcement on proof reads;
+- capability/key binding enforcement in direct projection;
+- strengthened copied-root replay test;
+- `M03-REG-001` cross-capability replay regression test;
+- B4 replay coverage for cross-capability injection.
 
-Issue #9 remains open for admin-only branch protection/security configuration.
+Prior benchmark values are historical. Fresh exact-head gates/benchmark are required before HEDS can become APPROVED.
