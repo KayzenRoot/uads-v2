@@ -1,0 +1,98 @@
+name: UADS Cross-Platform Compatibility
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compatibility-${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  compatibility:
+    name: ${{ matrix.platform }} / Node 20
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'success') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            runner: ubuntu-latest
+          - platform: windows
+            runner: windows-latest
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact source SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Prove exact checkout identity
+        id: checkout_identity
+        shell: pwsh
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}
+        run: |
+          $actual = (git rev-parse HEAD).Trim().ToLowerInvariant()
+          $expected = $env:EXPECTED_SOURCE_SHA.Trim().ToLowerInvariant()
+          if ($actual -ne $expected) { throw "checked out HEAD does not match explicit source SHA" }
+          $tree = (git rev-parse 'HEAD^{tree}').Trim().ToLowerInvariant()
+          if ($tree -notmatch '^[0-9a-f]{40}$') { throw "checked out source tree SHA is invalid" }
+          "sourceTreeSha=$tree" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        id: npm_ci
+        run: npm ci
+
+      - name: Typecheck and build
+        id: typecheck_build
+        run: |
+          npm run typecheck
+          npm run build
+
+      - name: Adapter and root-binding smoke
+        id: adapter_eval
+        run: npm run eval:adapters
+
+      - name: Isolated global installation smoke
+        id: isolated_install
+        run: node scripts/github/compatibility-smoke.mjs --platform ${{ matrix.platform }} --report "${{ runner.temp }}/uads-compatibility-smoke.json"
+
+      - name: Write compatibility evidence
+        if: always()
+        env:
+          UADS_COMPATIBILITY_STATUS: ${{ job.status }}
+          UADS_COMPATIBILITY_CHECKS: >-
+            {"npm-ci":"${{ steps.npm_ci.outcome }}","typecheck-build":"${{ steps.typecheck_build.outcome }}","adapter-eval":"${{ steps.adapter_eval.outcome }}"}
+        run: >-
+          node scripts/github/generate-compatibility-evidence.mjs
+          --platform "${{ matrix.platform }}"
+          --source-sha "${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}"
+          --source-tree-sha "${{ steps.checkout_identity.outputs.sourceTreeSha }}"
+          --job-name "${{ matrix.platform }} / Node 20"
+          --checks-file "${{ runner.temp }}/uads-compatibility-smoke.json"
+          --output "${{ runner.temp }}/uads-compatibility-evidence.json"
+
+      - name: Upload compatibility evidence
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: uads-compatibility-${{ matrix.platform }}-${{ github.event.workflow_run.head_sha || github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/uads-compatibility-evidence.json
+          retention-days: 90
+          if-no-files-found: error
