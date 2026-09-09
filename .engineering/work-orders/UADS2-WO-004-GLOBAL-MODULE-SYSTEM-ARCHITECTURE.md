@@ -1,13 +1,15 @@
 # Work Order — UADS2-WO-004
 
-Status: READY_FOR_EXACT_HEAD_HEDS
+Status: COMPLETED — HEDS APPROVED / MERGED
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-004-global-module-architecture`
 Base SHA: `d3f80ed352c8424853882bbf9041c386a93bd603`
-Issue: #24
-PR: #25
+Issue: #24 — CLOSED
+PR: #25 — MERGED
 Owner decision source: #23
 Risk: MEDIUM
+Approved exact head: `84015b45088a0d4df0a0f2d07424784d73ca730e`
+Merge SHA: `58233f5d15ff60cf61a43dae355e51215cc20e33`
 Scope: planning/governance only
 
 ## Objective
@@ -57,8 +59,8 @@ Promote the owner-approved construction model and freeze enough system-level arc
 - [x] next eligible module is selected with rationale;
 - [x] non-NECESSARY HARD prerequisites of NECESSARY modules are reconciled through effective delivery criticality;
 - [x] no runtime source path changed;
-- [ ] exact-head mandatory CI gates pass;
-- [ ] HEDS APPROVED before deep discovery resumes.
+- [x] exact-head mandatory CI gates pass;
+- [x] HEDS APPROVED before deep discovery resumes.
 
 ## Next module candidate
 
@@ -67,3 +69,19 @@ M03 Host Capability Detector, only after WO-004 HEDS approval and merge.
 ## Stop
 
 STOP on runtime scope creep, dependency cycle, ambiguous dual ownership, owner-decision weakening, or unresolved HIGH/CRITICAL governance defect.
+
+
+## Final HEDS completion record
+
+- Verdict: `APPROVED`.
+- Exact reviewed head: `84015b45088a0d4df0a0f2d07424784d73ca730e`.
+- CI: SUCCESS.
+- CodeQL: SUCCESS.
+- Dependency Review: SUCCESS.
+- UADS Cross-Platform Compatibility: SUCCESS.
+- Unresolved review threads: 0.
+- HARD graph: 31 nodes / 60 edges / 0 cycles / 0 missing refs.
+- Issue #23 owner decision promoted as ADR-UADS2-011 without semantic weakening.
+- M14/M23/M24/M25 delivery-criticality inheritance accepted without overwriting declared classes.
+- PR #25 merged as `58233f5d15ff60cf61a43dae355e51215cc20e33`.
+- Next selected deep-discovery module: M03 Host Capability Detector.

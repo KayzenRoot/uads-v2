@@ -1,45 +1,64 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-003 APPROVED / MERGED; UADS2-WO-004 CONTENT FROZEN / HEDS PENDING
+Status: UADS2-WO-004 APPROVED / MERGED; M03 DEEP DISCOVERY NEXT
 Date: 2026-09-09
 
-Completed Work Order: UADS2-WO-003
-Active Work Order: UADS2-WO-004
-Active Issue: #24
-Owner-decision source: #23
-Active PR: #25
-Active Branch: `work/uads2-wo-004-global-module-architecture`
-Base SHA: `d3f80ed352c8424853882bbf9041c386a93bd603`
-Initial architecture snapshot: `d09c0c692e3bc07519aa39b1d12358f96ef0bac2`
-Topology/S07 correction snapshot: `4cf3884876f95949bbc5f51167649eb196c89e19`
+Completed Work Order: UADS2-WO-004
+Active Work Order: none
+Active PR: none
+Merged PR: #25
+Approved UADS2-WO-004 head: `84015b45088a0d4df0a0f2d07424784d73ca730e`
+UADS2-WO-004 merge SHA: `58233f5d15ff60cf61a43dae355e51215cc20e33`
 
-## Active gate
-UADS2-WO-004 is planning/governance only. No new deep module runtime implementation is authorized until exact-head HEDS APPROVED.
+## Canonical construction model
 
-## Proposed canonical construction model
+ADR-UADS2-011 is ACCEPTED:
 
 **Global Architecture → Deep Module Discovery → Vertical Implementation → Integration Freeze**
 
-- system-level architecture for all 31 modules first;
-- one deep-discovery module at a time;
-- dependency eligibility rather than numeric order;
-- S01 Technology Radar;
-- S01.5 Technology Invention Radar;
-- S02–S04 architecture/failure/tests before code;
-- S05 small vertical slices with continuous tests;
-- S06 integration/hardening;
-- S07 HEDS freeze;
-- M27–M31 on every slice;
-- Architecture Reconciliation every 3–5 module freezes, default 4.
+- all 31 modules are architected first at system level;
+- one deep-discovery module is active at a time by default;
+- construction order is dependency-driven, not numeric;
+- S01 Technology Radar is mandatory;
+- S01.5 Technology Invention Radar is mandatory and falsifiable;
+- S02–S04 freeze detailed architecture, failure/security/resilience and tests/benchmarks before code;
+- S05 uses small end-to-end vertical slices with continuous tests;
+- S06 integrates/hardens;
+- S07 requires exact-head HEDS module freeze;
+- M27–M31 enterprise gates apply continuously;
+- Architecture Reconciliation occurs every 3–5 completed module freezes, default 4, or earlier on material change.
 
-## Dependency graph
-Deterministic validation: 31 nodes, 60 HARD edges, 0 missing references, 0 cycles, 0 manifest mismatches.
+## Global dependency graph
 
-Topological layers are not eligibility sets. Current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30. WO-003 delivered a bounded M30 foundation, not an S07 M30 module freeze.
+Frozen system graph:
+- modules: 31;
+- HARD edges: 60;
+- missing references: 0;
+- cycles: 0;
+- manifest mismatches: 0.
 
-Dependency-derived delivery criticality: M14, M23, M24 and M25 are `NECESSARY_BY_HARD_DEPENDENCY` while their declared classes remain unchanged.
+Current HARD roots:
+M03, M07, M14, M17, M19, M25, M29, M30.
 
-First selected deep-discovery module after approval: **M03 Host Capability Detector**.
+WO-003 delivered a bounded M30 runtime foundation, not a complete M30 S07 module freeze.
+
+Dependency-derived delivery criticality preserves declared classes while elevating delivery priority:
+- M14 → `NECESSARY_BY_HARD_DEPENDENCY`;
+- M23 → `NECESSARY_BY_HARD_DEPENDENCY`;
+- M24 → `NECESSARY_BY_HARD_DEPENDENCY`;
+- M25 → `NECESSARY_BY_HARD_DEPENDENCY`.
+
+## Next NECESSARY increment
+
+Create `UADS2-WO-005 — M03 Host Capability Detector Deep Discovery`.
+
+M03 is selected because it is a HARD root and directly unlocks M01, M04, M06 and M23 while reducing unsafe/fabricated host-capability assumptions.
+
+WO-005 begins with:
+S00 → S01 → S01.5.
+
+No M03 runtime implementation begins before its S02–S04 contracts and tests are frozen under HEDS.
 
 ## Repository follow-up
+
 Issue #9 remains open for admin-only branch protection/security configuration.
