@@ -49,7 +49,7 @@
     "M03-T061-M03-T066 active-probe cross-platform"
   ],
   "benchmarkLinePrefix": "UADS2_WO_006_BENCHMARK",
-  "status": "PASSED_ON_IMPLEMENTATION_EQUIVALENT_HEAD",
+  "status": "HEDS_CORRECTION_APPLIED_PENDING_EXACT_HEAD_REVERIFY",
   "result": {
     "testFilesPassed": 52,
     "testsPassed": 462,
@@ -80,5 +80,9 @@
         "pass": true
       }
     }
-  }
+  },
+  "regressionTests": [
+    "M03-REG-001 cross-capability proof replay rejected"
+  ],
+  "note": "T047 strengthened to test copied cross-subject replay; fresh exact-head verification required."
 }

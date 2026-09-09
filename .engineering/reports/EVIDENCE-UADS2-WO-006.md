@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-006 / M03 S05 Slice 1
 
-Status: FINAL EVIDENCE FROZEN / EXACT-HEAD HEDS GATES PENDING
+Status: HEDS CORRECTION APPLIED / FRESH EXACT-HEAD GATES PENDING
 Issue: #28
 PR: #29
 Base main: `36b2019fc22b4d6c5d250e41edf12e737c4ddcfa`
@@ -71,7 +71,7 @@ Measured on implementation-equivalent head `0c96f6c4b74e73157fae3cb9533ffdd3f325
 - B4: unsafeTrue=0, tamperReplayAccepted=0, driftMisses=0, absenceUnsupported=0, PASS.
 - B7: corruptAccepted=0, recovered=true, PASS.
 
-The final review head differs from `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44` only by evidence/checkpoint metadata. Hosted gates must rerun on that final head before HEDS.
+`0c96f6c4b74e73157fae3cb9533ffdd3f3254a44` is now historical pre-HEDS-correction benchmark evidence. A fresh exact-head rerun is mandatory because the HEDS correction adds capability/subject binding checks to runtime reads/projection.
 
 ## Privacy/security review
 
@@ -125,3 +125,25 @@ Required before HEDS:
 - exact-head benchmark values copied into this bundle;
 - unresolved review threads = 0;
 - no HIGH/CRITICAL defect.
+
+
+## HEDS correction — cross-capability replay binding
+
+During exact-head HEDS on `a0b0f5ebd5cfc0b1b0322967697a2af5a233b51a`, the auditor identified a HIGH integrity gap:
+
+- a valid proof's `capabilityId` was cryptographically bound inside PCCR,
+  but the projector did not verify that the proof stored/passed under a map key
+  matched that key;
+- a copied or injected `toolCalling` proof could therefore be reused under
+  `subagents` (or another capability key) and incorrectly project `true`.
+
+Bounded correction:
+- `readHostCapabilityProof()` now rejects subject-path and capability-path binding mismatch;
+- direct projection now refuses a proof whose internal `capabilityId` differs from the target capability;
+- T047 was strengthened to copy a proof across subject roots and require REJECTED;
+- new regression `M03-REG-001` proves direct and stored cross-capability replay cannot enable another capability;
+- B4 replay accounting now includes a cross-capability replay attempt.
+
+No schema, package, probe or architectural scope expansion was required.
+
+The prior benchmark values remain historical only. Fresh exact-head B1/B3/B4/B7 values and all four hosted gates must be auditor-bound before final APPROVED.

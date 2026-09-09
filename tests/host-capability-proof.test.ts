@@ -308,10 +308,50 @@ describe("M03 PCCR core - frozen S04 mapping", () => {
     expect(evaluated.reasonCodes).toContain("ADAPTER_ID_MISMATCH");
   });
 
-  it("M03-T047 cross-root proof replay is rejected", () => {
+  it("M03-T047 cross-root proof replay is rejected even when the file is copied", () => {
     const paths = ensureWorkspace("project-m03-replay", home());
-    persistHostCapabilityProof(paths, proof());
-    expect(readHostCapabilityProof(paths, D.subjectOther, "toolCalling").status).toBe("MISSING");
+    const p = proof();
+    persistHostCapabilityProof(paths, p);
+    const source = hostCapabilityProofPath(paths, D.subject, "toolCalling");
+    const replay = hostCapabilityProofPath(paths, D.subjectOther, "toolCalling");
+    fs.mkdirSync(path.dirname(replay), { recursive: true });
+    fs.copyFileSync(source, replay);
+    const read = readHostCapabilityProof(paths, D.subjectOther, "toolCalling");
+    expect(read.status).toBe("REJECTED");
+    if (read.status === "REJECTED") {
+      expect(read.error).toMatch(/subject binding mismatch/);
+    }
+  });
+
+  it("M03-REG-001 cross-capability proof replay cannot enable another capability", () => {
+    const toolCallingProof = proof({ capabilityId: "toolCalling" });
+    const projected = projectHostCapabilityProofsToLegacySnapshot({
+      legacy: legacy({ subagents: true }),
+      proofs: { subagents: toolCallingProof },
+      currentBasis: { subagents: basis() },
+      now: "2026-09-09T12:30:00.000Z",
+    });
+    expect(projected.capabilities.subagents).toBe("unknown");
+
+    const paths = ensureWorkspace("project-m03-capability-replay", home());
+    persistHostCapabilityProof(paths, toolCallingProof);
+    const source = hostCapabilityProofPath(paths, D.subject, "toolCalling");
+    const replay = hostCapabilityProofPath(paths, D.subject, "subagents");
+    fs.copyFileSync(source, replay);
+    const read = readHostCapabilityProof(paths, D.subject, "subagents");
+    expect(read.status).toBe("REJECTED");
+    if (read.status === "REJECTED") {
+      expect(read.error).toMatch(/capability binding mismatch/);
+    }
+
+    const storedProjection = projectStoredHostCapabilityProofsToLegacySnapshot({
+      paths,
+      subjectDigest: D.subject,
+      legacy: legacy({ subagents: true }),
+      currentBasis: { subagents: basis() },
+      now: "2026-09-09T12:30:00.000Z",
+    });
+    expect(storedProjection.capabilities.subagents).toBe("unknown");
   });
 
   it("M03-T048 tampered proof digest is rejected", () => {
@@ -500,6 +540,13 @@ describe("M03 PCCR core - frozen S04 mapping", () => {
     } catch {
       // expected
     }
+    const crossCapabilityReplay = projectHostCapabilityProofsToLegacySnapshot({
+      legacy: legacy({ subagents: true }),
+      proofs: { subagents: proofs[0] },
+      currentBasis: { subagents: basis() },
+      now: "2026-09-09T12:30:00.000Z",
+    });
+    if (crossCapabilityReplay.capabilities.subagents === true) tamperReplayAccepted += 1;
     if (
       evaluateHostCapabilityProof(
         proofs[0]!,

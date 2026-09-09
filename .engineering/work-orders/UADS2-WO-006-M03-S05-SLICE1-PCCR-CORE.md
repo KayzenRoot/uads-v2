@@ -233,3 +233,19 @@ Initial test-only defect:
 T049 used a too-short fake GitHub token. The fixture was corrected to match the existing repository secret detector. Runtime implementation did not change.
 
 Final exact-head HEDS remains mandatory after this evidence-only metadata commit.
+
+
+## HEDS correction record
+
+Exact-head audit of `a0b0f5ebd5cfc0b1b0322967697a2af5a233b51a` identified a HIGH integrity defect:
+the PCCR internal `capabilityId` was not enforced against the proof map/storage capability key.
+
+Required bounded correction has been applied in-scope:
+- enforce subject/path binding in reads;
+- enforce capability/path binding in reads;
+- enforce proof capability/key binding before projection;
+- strengthen T047 copied-root replay;
+- add M03-REG-001 cross-capability replay regression;
+- extend B4 replay attempt coverage.
+
+Final status remains CORRECTION APPLIED / exact-head verification pending until fresh hosted gates and benchmark pass.

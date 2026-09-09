@@ -1,6 +1,6 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-006 PR #29 FINAL EVIDENCE FROZEN / EXACT-HEAD HEDS PENDING
+Status: UADS2-WO-006 PR #29 HEDS CORRECTION APPLIED / FRESH EXACT-HEAD GATES PENDING
 Date: 2026-09-09
 
 Completed Work Order: UADS2-WO-005
@@ -48,3 +48,18 @@ The evidence/checkpoint metadata is now frozen.
 Run all four hosted gates on the final PR head, confirm zero unresolved threads, then HEDS.
 
 No active host probe or next module may start before UADS2-WO-006 is APPROVED/MERGED.
+
+
+## HEDS correction record
+
+Exact-head audit on `a0b0f5ebd5cfc0b1b0322967697a2af5a233b51a` found a cross-capability replay gap: proof `capabilityId` was not checked against the projector/storage key.
+
+The bounded runtime correction adds:
+- subject/path binding enforcement on proof reads;
+- capability/path binding enforcement on proof reads;
+- capability/key binding enforcement in direct projection;
+- strengthened copied-root replay test;
+- `M03-REG-001` cross-capability replay regression test;
+- B4 replay coverage for cross-capability injection.
+
+Prior benchmark values are historical. Fresh exact-head gates/benchmark are required before HEDS can become APPROVED.

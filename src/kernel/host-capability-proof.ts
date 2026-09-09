@@ -378,9 +378,16 @@ export function readHostCapabilityProof(
     return { status: "REJECTED", proof: null, error: safeErrorMessage(parsed.error) };
   }
   try {
+    const proof = normalizeHostCapabilityProof(parsed.value, schemaRoot);
+    if (proof.subjectDigest !== subjectDigest) {
+      throw new Error("host capability proof subject binding mismatch");
+    }
+    if (proof.capabilityId !== capabilityId) {
+      throw new Error("host capability proof capability binding mismatch");
+    }
     return {
       status: "VALID",
-      proof: normalizeHostCapabilityProof(parsed.value, schemaRoot),
+      proof,
       error: null,
     };
   } catch (error) {
@@ -468,6 +475,10 @@ export function projectHostCapabilityProofsToLegacySnapshot(input: {
         now: input.now,
         schemaRoot: input.schemaRoot,
       });
+      if (evaluated.proof.capabilityId !== capabilityId) {
+        capabilities[capabilityId] = "unknown";
+        continue;
+      }
       if (evaluated.effectiveState === "SUPPORTED") {
         capabilities[capabilityId] = true;
       } else if (evaluated.effectiveState === "UNSUPPORTED") {

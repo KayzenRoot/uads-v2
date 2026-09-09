@@ -37,5 +37,7 @@
     "recovered": true,
     "pass": true
   },
-  "note": "Final PR review head adds evidence/checkpoint metadata only; exact-head hosted gates must rerun before HEDS."
+  "note": "Historical pre-HEDS-correction measurements from 0c96f6c4. Runtime capability/subject binding correction requires fresh exact-head benchmark and hosted gates before approval.",
+  "status": "SUPERSEDED_BY_HEDS_RUNTIME_CORRECTION_PENDING_EXACT_HEAD_RERUN",
+  "historical": true
 }
