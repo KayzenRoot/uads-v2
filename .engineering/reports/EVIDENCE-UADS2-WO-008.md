@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-008 / M03 S05.3
 
-Status: IMPLEMENTATION VERIFIED / FINAL EXACT-HEAD HEDS PENDING
+Status: HEDS APPROVED / MERGED
 Issue: #32
 PR: #33
 Base main: `f320243d28d95037f9e270e2d500606e791855c3`
@@ -107,3 +107,31 @@ Validation rerun:
 ## Final gate
 
 This evidence commit changes PR HEAD. Fresh exact-head CI / CodeQL / Dependency Review / Cross-Platform SUCCESS and zero unresolved threads are required before HEDS APPROVED.
+
+
+## Final exact-head HEDS evidence
+
+Exact reviewed head: `3c95b6b340168d619669ddc1f392872f3252e6f1`
+Merge SHA: `f870d46a39d9bbf0adb8ac9e5dd73b9848be276f`
+Exact-head CI run: `34414420839`
+Exact-head CI job: `102675959207`
+
+Final:
+- 54/54 test files PASS;
+- 508/508 tests PASS;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Cross-Platform Compatibility SUCCESS;
+- unresolved review threads = 0;
+- mergeable = true at audit.
+
+Exact-head benchmark:
+- B2 p50 4.638822 ms / p95 6.192627 ms;
+- B2 validation rerun p95 8.031462 ms;
+- B5 100 callers -> one executionId, one receiptDigest, one spawn, zero in-flight after settle;
+- B5 primary completion 103.931358 ms;
+- B3 1,137 bytes;
+- B4 all safety counters zero.
+
+All four runtime/test blobs were identical to the implementation-tested snapshot.

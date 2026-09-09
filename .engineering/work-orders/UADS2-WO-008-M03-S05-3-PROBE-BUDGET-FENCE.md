@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-008
 
-Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
+Status: COMPLETED — HEDS APPROVED / MERGED
 Module: M03 — Host Capability Detector
 Slice: S05.3 — Probe Budget Fence Core & Generic Safe Probe Executor
 Repository: `KayzenRoot/uads-v2`
@@ -275,3 +275,19 @@ Benchmark primary sample:
 - WO008-B4 all safety counters = 0.
 
 Final exact HEDS head will be auditor-bound after the evidence-only commit.
+
+
+## Final HEDS completion record
+
+- Exact reviewed head: `3c95b6b340168d619669ddc1f392872f3252e6f1`
+- HEDS verdict: `APPROVED`
+- CI / CodeQL / Dependency Review / Cross-Platform: SUCCESS
+- 54/54 test files PASS
+- 508/508 tests PASS
+- Exact-head B2 p95: 6.192627 ms <= 2000 ms
+- Exact-head B5: 100 callers -> 1 execution / 1 spawn / 0 in-flight after settle
+- B3: 1,137 bytes <= 65,536
+- B4 all safety counters: 0
+- PR #33 merge SHA: `f870d46a39d9bbf0adb8ac9e5dd73b9848be276f`
+- Vendor-specific probes remain unauthorized
+- M03 remains not S07-frozen

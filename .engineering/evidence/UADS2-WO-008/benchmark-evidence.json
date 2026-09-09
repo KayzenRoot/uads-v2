@@ -1,7 +1,7 @@
 {
   "schema": "uads2.wo008.benchmark-evidence",
   "schemaVersion": "1.0.0",
-  "status": "IMPLEMENTATION_HEAD_VERIFIED_FINAL_HEDS_HEAD_PENDING",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "implementationHead": "cf53be42fe74075071edaac6c2eb90935f0a215f",
   "sourceRunId": 34413709632,
   "sourceJobId": 102673708260,
@@ -60,6 +60,75 @@
         "uniqueExecutionIds": 1,
         "uniqueReceiptDigests": 1,
         "completionMs": 104.62987899999996,
+        "inFlightAfter": 0,
+        "spawnCount": 1,
+        "pass": true
+      },
+      "B3": {
+        "receiptBytes": 1137,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "shellExecution": 0,
+        "pathLookupExecution": 0,
+        "blockedSpawn": 0,
+        "leakedSecret": 0,
+        "pccrProofCreated": 0,
+        "pass": true
+      }
+    }
+  ],
+  "finalHead": "3c95b6b340168d619669ddc1f392872f3252e6f1",
+  "finalSourceRunId": 34414420839,
+  "finalSourceJobId": 102675959207,
+  "finalSamples": [
+    {
+      "B2": {
+        "samples": 50,
+        "p50Ms": 4.638822000000005,
+        "p95Ms": 6.192627000000016,
+        "targetP95Ms": 2000,
+        "pass": true,
+        "maxDescriptorTimeoutMs": 1000
+      },
+      "B5": {
+        "callers": 100,
+        "uniqueExecutionIds": 1,
+        "uniqueReceiptDigests": 1,
+        "completionMs": 103.93135799999993,
+        "inFlightAfter": 0,
+        "spawnCount": 1,
+        "pass": true
+      },
+      "B3": {
+        "receiptBytes": 1137,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "shellExecution": 0,
+        "pathLookupExecution": 0,
+        "blockedSpawn": 0,
+        "leakedSecret": 0,
+        "pccrProofCreated": 0,
+        "pass": true
+      }
+    },
+    {
+      "B2": {
+        "samples": 50,
+        "p50Ms": 5.738461000000029,
+        "p95Ms": 8.031462000000033,
+        "targetP95Ms": 2000,
+        "pass": true,
+        "maxDescriptorTimeoutMs": 1000
+      },
+      "B5": {
+        "callers": 100,
+        "uniqueExecutionIds": 1,
+        "uniqueReceiptDigests": 1,
+        "completionMs": 106.40815199999997,
         "inFlightAfter": 0,
         "spawnCount": 1,
         "pass": true

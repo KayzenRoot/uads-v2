@@ -3,7 +3,7 @@
   "schemaVersion": "1.0.0",
   "implementationHead": "cf53be42fe74075071edaac6c2eb90935f0a215f",
   "sourceRunId": 34413709632,
-  "status": "PASS_IMPLEMENTATION_HEAD",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "focusedCases": [
     {
       "id": "M03-T031",
@@ -105,5 +105,12 @@
       "failed": 0
     },
     "allStandardEvals": "PASS"
+  },
+  "finalHead": "3c95b6b340168d619669ddc1f392872f3252e6f1",
+  "finalSourceRunId": 34414420839,
+  "finalResult": {
+    "filesPassed": 54,
+    "testsPassed": 508,
+    "failed": 0
   }
 }
