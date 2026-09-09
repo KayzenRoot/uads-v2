@@ -1,12 +1,10 @@
 # M24 — Observability & Cost Ledger
 Status: DISCOVERY | Class: IMPORTANT
 
-Mission: make worker count, concurrency, model/effort, tokens, retries, context radius, cache, gates and TTTM measurable per Work Order.
+Mission: make worker count, concurrency, model/effort, tokens, retries, context radius, cache, gates, review-analysis attribution and TTTM measurable per Work Order.
 
-Standalone: local privacy-safe ledger. Hive complement: optional aggregate metrics may flow upward through explicit contract.
+M24 owns Work Order/cost attribution and ledger semantics. M30 owns production event transport, health/alerts, SLI/SLO and the real-time dashboard/operator surface.
 
-Candidate technology radar, UNAPPROVED: event-sourced Work Order telemetry; OpenTelemetry-compatible spans; cost attribution graph; QPT/TTTM dashboards.
+Review-analysis events from M08 transported by M30 must remain attributable to exact Work Order/review identity. Missing telemetry is explicit, never silently zero.
 
-Sessions S00–S07 cover metric semantics, telemetry technology, architecture, privacy/cardinality, accuracy tests, implementation, Hive export, freeze.
-
-Mandatory tests: double-count prevention, missing telemetry explicit, privacy redaction, exact WO attribution, low overhead benchmark.
+Mandatory tests: double-count prevention, missing telemetry explicit, privacy redaction, exact WO attribution, duplicate-rate recomputation identity and low overhead.

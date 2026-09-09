@@ -2,24 +2,20 @@
 
 Status: CANONICAL OVERLAY IN REVIEW
 
-## Development line
+V1 remains independent and usable. V2 remains global-first unless an accepted ADR changes it: sidecar under `~/.uads/`, user-level Cursor/Codex adapter roots, no uncontrolled project-local runtime state.
 
-- UADS V1 repository remains independent and usable.
-- UADS V2 development occurs only in `KayzenRoot/uads-v2`.
-- Bootstrap begins from V1 SHA `312e32946798eb3abbb49a79af08e13efb7719dc`.
+## M31 safe-delivery contract
+Applicable release/migration Work Orders define:
+- release-readiness gates and exact candidate;
+- schema/contract versioning;
+- compatibility/deprecation policy;
+- reversible migration strategy;
+- feature flag/canary/blue-green only when justified;
+- post-deploy verification;
+- rollback triggers and tested rollback path;
+- operator/runbook ownership;
+- deployment-health evidence before promotion.
 
-## Runtime strategy
+M28 owns backup/restore and RTO/RPO where applicable. M26 owns learned-policy rollback; M31 owns runtime/product/config/schema release rollback.
 
-V2 MUST preserve global-first installation semantics unless a dedicated accepted ADR changes them:
-- UADS state under `~/.uads/`;
-- Cursor integration under the user-level Cursor adapter root;
-- Codex integration under the user-level Codex adapter root;
-- no uncontrolled project-local runtime state.
-
-## Release transition
-
-Bootstrap does not rename package metadata, publish V2, create a tag or replace the installed V1. Versioning/package/release migration requires a separate Work Order after baseline and regression evidence.
-
-## Rollback
-
-Until V2 release is explicitly approved, rollback is simply continued use of the existing V1 installation/repository. V2 deployment work must never require destructive mutation of V1.
+Until V2 release is explicitly approved, V1 remains the safe coexistence path.

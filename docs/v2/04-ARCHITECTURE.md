@@ -3,18 +3,7 @@
 Status: CANONICAL OVERLAY IN REVIEW
 
 ## Operating modes
-
-UADS V2 is standalone-first.
-
-```text
-SOLO
-User → UADS V2 Core → Result / Evidence
-
-HIVE_CONNECTED
-HiveTaskEnvelope → Optional Hive Bridge → UADS V2 Core → UADSQualityBundle → Hive
-```
-
-`SOLO` is a first-class mandatory mode. The UADS core MUST NOT require Hive packages, services or availability to boot, plan, execute, verify or review its owned work. `HIVE_CONNECTED` is additive through a versioned optional bridge. Loss, absence or incompatibility of Hive must degrade safely to the supported standalone boundary rather than break UADS core execution.
+`SOLO` is mandatory and complete. `HIVE_CONNECTED` is optional/additive through versioned contracts. Hive absence must not break UADS core execution.
 
 ## Core model
 
@@ -23,91 +12,45 @@ User / optional HiveTaskEnvelope
         |
         v
 UADS Coordinator
-        |
         +--> Context / Risk / Impact
-        |
         +--> Model + Effort Router
-        |
-        +--> Spawn Gate
-                |
-                +--> zero or one active specialist worker
-        |
-        +--> Selected Verification / Fault Resolution
-        |
-        +--> Evidence + Review Package
-        |
-        v
-Main Session Result / optional UADSQualityBundle
+        +--> Spawn Gate --> zero or one active specialist worker
+        +--> Verification / Fault Resolution
+        +--> Evidence / Review
+        +--> Enterprise Production-Readiness Plane
+               M27 Capacity & Load
+               M28 Resilience & Recovery
+               M29 Operational Security & Supply Chain
+               M30 Production Observability & Real-Time Operations
+               M31 Release Engineering & Safe Operations
 ```
 
-Default concurrency invariant:
+Default invariant: `coordinator_count=1`, `max_active_specialist_workers=1`, `parallel_specialist_fanout=false`.
 
-```text
-coordinator_count = 1
-max_active_specialist_workers = 1
-parallel_specialist_fanout = false
-```
+## Functional ownership
+M01 owns sequential queue/scheduler semantics. M02 owns background worker abstraction. M03 owns proven host capabilities. M04–M07 own model/effort/resource routing. M08 owns HEDS review runtime. M10/M20/M21 own fault, failure memory and retry semantics. M24 owns Work Order/cost ledger semantics.
 
-## Main components
+## Observability boundary
+M30 owns production telemetry transport, health/alerts, SLI/SLO and the real-time dashboard/operator plane. M24 owns Work Order/cost attribution. M08 emits review-analysis events required by B-001. Missing telemetry is explicit, never inferred.
 
-### Coordinator
-Owns bounded task lifecycle and preserves Work Order identity.
+## Enterprise production-readiness plane
+Every module Work Order classifies scale/load, resilience, operational security, production observability and continuous safe operations as `COVERED`, `NOT_APPLICABLE` with rationale, or `GAP`. Necessary GAPs block production-readiness declaration.
 
-### Sequential Agent Orchestrator
-Maintains a queue. A next specialist cannot start until the active specialist reaches a terminal state.
+## Runtime sequencing after UADS2-WO-002 approval
+1. M30 event spine + dashboard/operator foundation.
+2. First bounded M01 orchestrator slice integrated with M30.
+3. M03 capability proof + M02 background worker integration.
+4. Remaining modules through bounded Work Orders.
 
-### Background Worker Runtime
-Executes a selected specialist without creating a new visible user conversation when the host proves support.
-
-### Host Capability Layer
-Detects runtime/adapter capabilities. Capability state is PROVEN, UNKNOWN/UNPROVEN, UNSUPPORTED or BLOCKED. Unknown never authorizes a feature.
-
-### Model Router + Effort Autopilot
-Selects a policy-compatible model/profile and reasoning class from proven runtime options. Routing is evidence- and budget-aware.
-
-### Context Intelligence
-Retains inherited C0-C5/progressive-context behavior. Context expands only when evidence or risk requires it.
-
-### Evidence/Failure/Fault Layer
-Evidence Cache, Failure Memory, fault localization, targeted verification and correction loops share immutable identity and invalidation rules.
-
-### Review Pipeline
-Implements HEDS-compatible delta-first review outputs. UADS executes and packages evidence; it does not duplicate Hive's canonical governance authority.
-
-### Optional Hive Integration Bridge
-Translates versioned task/evidence contracts and capability state. It is an adapter boundary, not a core dependency. Hive cannot become necessary for normal UADS solo operation.
-
-## Hive boundary
-
-```text
-HIVE V2
-truth • durable memory • governance • macro planning • HEDS policy
-       |
-       | optional HiveTaskEnvelope
-       v
-UADS V2 BRIDGE
-version/capability/identity validation
-       |
-       v
-UADS V2 CORE
-context • routing • bounded execution • gates • fault repair • evidence
-       |
-       | optional UADSQualityBundle
-       v
-HIVE V2
-reconcile • promote • canonical checkpoint
-```
-
-## Non-duplication principle
-
-Analyze once when validity permits. Exchange evidence and identity rather than recomputing the same conclusion in both systems. A capability already owned by Hive should become a bridge/contract in UADS when integration is useful, not a duplicate authority.
+M27/M28/M29/M31 constraints apply from the first runtime slice.
 
 ## Safety invariants
-
-- standalone core remains operable with Hive absent;
+- Hive optionality preserved;
 - no canonical truth mutation from learned policy;
-- no hidden escalation to stronger model/effort without recorded reason;
-- no unbounded specialist spawn;
+- no hidden escalation;
+- no unbounded spawn;
 - no retry without changed hypothesis/evidence;
 - no proof reuse without validity;
-- no next increment while current one is CORRECTION REQUIRED/BLOCKED.
+- no advance while current work is BLOCKED/CORRECTION REQUIRED;
+- no production-ready claim with necessary enterprise GAP;
+- no real-time UI claim without objective source.
