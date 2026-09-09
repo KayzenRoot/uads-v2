@@ -1,0 +1,4 @@
+
+> uads@0.12.1 lint
+> tsc -p tsconfig.json --noEmit
+

@@ -1,0 +1,16 @@
+{
+  "radius": "C1",
+  "reason": "trivial change: named/affected files only",
+  "candidateAreas": [
+    "src"
+  ],
+  "reusableArtifacts": [
+    "sidecar://index/repository-map.json",
+    "sidecar://state/current.json",
+    "sidecar://decisions/rd_1a9bd8e2df2692e3.json",
+    "sidecar://context/packs/cpk_3ea90ffffe3272e4.json"
+  ],
+  "contextPackId": "cpk_3ea90ffffe3272e4",
+  "impactReportId": "imp_23c82503d7fd0f07",
+  "indexDigest": "df7252c08f943657690dae6e6e5de57776d7823396dac8b00d6e9720a3bfab18"
+}

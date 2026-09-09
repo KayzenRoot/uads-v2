@@ -1,0 +1,23 @@
+{
+  "schema": "uads.review-record",
+  "schemaVersion": "0.3.0",
+  "reviewId": "rv_9f102402fba9bc10",
+  "projectId": "8e4b5bd6a6c41b50",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "executionRunId": "er_47cc270c0ac2aee5",
+  "changeDigest": "844d441f03c19ed34bc658747850d0dc1edbc584c260d58a1fe38e4a46d8934e",
+  "reviewerRole": "independent-reviewer",
+  "reviewSessionId": "rev-independent-reviewer",
+  "implementerRole": "implementation-agent",
+  "implementerSessionId": "imp-1",
+  "verdict": "APPROVED",
+  "summary": "independent-reviewer approved",
+  "findings": [],
+  "reasonCodes": [],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_0f69990e6c92a13c.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2a14951f53d6ad90.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_fc835fc2f34b9125.json"
+  ],
+  "createdAt": "2026-09-09T15:15:09.525Z"
+}

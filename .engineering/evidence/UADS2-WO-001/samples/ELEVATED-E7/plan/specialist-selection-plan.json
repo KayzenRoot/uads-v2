@@ -1,0 +1,789 @@
+{
+  "schema": "uads.specialist-selection-plan",
+  "schemaVersion": "0.9.0",
+  "selectionPlanId": "sp_a97cbe88b8c5d629",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_3af1677e2f4bb9bf",
+  "workOrderDigest": "c8d09777203ac33f5521a1c7f2be36140418ec66018e0b86205837c618650d04",
+  "routingDigest": "155adfdeaec62ba09cd7460024049dd66858db80f637b74780e364564cd1998c",
+  "registryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "policyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "changeDigest": null,
+  "impactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "gateContractDigest": "71055b95a91f97aeb6c37f22a055e87ec0e8883ef68351f5b09f4ac3b0f542ba",
+  "selected": [
+    {
+      "specialistId": "repo-inspector",
+      "kind": "core",
+      "role": "Inspect repository metadata and project identity",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "requirements-engineer",
+      "kind": "core",
+      "role": "Normalize requirements and acceptance criteria",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "requirements"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "implementation-planner",
+      "kind": "core",
+      "role": "Produce a bounded executable Work Order plan",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "implementation-agent",
+      "kind": "core",
+      "role": "Apply necessary in-scope product edits",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "implementation"
+    },
+    {
+      "specialistId": "test-engineer",
+      "kind": "core",
+      "role": "Design and run focused verification",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED",
+        "GATE_REQUIRES_SPECIALIST"
+      ],
+      "coversDomains": [
+        "quality"
+      ],
+      "coversGates": [
+        "static",
+        "unit-test"
+      ],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "checkpoint-manager",
+      "kind": "core",
+      "role": "Persist bounded resume and checkpoint state",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "backend-api-specialist",
+      "kind": "domain",
+      "role": "Handle backend, API, and SaaS boundaries",
+      "required": true,
+      "reasonCodes": [
+        "DOMAIN_COVERAGE"
+      ],
+      "coversDomains": [
+        "api",
+        "backend",
+        "saas"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "finance-math-specialist",
+      "kind": "domain",
+      "role": "Handle finance, accounting, and numerical correctness",
+      "required": true,
+      "reasonCodes": [
+        "DOMAIN_COVERAGE",
+        "GATE_REQUIRES_SPECIALIST"
+      ],
+      "coversDomains": [
+        "finance-economics",
+        "mathematics-simulation",
+        "tokenomics"
+      ],
+      "coversGates": [
+        "financial-numerical-validation"
+      ],
+      "independenceClass": "support"
+    }
+  ],
+  "assurance": [
+    {
+      "specialistId": "independent-reviewer",
+      "kind": "core",
+      "role": "Independently review the implementation",
+      "required": true,
+      "reasonCodes": [
+        "INDEPENDENT_REVIEW_REQUIRED"
+      ],
+      "coversDomains": [
+        "quality"
+      ],
+      "coversGates": [],
+      "independenceClass": "independent-review"
+    },
+    {
+      "specialistId": "security-reviewer",
+      "kind": "assurance",
+      "role": "Provide security assurance for sensitive changes",
+      "required": true,
+      "reasonCodes": [
+        "GATE_REQUIRES_SPECIALIST",
+        "SECURITY_ASSURANCE_REQUIRED"
+      ],
+      "coversDomains": [
+        "security"
+      ],
+      "coversGates": [
+        "security-review"
+      ],
+      "independenceClass": "assurance"
+    }
+  ],
+  "assignments": [
+    {
+      "specialistId": "backend-api-specialist",
+      "role": "Handle backend, API, and SaaS boundaries",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "api",
+        "backend",
+        "saas"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "backend/API verification"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must preserve authentication, contract, and data-boundary obligations.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "checkpoint-manager",
+      "role": "Persist bounded resume and checkpoint state",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "atomic checkpoint"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must persist only sanitized sidecar state outside the managed project.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "finance-math-specialist",
+      "role": "Handle finance, accounting, and numerical correctness",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "finance-economics",
+        "mathematics-simulation",
+        "tokenomics"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:financial-numerical-validation",
+        "numerical and edge-case validation"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not hard-code vendor prices or authorize financial transfers.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "implementation-agent",
+      "role": "Apply necessary in-scope product edits",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "in-scope change"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not perform approval-gated actions or serve as the sole final reviewer.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 4,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "implementation-planner",
+      "role": "Produce a bounded executable Work Order plan",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "Work Order plan"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not dispatch work outside the selected scope.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "independent-reviewer",
+      "role": "Independently review the implementation",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "independent review"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "implementing product changes",
+        "Must use an independent session and must not implement the reviewed change.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "repo-inspector",
+      "role": "Inspect repository metadata and project identity",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "repository map"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not edit product files or execute discovered project code.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "requirements-engineer",
+      "role": "Normalize requirements and acceptance criteria",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "requirements"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "acceptance criteria"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not broaden scope beyond the accepted Work Order.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "security-reviewer",
+      "role": "Provide security assurance for sensitive changes",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "security"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:security-review",
+        "security review"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "implementing product changes",
+        "Must not expose secrets or approve by implementing.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "test-engineer",
+      "role": "Design and run focused verification",
+      "objective": "Change fee accrual and rounding for a financial ledger.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "financial-numerical-validation",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:static",
+        "gate:unit-test",
+        "test evidence"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not self-approve implementation changes.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 3,
+      "parallelEligible": false
+    }
+  ],
+  "rejections": [
+    {
+      "specialistId": "data-ai-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "database-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "documentation-dx-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "frontend-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "game-systems-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "mobile-client-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "performance-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "platform-cloud-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "product-requirements-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "quality-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "release-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "reliability-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "reliability-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "software-architect",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "web3-contract-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    }
+  ],
+  "unmetCoverage": [],
+  "requiredObligations": [
+    {
+      "obligationId": "assurance:independent-reviewer",
+      "kind": "assurance",
+      "domainId": null,
+      "gateId": null,
+      "evidenceId": "independent review",
+      "affectedArea": null,
+      "specialistId": "independent-reviewer"
+    },
+    {
+      "obligationId": "assurance:security-reviewer",
+      "kind": "assurance",
+      "domainId": null,
+      "gateId": null,
+      "evidenceId": "security review",
+      "affectedArea": null,
+      "specialistId": "security-reviewer"
+    },
+    {
+      "obligationId": "domain:backend",
+      "kind": "domain",
+      "domainId": "backend",
+      "gateId": null,
+      "evidenceId": null,
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "domain:finance-economics",
+      "kind": "domain",
+      "domainId": "finance-economics",
+      "gateId": null,
+      "evidenceId": null,
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:financial-numerical-validation",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "financial-numerical-validation",
+      "evidenceId": "gate:financial-numerical-validation",
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:security-review",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "security-review",
+      "evidenceId": "gate:security-review",
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:static",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "static",
+      "evidenceId": "gate:static",
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:unit-test",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "unit-test",
+      "evidenceId": "gate:unit-test",
+      "affectedArea": null,
+      "specialistId": null
+    }
+  ],
+  "coveredObligations": [
+    {
+      "obligationId": "assurance:independent-reviewer",
+      "gateId": null,
+      "evidenceId": "independent review",
+      "specialistId": "independent-reviewer",
+      "reasonCode": "INDEPENDENT_REVIEW_REQUIRED",
+      "coverageKind": "assurance"
+    },
+    {
+      "obligationId": "assurance:security-reviewer",
+      "gateId": null,
+      "evidenceId": "security review",
+      "specialistId": "security-reviewer",
+      "reasonCode": "SECURITY_ASSURANCE_REQUIRED",
+      "coverageKind": "assurance"
+    },
+    {
+      "obligationId": "domain:backend",
+      "gateId": null,
+      "evidenceId": null,
+      "specialistId": "backend-api-specialist",
+      "reasonCode": "DOMAIN_COVERAGE",
+      "coverageKind": "domain"
+    },
+    {
+      "obligationId": "domain:finance-economics",
+      "gateId": null,
+      "evidenceId": null,
+      "specialistId": "finance-math-specialist",
+      "reasonCode": "DOMAIN_COVERAGE",
+      "coverageKind": "domain"
+    },
+    {
+      "obligationId": "gate:financial-numerical-validation",
+      "gateId": "financial-numerical-validation",
+      "evidenceId": "gate:financial-numerical-validation",
+      "specialistId": "finance-math-specialist",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    },
+    {
+      "obligationId": "gate:security-review",
+      "gateId": "security-review",
+      "evidenceId": "gate:security-review",
+      "specialistId": "security-reviewer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    },
+    {
+      "obligationId": "gate:static",
+      "gateId": "static",
+      "evidenceId": "gate:static",
+      "specialistId": "test-engineer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    },
+    {
+      "obligationId": "gate:unit-test",
+      "gateId": "unit-test",
+      "evidenceId": "gate:unit-test",
+      "specialistId": "test-engineer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    }
+  ],
+  "unmetObligations": [],
+  "conflicts": [],
+  "dispatch": {
+    "dependencyGroups": [
+      [
+        "checkpoint-manager",
+        "repo-inspector",
+        "requirements-engineer"
+      ],
+      [
+        "backend-api-specialist",
+        "finance-math-specialist",
+        "implementation-planner"
+      ],
+      [
+        "test-engineer"
+      ],
+      [
+        "implementation-agent"
+      ],
+      [
+        "independent-reviewer",
+        "security-reviewer"
+      ]
+    ],
+    "parallelEligibleGroups": [
+      [
+        "backend-api-specialist",
+        "finance-math-specialist"
+      ]
+    ]
+  },
+  "status": "SELECTED",
+  "blockedReasonCodes": [],
+  "selectionDigest": "6fd291a24740eb20c29c4a3088d1b4e4c22f25896c7dc76f36de8ef4430a7d13"
+}

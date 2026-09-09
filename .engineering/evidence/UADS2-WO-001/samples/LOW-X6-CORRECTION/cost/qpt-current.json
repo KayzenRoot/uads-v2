@@ -1,0 +1,28 @@
+{
+  "schema": "uads.qpt-snapshot",
+  "schemaVersion": "0.6.0",
+  "projectId": "8e4b5bd6a6c41b50",
+  "requiredGatesTotal": 3,
+  "requiredGatesSatisfiedCurrent": 3,
+  "verifiedQualityCoverage": 1,
+  "requiredIndependentReview": "satisfied",
+  "estimatedContextTokens": 6,
+  "tokenEstimateMethod": "byte-heuristic",
+  "toolExecutions": 6,
+  "gateExecutions": 6,
+  "gateCacheHits": 0,
+  "gateCacheMisses": 6,
+  "avoidedWorkCount": 0,
+  "contextRadius": "C1",
+  "budgetUtilization": 0.000375,
+  "qptRatio": 1,
+  "qptFormula": "verifiedQualityCoverage / max(1, estimatedContextTokens/1000)",
+  "limitations": [
+    "byte-heuristic estimates only; not provider tokenizer counts",
+    "not a financial cost, latency, or billing score",
+    "agentCallsReported stays null unless the host reports them",
+    "estimatedDiagnosticTokens is tracked separately and is not part of the QPT denominator"
+  ],
+  "estimatedDiagnosticTokens": 0,
+  "updatedAt": "2026-09-09T15:15:10.203Z"
+}

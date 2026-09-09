@@ -1,0 +1,22 @@
+{
+  "schema": "uads.evidence-record",
+  "schemaVersion": "0.3.0",
+  "evidenceId": "ev_2dcc61fdc46946d6",
+  "projectId": "8e4b5bd6a6c41b50",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "executionRunId": "er_47cc270c0ac2aee5",
+  "changeDigest": "58496ce2d1ab76e419dc7f9132ecd7c074b15b3779190b302b84eaa5a65a3f8a",
+  "gateId": "static",
+  "sourceRole": "test-engineer",
+  "kind": "command",
+  "createdAt": "2026-09-09T15:15:02.072Z",
+  "status": "PASS",
+  "summary": "static pass",
+  "command": "eval:static",
+  "exitCode": 0,
+  "outputRef": "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2dcc61fdc46946d6.output.txt",
+  "outputDigest": "4fc6853bb8532d5f19ec3d67edd11b54889033f4f9c028cef0a33d50383563cd",
+  "fileRef": null,
+  "fileDigest": null,
+  "source": "executed"
+}

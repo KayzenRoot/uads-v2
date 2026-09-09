@@ -1,0 +1,84 @@
+{
+  "schema": "uads.routing-decision",
+  "schemaVersion": "0.2.0",
+  "routingDecisionId": "rd_3af1677e2f4bb9bf",
+  "projectId": "58233072c1c707ff",
+  "createdAt": "2026-09-09T15:13:08.804Z",
+  "scopeClass": "local",
+  "scopeReasons": [
+    "isolated module or component"
+  ],
+  "riskLevel": "HIGH",
+  "riskReasons": [
+    "financial/economic correctness"
+  ],
+  "domains": [
+    {
+      "id": "finance-economics",
+      "reason": "intake domain signal: finance-economics"
+    },
+    {
+      "id": "backend",
+      "reason": "intake domain signal: backend"
+    }
+  ],
+  "specialists": [
+    "repo-inspector",
+    "requirements-engineer",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "backend-api-specialist",
+    "finance-math-specialist"
+  ],
+  "assuranceSpecialists": [
+    "independent-reviewer",
+    "security-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_a97cbe88b8c5d629",
+  "specialistSelectionDigest": "6fd291a24740eb20c29c4a3088d1b4e4c22f25896c7dc76f36de8ef4430a7d13",
+  "specialistRegistryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "specialistPolicyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "specialistChangeDigest": null,
+  "specialistImpactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "specialistGateContractDigest": "71055b95a91f97aeb6c37f22a055e87ec0e8883ef68351f5b09f4ac3b0f542ba",
+  "specialistRiskSignals": [
+    "financial-calculation"
+  ],
+  "specialistDependencySignals": null,
+  "gates": [
+    {
+      "id": "static",
+      "reason": "static analysis for every planned change"
+    },
+    {
+      "id": "unit-test",
+      "reason": "focused tests or smoke for the requested change"
+    },
+    {
+      "id": "financial-numerical-validation",
+      "reason": "numerical/edge-case validation"
+    },
+    {
+      "id": "security-review",
+      "reason": "high/critical plans require security assurance"
+    }
+  ],
+  "contextRadius": "C3",
+  "contextReason": "cross-cutting or high risk: dependency neighborhood",
+  "capabilityClass": "strong",
+  "orderConstraints": [
+    "inspect before edit",
+    "implement only NECESSARY scope",
+    "implementation-agent is not the sole final reviewer"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded"
+  ],
+  "warnings": [
+    "intake used conservative fallback-text classifier, not host semantic interpretation"
+  ]
+}

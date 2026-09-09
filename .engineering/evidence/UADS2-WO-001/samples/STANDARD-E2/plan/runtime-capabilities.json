@@ -1,0 +1,25 @@
+{
+  "schema": "uads.runtime-capability-snapshot",
+  "schemaVersion": "0.8.0",
+  "runtimeId": "generic-runtime",
+  "adapterId": "host-managed",
+  "adapterVersion": "0.8.0",
+  "runtimeVersion": "24.18.0",
+  "capabilities": {
+    "modelSelection": "unknown",
+    "toolCalling": "unknown",
+    "structuredOutput": "unknown",
+    "promptCache": "unknown",
+    "explicitCache": "unknown",
+    "persistentContext": "unknown",
+    "subagents": "unknown",
+    "parallelAgents": "unknown",
+    "usageTelemetry": "unknown",
+    "visionInput": "unknown"
+  },
+  "provenance": {
+    "source": "adapter",
+    "confidence": "unknown"
+  },
+  "identityDigest": "c47e12337ffd4a71aa797ef31f3f19ede7df01835f28ce08d02ef8ddf735b2cb"
+}

@@ -1,0 +1,112 @@
+{
+  "schema": "uads.routing-decision",
+  "schemaVersion": "0.2.0",
+  "routingDecisionId": "rd_191143702562d55e",
+  "projectId": "58233072c1c707ff",
+  "createdAt": "2026-09-09T15:12:38.507Z",
+  "scopeClass": "cross-cutting",
+  "scopeReasons": [
+    "change spans more than one module or contract surface"
+  ],
+  "riskLevel": "HIGH",
+  "riskReasons": [
+    "financial/economic correctness",
+    "authenticated access to financial data"
+  ],
+  "domains": [
+    {
+      "id": "api",
+      "reason": "intake domain signal: api"
+    },
+    {
+      "id": "security",
+      "reason": "intake domain signal: security"
+    },
+    {
+      "id": "backend",
+      "reason": "intake domain signal: backend"
+    },
+    {
+      "id": "finance-economics",
+      "reason": "intake domain signal: finance-economics"
+    },
+    {
+      "id": "saas",
+      "reason": "intake domain signal: saas"
+    }
+  ],
+  "specialists": [
+    "repo-inspector",
+    "requirements-engineer",
+    "software-architect",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "backend-api-specialist",
+    "finance-math-specialist"
+  ],
+  "assuranceSpecialists": [
+    "independent-reviewer",
+    "security-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_995d03589aea16e5",
+  "specialistSelectionDigest": "ee86963279bba1f2f06c45d74f005b558fe755dbccd124cbd423c704a66eac42",
+  "specialistRegistryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "specialistPolicyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "specialistChangeDigest": null,
+  "specialistImpactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "specialistGateContractDigest": "e35730cf50fea66be80a0aa3a6172526b6a72106ea027d58d649064d641e5412",
+  "specialistRiskSignals": [
+    "authentication",
+    "payments",
+    "public-api"
+  ],
+  "specialistDependencySignals": null,
+  "gates": [
+    {
+      "id": "static",
+      "reason": "static analysis for every planned change"
+    },
+    {
+      "id": "unit-test",
+      "reason": "focused tests or smoke for the requested change"
+    },
+    {
+      "id": "integration-test",
+      "reason": "authenticated/API path needs integration coverage"
+    },
+    {
+      "id": "contract-test",
+      "reason": "public API/contract assertions when applicable"
+    },
+    {
+      "id": "security-review",
+      "reason": "auth/API change requires security review"
+    },
+    {
+      "id": "build",
+      "reason": "compile the service"
+    },
+    {
+      "id": "financial-numerical-validation",
+      "reason": "numerical/edge-case validation"
+    }
+  ],
+  "contextRadius": "C3",
+  "contextReason": "cross-cutting or high risk: dependency neighborhood",
+  "capabilityClass": "strong",
+  "orderConstraints": [
+    "inspect before edit",
+    "implement only NECESSARY scope",
+    "implementation-agent is not the sole final reviewer"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded"
+  ],
+  "warnings": [
+    "intake used conservative fallback-text classifier, not host semantic interpretation"
+  ]
+}

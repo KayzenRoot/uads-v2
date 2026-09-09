@@ -1,0 +1,25 @@
+{
+  "schema": "uads.checkpoint",
+  "schemaVersion": "0.2.0",
+  "checkpointId": "cp_191143702562d55e",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_191143702562d55e",
+  "routingDecisionId": "rd_191143702562d55e",
+  "createdAt": "2026-09-09T15:12:38.507Z",
+  "updatedAt": "2026-09-09T15:12:48.687Z",
+  "phase": "plan",
+  "status": "blocked",
+  "completedSteps": [
+    "intake",
+    "classify",
+    "plan"
+  ],
+  "nextAction": "Register a compatible model profile or configure a runtime that proves the required capabilities, then re-route.",
+  "blockers": [
+    "NO_ELIGIBLE_MODEL"
+  ],
+  "evidenceRefs": [],
+  "repositoryMapDigest": "ea0273fbcc459482bcd2c2187c9817599d153c9af9e02e05cfca0694a2dcced9",
+  "contextPlanRef": "sidecar://context/plan.json",
+  "resumeCursor": "plan-complete:await-implementation"
+}

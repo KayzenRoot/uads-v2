@@ -1,0 +1,334 @@
+{
+  "schema": "uads.execution-packet",
+  "schemaVersion": "0.3.0",
+  "executionRunId": "er_47cc270c0ac2aee5",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "objective": "Change the primary button color.",
+  "includedScope": [
+    "src"
+  ],
+  "outOfScope": [
+    "backend",
+    "unrelated",
+    "unrelated architecture refactors",
+    "unrelated Web3/tokenomics work",
+    "unrelated marketplace or dashboard features"
+  ],
+  "riskLevel": "LOW",
+  "domains": [
+    "frontend"
+  ],
+  "contextRadius": "C1",
+  "contextCandidates": [
+    "src"
+  ],
+  "specialists": [
+    "repo-inspector",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "frontend-specialist"
+  ],
+  "assuranceReviewers": [
+    "independent-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_afad72b1e7e12a84",
+  "specialistSelectionDigest": "57f8cb3df3982464fc0795de75580a3ead5ec09fefacc78ce6d804812ad6fd31",
+  "specialistAssignments": [
+    {
+      "specialistId": "checkpoint-manager",
+      "role": "Persist bounded resume and checkpoint state",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "atomic checkpoint"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must persist only sanitized sidecar state outside the managed project.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "frontend-specialist",
+      "role": "Handle frontend and interaction concerns",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "frontend"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "frontend verification"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not introduce unrelated backend, Web3, or finance work.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "implementation-agent",
+      "role": "Apply necessary in-scope product edits",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "in-scope change"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not perform approval-gated actions or serve as the sole final reviewer.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 4,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "implementation-planner",
+      "role": "Produce a bounded executable Work Order plan",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "Work Order plan"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not dispatch work outside the selected scope.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "independent-reviewer",
+      "role": "Independently review the implementation",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "independent review"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "backend",
+        "implementing product changes",
+        "Must use an independent session and must not implement the reviewed change.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "repo-inspector",
+      "role": "Inspect repository metadata and project identity",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "repository map"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not edit product files or execute discovered project code.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "test-engineer",
+      "role": "Design and run focused verification",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:build",
+        "gate:static",
+        "gate:unit-test",
+        "test evidence"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not self-approve implementation changes.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 3,
+      "parallelEligible": false
+    }
+  ],
+  "selectedGates": [
+    "static",
+    "unit-test",
+    "build"
+  ],
+  "acceptanceCriteria": [
+    "Primary button uses the new color",
+    "Selected gates have evidence"
+  ],
+  "requiredEvidence": [
+    "gate:static",
+    "gate:unit-test",
+    "gate:build"
+  ],
+  "safeAutonomousActions": [
+    "repository reads",
+    "local code edits",
+    "local tests",
+    "lint/typecheck/build",
+    "review-bundle generation",
+    "non-destructive Git inspection",
+    "normal commits/pushes in an authorized workflow"
+  ],
+  "approvalGatedActions": [
+    "production deployment",
+    "spending money",
+    "rotating real credentials",
+    "destructive Git history rewrite",
+    "publishing packages/releases when not already authorized"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded",
+    "Begin from Work Order, checkpoint, compact repository map, Context Pack, and context candidates before source files."
+  ],
+  "baselineGitHead": "cf95f144a2da198f032ae0dc51a7580416db80d0",
+  "nextAction": "Generate a review ZIP if required. Do not deploy or transfer funds.",
+  "contextPackId": "cpk_3ea90ffffe3272e4",
+  "impactReportId": "imp_23c82503d7fd0f07",
+  "indexDigest": "df7252c08f943657690dae6e6e5de57776d7823396dac8b00d6e9720a3bfab18",
+  "modelPlanId": "mrp_e8aa5ed88fd5c205",
+  "selectedProfileId": null,
+  "selectedProviderId": null,
+  "selectedModelId": null,
+  "selectionMode": "host-managed",
+  "modelExecutionStrategy": {
+    "parallel": false,
+    "roleDispatch": "role-cycling",
+    "usageTelemetryAvailable": null
+  }
+}

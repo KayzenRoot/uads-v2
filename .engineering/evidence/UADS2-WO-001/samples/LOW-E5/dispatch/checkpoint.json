@@ -1,0 +1,29 @@
+{
+  "schema": "uads.checkpoint",
+  "schemaVersion": "0.2.0",
+  "checkpointId": "cp_9bfd07a91b9b364f",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_9bfd07a91b9b364f",
+  "routingDecisionId": "rd_9bfd07a91b9b364f",
+  "createdAt": "2026-09-09T15:19:20.119Z",
+  "updatedAt": "2026-09-09T15:20:49.712Z",
+  "phase": "stopped",
+  "status": "completed",
+  "completedSteps": [
+    "intake",
+    "classify",
+    "plan",
+    "dispatch",
+    "verify",
+    "assurance-start",
+    "finalize"
+  ],
+  "nextAction": "Generate a review ZIP if required. Do not deploy or transfer funds.",
+  "blockers": [],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_8ce6f0a2afdfc930/evidence/ev_a4f01df54d73b35c.json"
+  ],
+  "repositoryMapDigest": "ea0273fbcc459482bcd2c2187c9817599d153c9af9e02e05cfca0694a2dcced9",
+  "contextPlanRef": "sidecar://context/plan.json",
+  "resumeCursor": "complete:await-review-bundle"
+}

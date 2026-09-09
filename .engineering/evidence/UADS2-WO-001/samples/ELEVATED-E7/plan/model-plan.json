@@ -1,0 +1,101 @@
+{
+  "schema": "uads.model-execution-plan",
+  "schemaVersion": "0.8.0",
+  "planId": "mrp_77a1e582c3dfccc7",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_3af1677e2f4bb9bf",
+  "workOrderDigest": "e0ec4f23934d8083f600f9439f1e9aec93073b3a817ee5a74ff123576b402be6",
+  "changeDigest": null,
+  "risk": "HIGH",
+  "scopeClass": "local",
+  "complexity": "complex",
+  "uncertainty": 8,
+  "requiredCapabilityClass": "strong",
+  "requiredCapabilities": [
+    "modelSelection"
+  ],
+  "runtimeIdentityDigest": "c47e12337ffd4a71aa797ef31f3f19ede7df01835f28ce08d02ef8ddf735b2cb",
+  "registryDigest": "670ac40ef9e62819b61fb676949e92eae94137eaa33ddac51da69ce90f8e6a67",
+  "policyDigest": "a33cfdab4f2bafde465916a3db9c7f55ecbd121d12de9359c048176974e9e9c3",
+  "candidates": [],
+  "eligibleCandidates": [],
+  "rejections": [],
+  "selectedProfileId": null,
+  "selectedProviderId": null,
+  "selectedModelId": null,
+  "roleSelections": [
+    {
+      "role": "implementation",
+      "profileId": null,
+      "providerId": null,
+      "modelId": null,
+      "status": "blocked",
+      "reasonCodes": [
+        "NO_ELIGIBLE_MODEL"
+      ]
+    },
+    {
+      "role": "review",
+      "profileId": null,
+      "providerId": null,
+      "modelId": null,
+      "status": "blocked",
+      "reasonCodes": [
+        "NO_ELIGIBLE_MODEL"
+      ]
+    },
+    {
+      "role": "testing",
+      "profileId": null,
+      "providerId": null,
+      "modelId": null,
+      "status": "blocked",
+      "reasonCodes": [
+        "NO_ELIGIBLE_MODEL"
+      ]
+    },
+    {
+      "role": "assurance",
+      "profileId": null,
+      "providerId": null,
+      "modelId": null,
+      "status": "blocked",
+      "reasonCodes": [
+        "NO_ELIGIBLE_MODEL"
+      ]
+    }
+  ],
+  "selectionReasonCodes": [
+    "NO_ELIGIBLE_MODEL",
+    "FAIL_CLOSED"
+  ],
+  "fallbackProfileIds": [],
+  "escalation": {
+    "floor": "strong",
+    "currentTier": "strong",
+    "reasonCodes": []
+  },
+  "cacheHints": {
+    "staticLayerDigest": "2053dbbf6ec7135c4e994d3464c478db6f48d3ca21052c8f44915edc96e02c39",
+    "semiStableLayerDigest": "b5d9adcc5f9d6d9a6aeb92cd5fc18f4dfffe3041556d4d3a48b2adf8219e5b0e",
+    "dynamicLayerDigest": "73c76d56fd4042001a19cd735382344bc7ecb1adf080796e9096cf26fcc6cdde",
+    "promptCacheUsable": false,
+    "explicitCacheUsable": false,
+    "persistentContextUsable": false
+  },
+  "execution": {
+    "parallel": false,
+    "roleDispatch": "role-cycling",
+    "usageTelemetryAvailable": null
+  },
+  "budget": {
+    "hardLimit": 96000,
+    "softLimit": 48000,
+    "estimatedInputTokens": 0,
+    "requiredOutputTokens": 4096,
+    "selectedContextWindowTokens": null
+  },
+  "selectionMode": "router",
+  "status": "BLOCKED",
+  "blockedReason": "NO_ELIGIBLE_MODEL"
+}

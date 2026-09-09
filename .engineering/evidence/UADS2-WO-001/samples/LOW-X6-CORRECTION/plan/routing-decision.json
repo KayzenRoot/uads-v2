@@ -1,0 +1,69 @@
+{
+  "schema": "uads.routing-decision",
+  "schemaVersion": "0.2.0",
+  "routingDecisionId": "rd_1a9bd8e2df2692e3",
+  "projectId": "8e4b5bd6a6c41b50",
+  "createdAt": "2026-09-09T15:14:57.631Z",
+  "scopeClass": "trivial",
+  "scopeReasons": [
+    "isolated presentation change"
+  ],
+  "riskLevel": "LOW",
+  "riskReasons": [
+    "no high-risk structured signals in intake"
+  ],
+  "domains": [
+    {
+      "id": "frontend",
+      "reason": "intake domain signal: frontend"
+    }
+  ],
+  "specialists": [
+    "repo-inspector",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "frontend-specialist"
+  ],
+  "assuranceSpecialists": [
+    "independent-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_afad72b1e7e12a84",
+  "specialistSelectionDigest": "57f8cb3df3982464fc0795de75580a3ead5ec09fefacc78ce6d804812ad6fd31",
+  "specialistRegistryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "specialistPolicyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "specialistChangeDigest": null,
+  "specialistImpactDigest": "df7252c08f943657690dae6e6e5de57776d7823396dac8b00d6e9720a3bfab18",
+  "specialistGateContractDigest": "ec2f65402bd1923cb24ba8df59ba1a06315bb221621e17d522448fe40b9f2d50",
+  "specialistRiskSignals": [],
+  "specialistDependencySignals": null,
+  "gates": [
+    {
+      "id": "static",
+      "reason": "static analysis for every planned change"
+    },
+    {
+      "id": "unit-test",
+      "reason": "focused tests or smoke for the requested change"
+    },
+    {
+      "id": "build",
+      "reason": "build if the project convention compiles UI assets"
+    }
+  ],
+  "contextRadius": "C1",
+  "contextReason": "trivial change: named/affected files only",
+  "capabilityClass": "economy",
+  "orderConstraints": [
+    "inspect before edit",
+    "implement only NECESSARY scope",
+    "implementation-agent is not the sole final reviewer"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded"
+  ],
+  "warnings": []
+}

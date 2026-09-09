@@ -1,0 +1,69 @@
+{
+  "schema": "uads.review-packet",
+  "schemaVersion": "0.3.0",
+  "executionRunId": "er_47cc270c0ac2aee5",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "objective": "Change the primary button color.",
+  "acceptanceCriteria": [
+    "Primary button uses the new color",
+    "Selected gates have evidence"
+  ],
+  "includedScope": [
+    "src"
+  ],
+  "outOfScope": [
+    "backend",
+    "unrelated",
+    "unrelated architecture refactors",
+    "unrelated Web3/tokenomics work",
+    "unrelated marketplace or dashboard features"
+  ],
+  "changedFiles": [
+    "src/button.css"
+  ],
+  "changeDigest": "844d441f03c19ed34bc658747850d0dc1edbc584c260d58a1fe38e4a46d8934e",
+  "gateStates": [
+    {
+      "gateId": "static",
+      "status": "PASS"
+    },
+    {
+      "gateId": "unit-test",
+      "status": "PASS"
+    },
+    {
+      "gateId": "build",
+      "status": "PASS"
+    }
+  ],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_0f69990e6c92a13c.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2a14951f53d6ad90.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_fc835fc2f34b9125.json"
+  ],
+  "requiredReviewers": [
+    "independent-reviewer"
+  ],
+  "riskLevel": "LOW",
+  "roleToGateMapping": {
+    "independent-reviewer": [],
+    "security-reviewer": [],
+    "performance-reviewer": [],
+    "reliability-reviewer": []
+  },
+  "requiredEvidenceObligations": [
+    "gate:static",
+    "gate:unit-test",
+    "gate:build"
+  ],
+  "unresolvedBlockers": [
+    "MISSING_REQUIRED_REVIEWER:independent-reviewer"
+  ],
+  "doNotImplement": [
+    "provider API calls or arbitrary external commands",
+    "out-of-scope files or project-local UADS operational state",
+    "approval-gated release, deployment, custody, or financial actions"
+  ],
+  "independentReviewInvariant": "Every required assurance role uses an exact recognized role and a distinct non-implementer session bound to this change digest.",
+  "nextAction": "Invoke distinct reviewer session(s). Do not self-approve. Record verdicts with uads assurance record."
+}
