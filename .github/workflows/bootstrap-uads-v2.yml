@@ -1,0 +1,78 @@
+name: UADS V2 Controlled Bootstrap
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/bootstrap-uads-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uads-v2-controlled-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  import-v1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target bootstrap branch
+        uses: actions/checkout@v4
+        with:
+          ref: bootstrap/uads2-foundation-001
+          fetch-depth: 0
+
+      - name: Import exact UADS V1 snapshot
+        shell: bash
+        env:
+          SOURCE_REPOSITORY: KayzenRoot/uads
+          SOURCE_SHA: 312e32946798eb3abbb49a79af08e13efb7719dc
+          TARGET_BRANCH: bootstrap/uads2-foundation-001
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          tmp="$(mktemp -d)"
+          git clone --no-tags "https://github.com/${SOURCE_REPOSITORY}.git" "$tmp/uads-v1"
+          git -C "$tmp/uads-v1" checkout --detach "$SOURCE_SHA"
+          actual="$(git -C "$tmp/uads-v1" rev-parse HEAD)"
+          test "$actual" = "$SOURCE_SHA"
+
+          # Restore the target branch with exact source contents.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$tmp/uads-v1/." .
+          rm -rf .git
+          rm -rf "$tmp/uads-v1/.git"
+
+          # Rebind the copied tree to the target repository and branch.
+          git init
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags origin "$TARGET_BRANCH"
+          git reset "origin/$TARGET_BRANCH"
+          git checkout -B "$TARGET_BRANCH"
+
+          mkdir -p .engineering/migrations
+          cat > .engineering/migrations/UADS2-V1-SNAPSHOT.md <<'EOF'
+          # UADS V2 V1 Snapshot Provenance
+
+          Status: IMPORTED_BASELINE
+          Source repository: KayzenRoot/uads
+          Source ref: main
+          Source SHA: 312e32946798eb3abbb49a79af08e13efb7719dc
+          Source tree SHA: b2a6763045fc1dbb81b6ba2880bf1f77167d7133
+          Target repository: KayzenRoot/uads-v2
+          Work Order: UADS2-BOOTSTRAP-001
+
+          This snapshot establishes UADS V2 as a controlled continuation of UADS V1.
+          UADS V1 remains untouched and independently usable.
+          EOF
+
+          git add -A
+          git diff --cached --check
+          git commit -m "chore(UADS2-BOOTSTRAP-001): import UADS V1 frozen baseline"
+          git push origin "HEAD:$TARGET_BRANCH"
