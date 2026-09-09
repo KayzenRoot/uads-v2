@@ -1,6 +1,6 @@
 # CHECKPOINT DELTA — UADS2-WO-005
 
-Status: PROPOSED / HEDS PENDING
+Status: CONTENT FROZEN / HEDS PENDING
 Module: M03
 Issue: #26
 
@@ -27,3 +27,8 @@ Promote only after exact-head HEDS APPROVED.
 - no current schema change;
 - no package/dependency change;
 - no claim that Cursor/Codex capabilities are currently available on the user's machine.
+
+
+## Canonical reconciliation
+
+The pre-ADR-UADS2-011 sequencing in `docs/v2/04-ARCHITECTURE.md` that placed M01 before M03 is explicitly marked SUPERSEDED. Historical provenance remains visible; current authority is ADR-UADS2-011 + the frozen HARD dependency graph.

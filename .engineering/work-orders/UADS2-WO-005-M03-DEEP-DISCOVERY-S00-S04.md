@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-005
 
-Status: ACTIVE — M03 S00-S04 DEEP DISCOVERY
+Status: CONTENT FROZEN — EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-005-m03-deep-discovery`
@@ -34,7 +34,8 @@ M03 must convert host capability handling from coarse adapter/static declaration
 - no worker runtime or orchestration implementation (M01/M02);
 - no peer capability negotiation implementation (M23);
 - no broad Cursor/Codex adapter V2 implementation (M15/M16);
-- no package/dependency changes.
+- no package/dependency changes;
+- bounded canonical reconciliation of stale pre-ADR-UADS2-011 runtime sequencing is allowed because it conflicts with the accepted HARD dependency graph.
 
 ## Source-lock observations
 
@@ -59,19 +60,20 @@ Current gaps:
 
 ## Acceptance
 
-- [ ] S00 metrics and capability vocabulary frozen;
-- [ ] S01 candidates classified REUSE/ADAPT/INVENT/EXPERIMENT/OUT_OF_SCOPE;
-- [ ] S01.5 proprietary candidates are falsifiable;
-- [ ] S02 owns one primary proof model and compatibility projection;
-- [ ] `UNKNOWN` / `BLOCKED` / `STALE` can never project to enabled `true`;
-- [ ] negative proof rule prevents absence-as-unsupported;
-- [ ] freshness/drift invalidation contract defined;
-- [ ] active-probe safety envelope defined;
-- [ ] M30 event contract defined without claiming runtime implementation;
-- [ ] M27-M31 enterprise classifications defined;
-- [ ] S03 adversarial/failure model frozen;
-- [ ] S04 tests/benchmarks frozen before S05;
-- [ ] no runtime source/schema/package modification;
+- [x] S00 metrics and capability vocabulary frozen;
+- [x] S01 candidates classified REUSE/ADAPT/INVENT/EXPERIMENT/OUT_OF_SCOPE;
+- [x] S01.5 proprietary candidates are falsifiable;
+- [x] S02 owns one primary proof model and compatibility projection;
+- [x] `UNKNOWN` / `BLOCKED` / `STALE` can never project to enabled `true`;
+- [x] negative proof rule prevents absence-as-unsupported;
+- [x] freshness/drift invalidation contract defined;
+- [x] active-probe safety envelope defined;
+- [x] M30 event contract defined without claiming runtime implementation;
+- [x] M27-M31 enterprise classifications defined;
+- [x] S03 adversarial/failure model frozen;
+- [x] S04 tests/benchmarks frozen before S05;
+- [x] no runtime source/schema/package modification;
+- [x] stale WO-002 sequencing reconciled as superseded without deleting provenance;
 - [ ] exact-head hosted gates SUCCESS;
 - [ ] HEDS APPROVED before first S05 slice.
 

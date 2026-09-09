@@ -130,14 +130,23 @@ M30 owns authoritative production event transport, operational aggregation, SLI/
 
 A real-time UI claim MUST be backed by an objective source. Missing data is `UNAVAILABLE` or degraded, never fabricated.
 
-## Runtime sequencing after UADS2-WO-002 approval
+## Historical runtime sequencing from UADS2-WO-002 — SUPERSEDED
 
-1. Establish M30 event spine + dashboard/operator foundation.
-2. Implement the first bounded M01 Sequential Agent Orchestrator slice integrated with M30 telemetry.
-3. Add M03 capability proof and M02 background-worker integration.
-4. Continue remaining modules through bounded Work Orders.
+The earlier bounded sequence proposed:
 
-M27/M28/M29/M31 constraints apply from the first runtime slice.
+1. establish M30 event/dashboard foundation;
+2. implement an M01 slice;
+3. add M03/M02 capability/background integration.
+
+This sequence is retained as historical provenance but is **superseded by ADR-UADS2-011 and the frozen global HARD dependency graph**.
+
+Current rule:
+- module numbers do not define build order;
+- a module may enter deep discovery only from the graph-eligible set;
+- M03 is a HARD predecessor of M01 and is the selected next module;
+- the WO-003 M30 foundation does not equal full M30 S07 module freeze.
+
+M27/M28/M29/M31 constraints still apply from the first runtime slice.
 
 ## Safety invariants
 
@@ -168,3 +177,22 @@ A module may enter deep discovery only when its HARD predecessors are frozen, un
 The first selected deep-discovery module after UADS2-WO-004 approval is M03 Host Capability Detector.
 
 Architecture Reconciliation runs every 3–5 completed module freezes, default 4, and immediately on material boundary/ADR/technology/regression changes.
+
+
+## M03 deep-discovery candidate — ADR-UADS2-012
+
+UADS2-WO-005 proposes **Proof-Carrying Host Capabilities** for M03.
+
+The candidate architecture separates:
+- host/adapter presence;
+- declarations/enumerations;
+- current per-capability evidence;
+- freshness/drift validity;
+- compatibility projection.
+
+Only a current valid `SUPPORTED` proof may project to enabled `true`.
+`UNKNOWN`, `BLOCKED` and `STALE` project to `unknown`.
+
+`UNSUPPORTED` is legal only under the Negative Proof Contract; absence/timeout/permission denial is insufficient.
+
+This subsection is a frozen candidate until exact-head HEDS approves UADS2-WO-005. No M03 runtime implementation is authorized by this text.
