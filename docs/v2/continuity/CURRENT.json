@@ -3,7 +3,7 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_005_M03_S00_S04_PR27_EXACT_HEAD_HEDS_PENDING",
+  "programState": "UADS2_WO_005_M03_S00_S04_FINAL_CONTENT_FROZEN_PR27_HEDS_PENDING",
   "completedWorkOrder": "UADS2-WO-004",
   "completedPullRequest": 25,
   "approvedHead": "84015b45088a0d4df0a0f2d07424784d73ca730e",
@@ -13,8 +13,8 @@
   "activePullRequest": 27,
   "activeBranch": "work/uads2-wo-005-m03-deep-discovery",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "PR #27 opened; M03 S00-S04 content frozen; exact-head hosted gates and HEDS pending",
-  "nextNecessaryAction": "Wait for PR #27 exact-head CI, CodeQL, Dependency Review and Cross-Platform Compatibility, then run HEDS. No S05 implementation before APPROVED/MERGED.",
+  "activeSession": "PR #27 final content frozen after E2 proof-floor tightening; exact-head hosted gates and HEDS pending",
+  "nextNecessaryAction": "Do not modify PR #27 content. Wait for exact-head CI, CodeQL, Dependency Review and Cross-Platform Compatibility, then run HEDS. S05 remains unauthorized.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
@@ -36,7 +36,8 @@
       "CLDS",
       "PBF"
     ],
-    "firstS05Slice": "PCCR core + passive/deterministic-local proof + compatibility projector"
+    "firstS05Slice": "PCCR core + passive/deterministic-local proof + compatibility projector",
+    "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [

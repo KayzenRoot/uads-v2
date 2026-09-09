@@ -5,7 +5,8 @@ Issue: #26
 PR: #27
 Base main: `122426d0c7079722ed7ca118f13385b7b67183ee`
 Branch: `work/uads2-wo-005-m03-deep-discovery`
-Review-freeze parent: `fa1b009b933daf7211dfcf1df23641bb41f978de`
+Initial PR-binding parent: `fa1b009b933daf7211dfcf1df23641bb41f978de`
+Exact final review head: resolved externally from PR #27 by HEDS; intentionally not self-embedded in this mutable evidence file.
 
 ## Objective
 
@@ -139,3 +140,14 @@ PR #27 changes exactly 18 paths and all are under `.engineering/` or `docs/v2/`.
 
 No runtime/source/schema/test/package/lockfile path is changed.
 Unresolved review threads at PR-open verification: 0.
+
+
+## Final semantic tightening before exact-head freeze
+
+The CEL rule was tightened after PR opening:
+- E1 `DECLARED` is discovery input only;
+- E1 can never produce `SUPPORTED`;
+- every enabling `SUPPORTED` has a global minimum proof floor of E2 `DETERMINISTIC_LOCAL_FACT`;
+- stronger per-capability requirements may require E3/E4.
+
+This removes declaration-only enablement for all capabilities, not only high-impact capabilities.
