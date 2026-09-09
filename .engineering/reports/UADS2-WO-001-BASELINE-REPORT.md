@@ -20,7 +20,8 @@ V2 base `3eedf833c00b18755ce2b105f4df8c6c13269055`. The frozen V1 source is
 
 ## HEAD SHA
 
-To be filled after the final documentation/evidence commit and normal push.
+`cf19c3a048bb92442966fa5c6d5ba2431a63421f` — pushed baseline artifact
+commit. The final handoff records the branch tip after this metadata update.
 
 ## SAMPLES
 
