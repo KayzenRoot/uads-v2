@@ -3,48 +3,31 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_006_APPROVED_MERGED_M03_S05_2_NEXT",
+  "programState": "UADS2_WO_007_M03_S05_2_CONTRACT_FROZEN_EXECUTOR_NEXT",
   "completedWorkOrder": "UADS2-WO-006",
   "completedPullRequest": 29,
   "approvedHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
   "mergeCommit": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
-  "lastRecordedHead": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
-  "activeWorkOrder": null,
+  "lastRecordedHead": "384e24ba947382d68a8215f494041cee7cf15670",
+  "activeWorkOrder": "UADS2-WO-007",
   "activePullRequest": null,
-  "activeBranch": null,
+  "activeBranch": "work/uads2-wo-007-m03-subject-passive-evidence",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.1 approved/merged; S05.2 host subject identity and passive evidence bridge next",
-  "nextNecessaryAction": "Create UADS2-WO-007 for M03 S05.2 Host Subject Identity & Passive Evidence Bridge. Keep subprocess/shell/network and vendor-specific active probes out of scope.",
+  "activeSession": "S05.2 Host Subject Identity & Passive Evidence Bridge contract frozen; executor next",
+  "nextNecessaryAction": "Execute WO-007 on the same branch. No child process/shell/network or vendor-specific active probe. Produce tests/evidence/PR then exact-head HEDS.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
-  "acceptedPriorities": [
-    "ADR-UADS2-009 dashboard-first event-backed real-time operations",
-    "ADR-UADS2-010 enterprise production-readiness contract with M27-M31",
-    "ADR-UADS2-011 Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze",
-    "ADR-UADS2-012 Proof-Carrying Host Capabilities",
-    "B-001 V2 structured analysis-event proof"
-  ],
   "m03": {
-    "issue": 28,
     "completedSlices": [
       "S05.1"
     ],
-    "nextSlice": "S05.2 Host Subject Identity & Passive Evidence Bridge",
+    "activeSlice": "S05.2",
+    "issue": 30,
     "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED",
-    "activeProbes": "NOT_IMPLEMENTED",
-    "vendorSpecificActiveProbes": "EXPERIMENT_NOT_AUTHORIZED",
-    "wo006": {
-      "approvedHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
-      "mergeCommit": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
-      "testsPassed": 463,
-      "testFilesPassed": 52,
-      "B1P95Ms": 0.14788499999997384,
-      "B3BytesPerHost": 10990,
-      "B4ZeroDefects": true,
-      "B7Recovery": true,
-      "crossCapabilityReplayClosed": true
-    }
+    "passiveSupportedPath": false,
+    "activeProbes": "NOT_AUTHORIZED",
+    "nextAfterApproval": "recompute M03 S05 remaining slices from S04 and architecture; active-probe work remains separate gated experiment"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
