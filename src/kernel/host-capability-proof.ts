@@ -20,6 +20,7 @@ import { persistOperationalEvent } from "./operational-events.js";
 
 export const HOST_CAPABILITY_PROOF_SCHEMA = "uads.host-capability-proof" as const;
 export const HOST_CAPABILITY_PROOF_SCHEMA_VERSION = "1.0.0" as const;
+export const HOST_CAPABILITY_PROOF_SCHEMA_VERSION_V11 = "1.1.0" as const;
 export const HOST_CAPABILITY_PROOF_STATES = [
   "SUPPORTED",
   "UNSUPPORTED",
@@ -29,7 +30,11 @@ export const HOST_CAPABILITY_PROOF_STATES = [
 ] as const;
 export const HOST_CAPABILITY_EVIDENCE_CLASSES = ["E0", "E1", "E2", "E3", "E4"] as const;
 export const HOST_CAPABILITY_VALIDITY_CLASSES = ["IDENTITY_BOUND", "LEASED"] as const;
-export const HOST_CAPABILITY_NEGATIVE_PROOF_KINDS = ["adapter-contract-impossible"] as const;
+export const HOST_CAPABILITY_NEGATIVE_PROOF_KINDS = [
+  "adapter-contract-impossible",
+  "active-probe-recognized-unsupported",
+  "complete-enumeration-exclusion",
+] as const;
 
 export type HostCapabilityProofState = (typeof HOST_CAPABILITY_PROOF_STATES)[number];
 export type HostCapabilityEvidenceClass = (typeof HOST_CAPABILITY_EVIDENCE_CLASSES)[number];
@@ -45,7 +50,9 @@ export type HostCapabilityValidityBasis = {
 
 export type HostCapabilityProofRecord = {
   schema: typeof HOST_CAPABILITY_PROOF_SCHEMA;
-  schemaVersion: typeof HOST_CAPABILITY_PROOF_SCHEMA_VERSION;
+  schemaVersion:
+    | typeof HOST_CAPABILITY_PROOF_SCHEMA_VERSION
+    | typeof HOST_CAPABILITY_PROOF_SCHEMA_VERSION_V11;
   capabilityId: ModelCapability;
   state: HostCapabilityProofState;
   evidenceClass: HostCapabilityEvidenceClass;
@@ -237,12 +244,24 @@ function assertProofSemantics(proof: Omit<HostCapabilityProofRecord, "proofDiges
     if (EVIDENCE_RANK[proof.evidenceClass] < EVIDENCE_RANK.E2) {
       throw new Error("UNSUPPORTED requires E2 or stronger evidence");
     }
-    if (proof.negativeProofKind !== "adapter-contract-impossible") {
-      throw new Error("Slice-1 UNSUPPORTED requires adapter-contract-impossible negative proof");
+    if (proof.negativeProofKind === null) {
+      throw new Error("UNSUPPORTED requires a Negative Proof Contract kind");
+    }
+    if (
+      proof.schemaVersion === HOST_CAPABILITY_PROOF_SCHEMA_VERSION &&
+      proof.negativeProofKind !== "adapter-contract-impossible"
+    ) {
+      throw new Error("PCCR 1.0 UNSUPPORTED requires adapter-contract-impossible negative proof");
+    }
+    if (
+      proof.negativeProofKind === "active-probe-recognized-unsupported" &&
+      EVIDENCE_RANK[proof.evidenceClass] < EVIDENCE_RANK.E3
+    ) {
+      throw new Error("active-probe-recognized-unsupported requires E3 or stronger evidence");
     }
     assertDigest(proof.validityBasis.adapterContractDigest, "adapterContractDigest");
   } else if (proof.negativeProofKind !== null) {
-    throw new Error("negativeProofKind is only valid for UNSUPPORTED in Slice 1");
+    throw new Error("negativeProofKind is only valid for UNSUPPORTED");
   }
 }
 
@@ -253,14 +272,17 @@ function unsignedProof(
   return unsigned;
 }
 
-export function compileHostCapabilityProof(
+function compileHostCapabilityProofForVersion(
   input: HostCapabilityProofInput,
+  schemaVersion:
+    | typeof HOST_CAPABILITY_PROOF_SCHEMA_VERSION
+    | typeof HOST_CAPABILITY_PROOF_SCHEMA_VERSION_V11,
   schemaRoot?: string,
 ): HostCapabilityProofRecord {
   const unsigned: Omit<HostCapabilityProofRecord, "proofDigest"> = {
     ...input,
     schema: HOST_CAPABILITY_PROOF_SCHEMA,
-    schemaVersion: HOST_CAPABILITY_PROOF_SCHEMA_VERSION,
+    schemaVersion,
   };
   assertProofPrivacy(unsigned);
   assertProofSemantics(unsigned);
@@ -270,6 +292,28 @@ export function compileHostCapabilityProof(
   };
   assertSchema("host-capability-proof.schema.json", proof, schemaRoot);
   return normalizeHostCapabilityProof(proof, schemaRoot);
+}
+
+export function compileHostCapabilityProof(
+  input: HostCapabilityProofInput,
+  schemaRoot?: string,
+): HostCapabilityProofRecord {
+  return compileHostCapabilityProofForVersion(
+    input,
+    HOST_CAPABILITY_PROOF_SCHEMA_VERSION,
+    schemaRoot,
+  );
+}
+
+export function compileHostCapabilityProofV11(
+  input: HostCapabilityProofInput,
+  schemaRoot?: string,
+): HostCapabilityProofRecord {
+  return compileHostCapabilityProofForVersion(
+    input,
+    HOST_CAPABILITY_PROOF_SCHEMA_VERSION_V11,
+    schemaRoot,
+  );
 }
 
 export function normalizeHostCapabilityProof(

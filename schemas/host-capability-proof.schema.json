@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://uads.local/schemas/host-capability-proof.schema.json",
   "title": "UADS Host Capability Proof",
-  "description": "Closed, privacy-safe per-capability proof record for M03 PCCR Slice 1.",
+  "description": "Closed, privacy-safe per-capability PCCR supporting historical 1.0 and backward-compatible 1.1 active-evidence semantics.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -25,8 +25,15 @@
     "proofDigest"
   ],
   "properties": {
-    "schema": { "const": "uads.host-capability-proof" },
-    "schemaVersion": { "const": "1.0.0" },
+    "schema": {
+      "const": "uads.host-capability-proof"
+    },
+    "schemaVersion": {
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
+    },
     "capabilityId": {
       "type": "string",
       "enum": [
@@ -44,13 +51,28 @@
     },
     "state": {
       "type": "string",
-      "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED", "STALE"]
+      "enum": [
+        "SUPPORTED",
+        "UNSUPPORTED",
+        "UNKNOWN",
+        "BLOCKED",
+        "STALE"
+      ]
     },
     "evidenceClass": {
       "type": "string",
-      "enum": ["E0", "E1", "E2", "E3", "E4"]
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
     },
-    "subjectDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "subjectDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "adapterId": {
       "type": "string",
       "minLength": 1,
@@ -59,8 +81,14 @@
     },
     "runtimeVersion": {
       "anyOf": [
-        { "type": "null" },
-        { "type": "string", "minLength": 1, "maxLength": 128 }
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
       ]
     },
     "probeId": {
@@ -79,31 +107,64 @@
         "configurationDigest"
       ],
       "properties": {
-        "adapterContractDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "probeDefinitionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "policyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "adapterContractDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "probeDefinitionDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "policyDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
         "configurationDigest": {
           "anyOf": [
-            { "type": "null" },
-            { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
           ]
         }
       }
     },
-    "observedAt": { "type": "string", "format": "date-time" },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
     "validUntil": {
       "anyOf": [
-        { "type": "null" },
-        { "type": "string", "format": "date-time" }
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        }
       ]
     },
     "validityClass": {
       "type": "string",
-      "enum": ["IDENTITY_BOUND", "LEASED"]
+      "enum": [
+        "IDENTITY_BOUND",
+        "LEASED"
+      ]
     },
-    "evidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "evidenceDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "negativeProofKind": {
-      "enum": [null, "adapter-contract-impossible"]
+      "enum": [
+        null,
+        "adapter-contract-impossible",
+        "active-probe-recognized-unsupported",
+        "complete-enumeration-exclusion"
+      ]
     },
     "reasonCodes": {
       "type": "array",
@@ -116,6 +177,33 @@
         "pattern": "^[A-Z0-9._:-]+$"
       }
     },
-    "proofDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
-  }
+    "proofDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "1.0.0"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "negativeProofKind": {
+            "enum": [
+              null,
+              "adapter-contract-impossible"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }
