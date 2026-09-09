@@ -150,3 +150,21 @@ M27/M28/M29/M31 constraints apply from the first runtime slice.
 - no next increment while current one is CORRECTION REQUIRED/BLOCKED;
 - no production-readiness declaration with a necessary enterprise pillar still GAP;
 - no real-time UI claim without objective event/source backing.
+
+
+## Global module architecture gate — ADR-UADS2-011
+
+The 31-module system-level topology, ownership matrix and dependency graph are canonical planning inputs:
+
+- `docs/v2/planning/GLOBAL-MODULE-SYSTEM-ARCHITECTURE.md`
+- `docs/v2/planning/GLOBAL-MODULE-SYSTEM-CONTRACTS.md`
+- `docs/v2/planning/GLOBAL-MODULE-DEPENDENCY-GRAPH.md`
+- `docs/v2/planning/GLOBAL-MODULE-DEPENDENCIES.json`
+
+Detailed technology choices are intentionally deferred to each module's S01/S01.5 cycle.
+
+A module may enter deep discovery only when its HARD predecessors are frozen, unless a new explicit ADR authorizes a contract-first exception. Module numbers are not construction order.
+
+The first selected deep-discovery module after UADS2-WO-004 approval is M03 Host Capability Detector.
+
+Architecture Reconciliation runs every 3–5 completed module freezes, default 4, and immediately on material boundary/ADR/technology/regression changes.

@@ -1,0 +1,1940 @@
+{
+  "schema": "uads-v2.global-module-dependency-graph",
+  "schemaVersion": "1.0.0",
+  "date": "2026-09-09",
+  "sourceCommit": "d3f80ed352c8424853882bbf9041c386a93bd603",
+  "ownerDecisionIssue": 23,
+  "workOrder": "UADS2-WO-004",
+  "dependencyTypes": {
+    "HARD": "Full module freeze cannot claim its primary mission without predecessor contract/capability.",
+    "SOFT_OPTIONAL": "Enhances quality/integration but a safe fallback must exist.",
+    "EVENT": "Producer/consumer relationship through objective event/evidence flow; logical family is not automatically a frozen runtime enum.",
+    "GOVERNANCE": "Constrains lifecycle/acceptance but is not a runtime dependency.",
+    "ENTERPRISE_CROSSCUTTING": "M27-M31 proof obligation applies continuously to the target module."
+  },
+  "nodes": [
+    {
+      "id": "M01",
+      "name": "Sequential Agent Orchestrator",
+      "requiredPredecessorsForFreeze": [
+        "M03",
+        "M07",
+        "M30"
+      ],
+      "eventFamily": "orchestrator.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M02",
+      "name": "Background Worker Runtime",
+      "requiredPredecessorsForFreeze": [
+        "M01",
+        "M03"
+      ],
+      "eventFamily": "worker.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M03",
+      "name": "Host Capability Detector",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "capability.host",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M04",
+      "name": "Model Capability Registry",
+      "requiredPredecessorsForFreeze": [
+        "M03"
+      ],
+      "eventFamily": "model.registry",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M05",
+      "name": "Automatic Model Router 2.0",
+      "requiredPredecessorsForFreeze": [
+        "M04",
+        "M07",
+        "M25"
+      ],
+      "eventFamily": "model.route",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M06",
+      "name": "Effort Autopilot",
+      "requiredPredecessorsForFreeze": [
+        "M03",
+        "M07",
+        "M25"
+      ],
+      "eventFamily": "effort.route",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M07",
+      "name": "Token & Quota Governor 2.0",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "budget.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M08",
+      "name": "Review Pipeline 2.0",
+      "requiredPredecessorsForFreeze": [
+        "M09",
+        "M10",
+        "M14",
+        "M19",
+        "M20",
+        "M21",
+        "M22",
+        "M24",
+        "M30"
+      ],
+      "eventFamily": "review.lifecycle/review.analysis",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M09",
+      "name": "Smart Gate Selector",
+      "requiredPredecessorsForFreeze": [
+        "M14",
+        "M25"
+      ],
+      "eventFamily": "gate.selection",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M10",
+      "name": "Fault Resolution Engine 2.0",
+      "requiredPredecessorsForFreeze": [
+        "M30"
+      ],
+      "eventFamily": "fault.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M11",
+      "name": "Experience Engine",
+      "requiredPredecessorsForFreeze": [
+        "M24",
+        "M30"
+      ],
+      "eventFamily": "experience.observed",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
+    },
+    {
+      "id": "M12",
+      "name": "Policy Memory",
+      "requiredPredecessorsForFreeze": [
+        "M11"
+      ],
+      "eventFamily": "policy.candidate",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
+    },
+    {
+      "id": "M13",
+      "name": "Adaptive Routing Learner",
+      "requiredPredecessorsForFreeze": [
+        "M05",
+        "M06",
+        "M11",
+        "M12",
+        "M22"
+      ],
+      "eventFamily": "learning.routing",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
+    },
+    {
+      "id": "M14",
+      "name": "Context Radius Optimizer",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "context.radius",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
+    },
+    {
+      "id": "M15",
+      "name": "Cursor Adapter V2",
+      "requiredPredecessorsForFreeze": [
+        "M01",
+        "M03",
+        "M23"
+      ],
+      "eventFamily": "adapter.cursor",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M16",
+      "name": "Codex Adapter V2",
+      "requiredPredecessorsForFreeze": [
+        "M01",
+        "M03",
+        "M23"
+      ],
+      "eventFamily": "adapter.codex",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M17",
+      "name": "Project Resume Bootstrap",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "resume.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M18",
+      "name": "UADS-Hive Integration Bridge",
+      "requiredPredecessorsForFreeze": [
+        "M23",
+        "M29",
+        "M30"
+      ],
+      "eventFamily": "bridge.hive",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M19",
+      "name": "Evidence Cache 2.0",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "evidence.cache",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M20",
+      "name": "Failure Memory 2.0",
+      "requiredPredecessorsForFreeze": [
+        "M10"
+      ],
+      "eventFamily": "failure.memory",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M21",
+      "name": "Retry Controller",
+      "requiredPredecessorsForFreeze": [
+        "M07",
+        "M10",
+        "M20"
+      ],
+      "eventFamily": "retry.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M22",
+      "name": "Evidence-Driven Escalation",
+      "requiredPredecessorsForFreeze": [
+        "M05",
+        "M06",
+        "M07",
+        "M09",
+        "M14",
+        "M21"
+      ],
+      "eventFamily": "escalation.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M23",
+      "name": "Capability Negotiation Layer",
+      "requiredPredecessorsForFreeze": [
+        "M03"
+      ],
+      "eventFamily": "capability.negotiation",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
+    },
+    {
+      "id": "M24",
+      "name": "Observability & Cost Ledger",
+      "requiredPredecessorsForFreeze": [
+        "M30"
+      ],
+      "eventFamily": "cost.ledger",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
+    },
+    {
+      "id": "M25",
+      "name": "Configuration & Policy Profiles",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "policy.profile",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT",
+      "effectiveDeliveryClass": "NECESSARY_BY_HARD_DEPENDENCY"
+    },
+    {
+      "id": "M26",
+      "name": "Safe Learning / Rollback",
+      "requiredPredecessorsForFreeze": [
+        "M12",
+        "M13",
+        "M31"
+      ],
+      "eventFamily": "learning.rollout",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "IMPORTANT_EXPERIMENT",
+      "effectiveDeliveryClass": "IMPORTANT_EXPERIMENT"
+    },
+    {
+      "id": "M27",
+      "name": "Capacity & Load Engineering",
+      "requiredPredecessorsForFreeze": [
+        "M30"
+      ],
+      "eventFamily": "capacity.signal",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M28",
+      "name": "Resilience & Recovery Engineering",
+      "requiredPredecessorsForFreeze": [
+        "M30"
+      ],
+      "eventFamily": "resilience.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M29",
+      "name": "Operational Security & Supply Chain",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "security.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M30",
+      "name": "Production Observability & Real-Time Operations",
+      "requiredPredecessorsForFreeze": [],
+      "eventFamily": "operational.*",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    },
+    {
+      "id": "M31",
+      "name": "Release Engineering & Safe Operations",
+      "requiredPredecessorsForFreeze": [
+        "M29",
+        "M30"
+      ],
+      "eventFamily": "release.lifecycle",
+      "enterpriseGates": [
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31"
+      ],
+      "declaredClass": "NECESSARY",
+      "effectiveDeliveryClass": "NECESSARY"
+    }
+  ],
+  "edges": [
+    {
+      "from": "M03",
+      "to": "M01",
+      "type": "HARD"
+    },
+    {
+      "from": "M07",
+      "to": "M01",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M01",
+      "type": "HARD"
+    },
+    {
+      "from": "M01",
+      "to": "M02",
+      "type": "HARD"
+    },
+    {
+      "from": "M03",
+      "to": "M02",
+      "type": "HARD"
+    },
+    {
+      "from": "M03",
+      "to": "M04",
+      "type": "HARD"
+    },
+    {
+      "from": "M04",
+      "to": "M05",
+      "type": "HARD"
+    },
+    {
+      "from": "M07",
+      "to": "M05",
+      "type": "HARD"
+    },
+    {
+      "from": "M25",
+      "to": "M05",
+      "type": "HARD"
+    },
+    {
+      "from": "M03",
+      "to": "M06",
+      "type": "HARD"
+    },
+    {
+      "from": "M07",
+      "to": "M06",
+      "type": "HARD"
+    },
+    {
+      "from": "M25",
+      "to": "M06",
+      "type": "HARD"
+    },
+    {
+      "from": "M09",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M10",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M14",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M19",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M20",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M21",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M22",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M24",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M08",
+      "type": "HARD"
+    },
+    {
+      "from": "M14",
+      "to": "M09",
+      "type": "HARD"
+    },
+    {
+      "from": "M25",
+      "to": "M09",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M10",
+      "type": "HARD"
+    },
+    {
+      "from": "M24",
+      "to": "M11",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M11",
+      "type": "HARD"
+    },
+    {
+      "from": "M11",
+      "to": "M12",
+      "type": "HARD"
+    },
+    {
+      "from": "M05",
+      "to": "M13",
+      "type": "HARD"
+    },
+    {
+      "from": "M06",
+      "to": "M13",
+      "type": "HARD"
+    },
+    {
+      "from": "M11",
+      "to": "M13",
+      "type": "HARD"
+    },
+    {
+      "from": "M12",
+      "to": "M13",
+      "type": "HARD"
+    },
+    {
+      "from": "M22",
+      "to": "M13",
+      "type": "HARD"
+    },
+    {
+      "from": "M01",
+      "to": "M15",
+      "type": "HARD"
+    },
+    {
+      "from": "M03",
+      "to": "M15",
+      "type": "HARD"
+    },
+    {
+      "from": "M23",
+      "to": "M15",
+      "type": "HARD"
+    },
+    {
+      "from": "M01",
+      "to": "M16",
+      "type": "HARD"
+    },
+    {
+      "from": "M03",
+      "to": "M16",
+      "type": "HARD"
+    },
+    {
+      "from": "M23",
+      "to": "M16",
+      "type": "HARD"
+    },
+    {
+      "from": "M23",
+      "to": "M18",
+      "type": "HARD"
+    },
+    {
+      "from": "M29",
+      "to": "M18",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M18",
+      "type": "HARD"
+    },
+    {
+      "from": "M10",
+      "to": "M20",
+      "type": "HARD"
+    },
+    {
+      "from": "M07",
+      "to": "M21",
+      "type": "HARD"
+    },
+    {
+      "from": "M10",
+      "to": "M21",
+      "type": "HARD"
+    },
+    {
+      "from": "M20",
+      "to": "M21",
+      "type": "HARD"
+    },
+    {
+      "from": "M05",
+      "to": "M22",
+      "type": "HARD"
+    },
+    {
+      "from": "M06",
+      "to": "M22",
+      "type": "HARD"
+    },
+    {
+      "from": "M07",
+      "to": "M22",
+      "type": "HARD"
+    },
+    {
+      "from": "M09",
+      "to": "M22",
+      "type": "HARD"
+    },
+    {
+      "from": "M14",
+      "to": "M22",
+      "type": "HARD"
+    },
+    {
+      "from": "M21",
+      "to": "M22",
+      "type": "HARD"
+    },
+    {
+      "from": "M03",
+      "to": "M23",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M24",
+      "type": "HARD"
+    },
+    {
+      "from": "M12",
+      "to": "M26",
+      "type": "HARD"
+    },
+    {
+      "from": "M13",
+      "to": "M26",
+      "type": "HARD"
+    },
+    {
+      "from": "M31",
+      "to": "M26",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M27",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M28",
+      "type": "HARD"
+    },
+    {
+      "from": "M29",
+      "to": "M31",
+      "type": "HARD"
+    },
+    {
+      "from": "M30",
+      "to": "M31",
+      "type": "HARD"
+    },
+    {
+      "from": "M17",
+      "to": "M14",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M19",
+      "to": "M14",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M24",
+      "to": "M07",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M24",
+      "to": "M05",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M24",
+      "to": "M06",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M20",
+      "to": "M10",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M18",
+      "to": "M17",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M25",
+      "to": "M18",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M19",
+      "to": "M08",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M23",
+      "to": "M18",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M04",
+      "to": "M15",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M04",
+      "to": "M16",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M05",
+      "to": "M15",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M05",
+      "to": "M16",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M06",
+      "to": "M15",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M06",
+      "to": "M16",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M18",
+      "to": "M08",
+      "type": "SOFT_OPTIONAL"
+    },
+    {
+      "from": "M01",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M02",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M03",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M04",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M05",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M06",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M07",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M08",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M09",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M10",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M11",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M12",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M13",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M14",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M15",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M16",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M17",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M18",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M19",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M20",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M21",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M22",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M23",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M24",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M25",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M26",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M27",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M28",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M29",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M31",
+      "to": "M30",
+      "type": "EVENT"
+    },
+    {
+      "from": "M08",
+      "to": "M24",
+      "type": "EVENT"
+    },
+    {
+      "from": "M30",
+      "to": "M24",
+      "type": "EVENT"
+    },
+    {
+      "from": "M10",
+      "to": "M20",
+      "type": "EVENT"
+    },
+    {
+      "from": "M20",
+      "to": "M21",
+      "type": "EVENT"
+    },
+    {
+      "from": "M11",
+      "to": "M12",
+      "type": "EVENT"
+    },
+    {
+      "from": "M12",
+      "to": "M13",
+      "type": "EVENT"
+    },
+    {
+      "from": "M13",
+      "to": "M26",
+      "type": "EVENT"
+    },
+    {
+      "from": "M27",
+      "to": "M01",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M01",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M01",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M01",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M01",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M02",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M02",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M02",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M02",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M02",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M03",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M03",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M03",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M03",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M03",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M04",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M04",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M04",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M04",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M04",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M05",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M05",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M05",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M05",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M05",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M06",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M06",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M06",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M06",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M06",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M07",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M07",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M07",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M07",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M07",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M08",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M08",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M08",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M08",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M08",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M09",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M09",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M09",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M09",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M09",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M10",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M10",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M10",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M10",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M10",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M11",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M11",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M11",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M11",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M11",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M12",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M12",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M12",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M12",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M12",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M13",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M13",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M13",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M13",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M13",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M14",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M14",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M14",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M14",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M14",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M15",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M15",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M15",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M15",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M15",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M16",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M16",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M16",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M16",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M16",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M17",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M17",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M17",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M17",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M17",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M18",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M18",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M18",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M18",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M18",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M19",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M19",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M19",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M19",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M19",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M20",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M20",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M20",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M20",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M20",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M21",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M21",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M21",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M21",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M21",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M22",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M22",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M22",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M22",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M22",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M23",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M23",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M23",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M23",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M23",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M24",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M24",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M24",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M24",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M24",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M25",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M25",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M25",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M25",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M25",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M27",
+      "to": "M26",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M28",
+      "to": "M26",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M29",
+      "to": "M26",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M30",
+      "to": "M26",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "M31",
+      "to": "M26",
+      "type": "ENTERPRISE_CROSSCUTTING"
+    },
+    {
+      "from": "ADR-UADS2-006",
+      "to": "ALL",
+      "type": "GOVERNANCE"
+    },
+    {
+      "from": "ADR-UADS2-010",
+      "to": "ALL",
+      "type": "GOVERNANCE"
+    },
+    {
+      "from": "ADR-UADS2-011",
+      "to": "ALL",
+      "type": "GOVERNANCE"
+    }
+  ],
+  "waves": [
+    {
+      "id": "T0",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M03",
+        "M07",
+        "M14",
+        "M17",
+        "M19",
+        "M25",
+        "M29",
+        "M30"
+      ],
+      "note": "HARD roots. Current runtime foundation exists for M30, but WO-003 did not constitute full M30 S07 module freeze."
+    },
+    {
+      "id": "T1",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M01",
+        "M04",
+        "M06",
+        "M09",
+        "M10",
+        "M23",
+        "M24",
+        "M27",
+        "M28",
+        "M31"
+      ],
+      "note": "Requires only T0 HARD predecessors."
+    },
+    {
+      "id": "T2",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M02",
+        "M05",
+        "M11",
+        "M15",
+        "M16",
+        "M18",
+        "M20"
+      ],
+      "note": "Requires predecessors from T0/T1."
+    },
+    {
+      "id": "T3",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M12",
+        "M21"
+      ],
+      "note": "Requires predecessors through T2."
+    },
+    {
+      "id": "T4",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M22"
+      ],
+      "note": "Requires routing/gate/retry/context predecessors."
+    },
+    {
+      "id": "T5",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M08",
+        "M13"
+      ],
+      "note": "Full review runtime and adaptive learner convergence."
+    },
+    {
+      "id": "T6",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M26"
+      ],
+      "note": "Safe learned-policy rollout/rollback after all HARD predecessors."
+    }
+  ],
+  "selectionPolicy": {
+    "concurrency": "one deep-discovery module at a time",
+    "numericOrderRequired": false,
+    "chooseFrom": "currently eligible modules whose HARD predecessors have reached S07 freeze; roots have no HARD predecessors",
+    "scoreFactors": [
+      "critical-path unlock count",
+      "safety/risk",
+      "owner roadmap value",
+      "existing partial foundation",
+      "integration/rework reduction"
+    ],
+    "selectedNext": "M03",
+    "selectedNextRationale": "M03 is a HARD root and directly unlocks M01, M04, M06 and M23 while reducing unsafe host/provider capability assumptions.",
+    "currentEligibleRoots": [
+      "M03",
+      "M07",
+      "M14",
+      "M17",
+      "M19",
+      "M25",
+      "M29",
+      "M30"
+    ]
+  },
+  "reconciliation": {
+    "defaultEveryCompletedModuleFreezes": 4,
+    "minimum": 3,
+    "maximum": 5,
+    "earlierOn": [
+      "material interface change",
+      "accepted ADR change",
+      "technology invalidation",
+      "cross-module regression",
+      "new HIGH/CRITICAL risk"
+    ]
+  },
+  "freezeSemantics": {
+    "boundedFoundationIsNotModuleFreeze": true,
+    "m30State": "WO-003 delivered a bounded M30 foundation; M30 remains a module requiring its own later deep-discovery/S07 freeze before HARD dependents that require full M30 freeze may themselves freeze.",
+    "rule": "A HARD predecessor requirement is satisfied only by S07 module freeze unless an explicit contract-first ADR creates a narrower exception."
+  },
+  "deliveryCriticalityRule": {
+    "rule": "A module that is not declared NECESSARY but is a HARD predecessor of a declared NECESSARY module receives effectiveDeliveryClass=NECESSARY_BY_HARD_DEPENDENCY for delivery ordering. Declared class remains unchanged.",
+    "elevatedModules": [
+      "M14",
+      "M23",
+      "M24",
+      "M25"
+    ],
+    "rationale": {
+      "M14": "HARD predecessor of M09/M22/M08",
+      "M23": "HARD predecessor of M15/M16/M18",
+      "M24": "HARD predecessor of M08",
+      "M25": "HARD predecessor of M05/M06/M09"
+    }
+  }
+}
