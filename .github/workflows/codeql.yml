@@ -39,3 +39,9 @@ jobs:
         uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
           category: /language:${{ matrix.language }}
+          upload: never
+      - name: Record private-repository publishing capability
+        shell: bash
+        run: |
+          echo "CodeQL analysis completed. SARIF publication to GitHub code scanning is intentionally disabled until that private-repository capability is enabled."
+          echo "The CodeQL analysis gate remains required; only the external publishing side effect is capability-gated."
