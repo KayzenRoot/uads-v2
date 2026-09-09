@@ -1,6 +1,6 @@
 # Checkpoint Delta — UADS2-WO-003 / M30
 
-Status: `CORRECTION IMPLEMENTED — READY_FOR_FINAL_HEDS_AUDIT`
+Status: `CORRECTION IMPLEMENTED — HOSTED GATES PASS / READY_FOR_FINAL_HEDS_AUDIT`
 
 Base SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
 
@@ -36,8 +36,10 @@ Local npm ci, lint, typecheck, build, focused M30 tests (10/10; regression
 selection 31/31), orchestration/execution evals and engineering protocol
 validation passed. Full Vitest is INCONCLUSIVE because its runner did not
 return a final result; `npm run validate` remains gated by that same condition.
-The exact correction implementation snapshot is recorded above; hosted
-exact-head gates and final HEDS are still pending.
+The exact correction implementation snapshot is recorded above. Hosted CI,
+CodeQL, Dependency Review and Cross-Platform Compatibility all passed on
+audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`; final HEDS is still
+pending.
 
 ## Safety and rollback
 
@@ -49,6 +51,5 @@ binding before listen.
 
 ## Next action
 
-Push the same branch/PR, observe exact-head CI/CodeQL/Dependency Review/
-Cross-Platform results, then request independent HEDS final audit. Remain
-stopped until that audit is `APPROVED`; do not merge or begin M01.
+Request independent HEDS final audit on the same branch/PR. Remain stopped
+until that audit is `APPROVED`; do not merge or begin M01.

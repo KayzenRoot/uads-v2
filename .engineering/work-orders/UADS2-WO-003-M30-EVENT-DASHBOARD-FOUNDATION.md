@@ -171,7 +171,7 @@ Acceptance:
 - [x] New focused M30 tests pass.
 - [x] M30 overhead benchmark is reported with method and limitations.
 - [ ] Evidence Bundle binds the final exact PR head and hosted gates (implementation snapshot is recorded; final HEDS remains pending).
-- [ ] Exact-head CI, CodeQL, Dependency Review and Cross-Platform Compatibility pass.
+- [x] Exact-head CI, CodeQL, Dependency Review and Cross-Platform Compatibility pass on audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`.
 - [ ] HEDS returns `APPROVED` before merge.
 
 ## Required tests

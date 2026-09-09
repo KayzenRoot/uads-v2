@@ -6,6 +6,9 @@ BASE SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
 
 HEAD SHA: `60b3f26f276a8f22fafb73b7d33f60cef16d053f` (correction implementation snapshot; final PR head and hosted gates remain auditor-bound)
 
+AUDITED PR HEAD: `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521` (latest pushed
+content head observed before this metadata-only status update)
+
 ## IMPLEMENTATION
 
 Implemented and corrected the bounded M30 runtime surface on the existing global-first
@@ -152,8 +155,9 @@ reference is not claimed because that binary is not versioned in the repository.
 
 ## CI
 
-`PENDING — correction snapshot is ready to push; exact pushed PR #22 head must
-be read before claiming hosted PASS.`
+`PASS on audited PR head 1f62e6ae225c7b4e2da0d956e573f5cf95a3b521 — CI,
+CodeQL, Dependency Review and UADS Cross-Platform Compatibility all completed
+SUCCESS. Final HEDS audit remains pending.`
 
 ## EVIDENCE
 
@@ -166,8 +170,8 @@ be read before claiming hosted PASS.`
 
 PR #22: https://github.com/KayzenRoot/uads-v2/pull/22
 
-Same branch and PR retained; no merge performed. Ready for independent HEDS
-exact-head final audit after push.
+Same branch and PR retained; no merge performed. Hosted gates passed on the
+audited PR head above; ready for independent HEDS exact-head final audit.
 
 ## STOP CONDITION
 

@@ -104,5 +104,6 @@ Future modules emit through a small M30 event API. They must not write dashboard
   handling, bounded SSE lifecycle, and objective dashboard identity/status
   rendering. Missing fields remain `UNAVAILABLE`.
 
-The correction implementation snapshot is `60b3f26f276a8f22fafb73b7d33f60cef16d053f`; hosted exact-head gates and final
-HEDS approval remain pending before merge.
+The correction implementation snapshot is `60b3f26f276a8f22fafb73b7d33f60cef16d053f`; hosted exact-head gates passed on
+audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`, while final HEDS
+approval remains pending before merge.

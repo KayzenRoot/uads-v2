@@ -52,8 +52,9 @@ User-facing execution copy must be delivered as PDF after preflight HEDS approva
 ## Guardrail
 
 Preflight HEDS approved implementation on the locked branch; correction CR-001
-through CR-003 is now implemented locally. No merge until final exact-head HEDS
-`APPROVED` and all required hosted gates are successful.
+through CR-003 is now implemented locally. Required hosted gates passed on the
+audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`. No merge until final
+exact-head HEDS `APPROVED`.
 
 ## Repository follow-up
 
