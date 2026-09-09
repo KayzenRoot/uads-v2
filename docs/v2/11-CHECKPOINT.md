@@ -1,71 +1,40 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-003 APPROVED / MERGED; GLOBAL ARCHITECTURE PLANNING NEXT
+Status: UADS2-WO-003 APPROVED / MERGED; UADS2-WO-004 GLOBAL ARCHITECTURE ACTIVE
 Date: 2026-09-09
 
 Completed Work Order: UADS2-WO-003
-Active Work Order: none
-Active PR: none
-Merged PR: #22
-Approved UADS2-WO-003 head: `553ec1e66a84444d9944b45220ecdfe2160ced6b`
-UADS2-WO-003 merge SHA: `e54f70fd40bdc9b58c9145036b920f59879f6d63`
+Active Work Order: UADS2-WO-004
+Active Issue: #24
+Owner-decision source: #23
+Active PR: pending creation
+Active Branch: `work/uads2-wo-004-global-module-architecture`
+Base SHA: `d3f80ed352c8424853882bbf9041c386a93bd603`
 
-## Canonical truth
+## Active gate
 
-UADS2-WO-001, UADS2-WO-002 and UADS2-WO-003 are complete and HEDS APPROVED.
+UADS2-WO-004 is planning/governance only. No new deep module runtime implementation is authorized until exact-head HEDS APPROVED.
 
-ADR-UADS2-009 requires dashboard-first event-backed real-time operations.
-ADR-UADS2-010 requires five enterprise production-readiness classifications and M27-M31 ownership.
-B-001 preserves frozen-V1 Duplicate Analysis Rate as `UNAVAILABLE (0/0)` and requires deterministic structured analysis-event proof in V2.
+## Proposed canonical construction model
 
-## UADS2-WO-003 completion
+**Global Architecture → Deep Module Discovery → Vertical Implementation → Integration Freeze**
 
-M30 Event Spine & Dashboard Operator Foundation is merged as the first bounded V2 runtime slice.
+- system-level architecture for all 31 modules first;
+- one deep-discovery module at a time;
+- dependency eligibility rather than numeric order;
+- S01 Technology Radar;
+- S01.5 Technology Invention Radar;
+- S02–S04 architecture/failure/tests before code;
+- S05 small vertical slices with continuous tests;
+- S06 integration/hardening;
+- S07 HEDS freeze;
+- M27–M31 on every slice;
+- Architecture Reconciliation every 3–5 module freezes, default 4.
 
-Accepted exact-head evidence:
-- CI SUCCESS;
-- CodeQL SUCCESS;
-- Dependency Review SUCCESS;
-- UADS Cross-Platform Compatibility SUCCESS on Windows/Node 20 and Linux/Node 20;
-- focused M30 tests 10/10;
-- focused regression selection 31/31;
-- CR-001, CR-002 and CR-003 closed;
-- B-001 transport/schema proof denominator 2, numerator 1, rate 0.5;
-- immutable no-overwrite event storage;
-- loopback-only dashboard;
-- objective Work Order/correlation/status surfaces;
-- no new runtime dependency;
-- no broad M01/M08 implementation;
-- no V1 mutation.
+## Dependency graph
 
-The local full Vitest/validate non-returning behavior remains documented as local INCONCLUSIVE; hosted exact-head CI completed the full test/eval/validation pipeline successfully.
-
-## Owner-approved construction model
-
-Issue #23 records the explicit owner decision:
-
-**Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze**
-
-This decision is preserved and MUST be canonically promoted by the next bounded planning Work Order before any new deep module implementation.
-
-## Next NECESSARY increment
-
-Create `UADS2-WO-004 — Global Module System Architecture & Dependency Graph`.
-
-Required planning scope:
-- promote issue #23 into an accepted ADR;
-- update Decisions Ledger, Architecture, module lifecycle/process docs, Checkpoint and Continuity;
-- architect all 31 modules at system level;
-- define/validate module boundaries, inputs/outputs, events, data ownership and explicit non-ownership;
-- generate and freeze the global dependency graph;
-- classify dependencies as hard, soft/optional, event-driven or governance-only;
-- identify implementation order by dependency / next NECESSARY capability, not module number;
-- define S01 Technology Radar and S01.5 Technology Invention Radar as mandatory deep-discovery steps per selected module;
-- require small vertical slices with continuous tests;
-- require Architecture Reconciliation Checkpoint every 3-5 completed modules or earlier on material change;
-- preserve M27-M31 enterprise gates continuously.
-
-No new deep module runtime implementation begins until UADS2-WO-004 is HEDS APPROVED.
+HARD dependencies are acyclic in the proposed graph.
+First selected deep-discovery module after approval: **M03 Host Capability Detector**.
 
 ## Repository follow-up
 

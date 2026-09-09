@@ -14,5 +14,6 @@ Status: CANONICAL OVERLAY IN REVIEW
 | ADR-UADS2-008 | UADS V2 is standalone-first; Hive integration is optional and additive | ACCEPTED |
 | ADR-UADS2-009 | Dashboard-first real-time operations: live system state, errors, diagnostics and new module observability are first-class; latest owner-approved visual concept is canonical visual target | ACCEPTED |
 | ADR-UADS2-010 | Enterprise production-readiness contract: mandatory scale/load, resilience, operational security, production observability and continuous safe-operations classification with M27–M31 cross-cutting owners | ACCEPTED |
+| ADR-UADS2-011 | Global Architecture → Deep Module Discovery → Vertical Implementation → Integration Freeze; dependency-driven one-module-at-a-time deepening with mandatory S01.5 Technology Invention Radar | ACCEPTED |
 
 No accepted decision may be silently overwritten. Supersession requires a new ADR and checkpoint delta.
