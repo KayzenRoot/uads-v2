@@ -3,6 +3,7 @@
 Status: CONTENT FROZEN / HEDS PENDING
 Module: M03
 Issue: #26
+PR: #27
 
 Promote only after exact-head HEDS APPROVED.
 
@@ -32,3 +33,9 @@ Promote only after exact-head HEDS APPROVED.
 ## Canonical reconciliation
 
 The pre-ADR-UADS2-011 sequencing in `docs/v2/04-ARCHITECTURE.md` that placed M01 before M03 is explicitly marked SUPERSEDED. Historical provenance remains visible; current authority is ADR-UADS2-011 + the frozen HARD dependency graph.
+
+
+## Review state
+
+PR #27 is the bounded S00-S04 freeze.
+No S05 implementation is authorized until exact-head hosted gates and HEDS are APPROVED.

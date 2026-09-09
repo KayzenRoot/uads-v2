@@ -2,8 +2,10 @@
 
 Status: CONTENT FROZEN / EXACT-HEAD HEDS PENDING
 Issue: #26
+PR: #27
 Base main: `122426d0c7079722ed7ca118f13385b7b67183ee`
 Branch: `work/uads2-wo-005-m03-deep-discovery`
+Review-freeze parent: `fa1b009b933daf7211dfcf1df23641bb41f978de`
 
 ## Objective
 
@@ -128,3 +130,11 @@ Before merge:
 - independent HEDS verdict APPROVED.
 
 Only after merge may ADR-UADS2-012 be promoted from PROPOSED to ACCEPTED and the first S05 vertical-slice Work Order be created.
+
+
+## PR scope verification
+
+PR #27 changes exactly 18 paths and all are under `.engineering/` or `docs/v2/`.
+
+No runtime/source/schema/test/package/lockfile path is changed.
+Unresolved review threads at PR-open verification: 0.

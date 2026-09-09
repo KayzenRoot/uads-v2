@@ -1,11 +1,12 @@
 # Work Order — UADS2-WO-005
 
-Status: CONTENT FROZEN — EXACT-HEAD HEDS PENDING
+Status: CONTENT FROZEN — PR #27 EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-005-m03-deep-discovery`
 Base SHA: `122426d0c7079722ed7ca118f13385b7b67183ee`
 Issue: #26
+PR: #27
 Risk: MEDIUM-HIGH
 Scope: architecture/discovery/test-design only
 
