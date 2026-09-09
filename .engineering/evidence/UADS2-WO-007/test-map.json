@@ -1,0 +1,144 @@
+{
+  "schema": "uads2.wo007.test-map",
+  "schemaVersion": "1.0.0",
+  "implementationHead": "3683c3d125d32558409f2362ef722b414114fb14",
+  "sourceRunId": 34411074895,
+  "status": "PASS_IMPLEMENTATION_HEAD",
+  "focusedCases": [
+    {
+      "id": "U007-T001",
+      "name": "subject digest deterministic across repeated detection timestamps",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T002",
+      "name": "different target root changes subject digest",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T003",
+      "name": "different adapter changes subject digest",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T004",
+      "name": "subject/bridge durable output contains no absolute host path",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T005",
+      "name": "exact adapter contract digest deterministic",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T006",
+      "name": "altered/non-canonical definition rejected or cannot reuse digest",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T007",
+      "name": "target presence creates zero TRUE capabilities",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T008",
+      "name": "Cursor present keeps ten capabilities UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T009",
+      "name": "Codex present keeps ten capabilities UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T010",
+      "name": "generic present proves only subagents/parallelAgents false through E2 NPC",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T011",
+      "name": "generic absent remains UNKNOWN and never false",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T012",
+      "name": "blocked target projects all UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T013",
+      "name": "generic negative proof binds exact adapterContractDigest",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T014",
+      "name": "target status drift makes prior negative proof STALE",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T015",
+      "name": "root switch stales prior proof",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T016",
+      "name": "WO-006 cross-capability replay remains rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T017",
+      "name": "legacy TRUE without matching PCCR remains UNKNOWN",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T018",
+      "name": "passive bridge emits no SUPPORTED proof",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T019",
+      "name": "telemetry failure independent of truth",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T020",
+      "name": "SOLO path requires no Hive",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T021",
+      "name": "no child_process/shell/network execution path",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T022",
+      "name": "persisted passive proof state <=64 KiB/host",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T023",
+      "name": "fixed semantic inputs/observedAt yield deterministic proof digests",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T024",
+      "name": "timestamp-only change leaves subjectDigest unchanged",
+      "status": "PASS"
+    },
+    {
+      "id": "U007-T025",
+      "name": "persisted proof re-evaluates after restart against exact basis",
+      "status": "PASS"
+    }
+  ],
+  "mandatoryRegression": {
+    "hostCapabilityProof": "PASS",
+    "hostAdapters": "PASS",
+    "adapterEval": "PASS",
+    "fullTest": {
+      "filesPassed": 53,
+      "testsPassed": 489,
+      "failed": 0
+    }
+  }
+}
