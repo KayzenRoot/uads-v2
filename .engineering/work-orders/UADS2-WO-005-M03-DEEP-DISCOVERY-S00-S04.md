@@ -83,7 +83,7 @@ Current gaps:
 STOP if:
 - a design requires arbitrary shell execution by default;
 - capability truth depends on undocumented provider assumptions;
-- declaration alone can enable a high-impact capability;
+- declaration/E1 alone can enable any capability;
 - an UNKNOWN/STALE/BLOCKED state can become TRUE;
 - negative proof is inferred merely from absence;
 - M03 takes ownership from M04/M06/M23;

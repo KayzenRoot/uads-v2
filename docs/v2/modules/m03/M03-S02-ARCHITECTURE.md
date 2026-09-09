@@ -47,11 +47,11 @@ Each definition is content-digested and versioned.
 For each capability:
 1. inspect reusable current proof;
 2. try passive deterministic facts;
-3. consume documented local declaration/enumeration if available;
+3. consume documented local declaration/enumeration as E1 discovery input; promote a complete identity-bound enumeration to E2 only when completeness and subject binding are proven;
 4. choose safe active probe only if required;
 5. otherwise return UNKNOWN/BLOCKED.
 
-The planner uses CEL minimum evidence requirements.
+The planner uses CEL minimum evidence requirements with a global enabling floor of E2. E1 can never produce SUPPORTED.
 
 ### 4. Bounded Probe Executor
 Initial design:

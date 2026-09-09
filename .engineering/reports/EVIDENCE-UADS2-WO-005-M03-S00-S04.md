@@ -59,6 +59,7 @@ ADAPT:
 
 INVENT:
 - PCCR — Proof-Carrying Capability Record;
+- global CEL enabling floor = E2; E1 declaration never becomes TRUE;
 - CEL — Capability Evidence Ladder;
 - NPC — Negative Proof Contract;
 - CLDS — Capability Lease & Drift Sentinel;

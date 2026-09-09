@@ -15,7 +15,7 @@ Every candidate is classified exactly once for the initial M03 implementation di
 | Existing closed JSON Schema / strict key validation | REUSE | Continue schema-closed proof records. |
 | M30 operational event spine | REUSE | M03 emits events; M30 transports/projects them. |
 | MCP-style explicit identity/version/capability discovery pattern | ADAPT | Use the pattern of explicit capability discovery, not MCP semantics as host truth. |
-| Version/feature enumeration where a host exposes a documented local interface | ADAPT | Declaration is evidence input; it does not automatically become enablement proof. |
+| Version/feature enumeration where a host exposes a documented local interface | ADAPT | E1 declaration is discovery input only and never enables TRUE. A complete identity-bound machine-readable enumeration may qualify as E2 only when its completeness and subject binding are themselves proven. |
 | Safe active local feature probes | ADAPT | Fixed probe descriptors, `execFile`, no shell by default, timeout/AbortSignal, sanitized environment. |
 | Content-addressed evidence cache + validity basis | ADAPT | Bind proof reuse to subject/probe/policy digests and expiry. |
 | Proof-Carrying Capability Record (PCCR) | INVENT | Per-capability state carries exact evidence/freshness/identity instead of snapshot-wide trust. |
@@ -54,6 +54,7 @@ Node's current `execFile` supports timeout and AbortSignal, which is preferable 
 
 - directory exists ⇒ feature supported;
 - adapter installed ⇒ feature supported;
+- declaration/E1 ⇒ feature supported;
 - host name ⇒ known feature matrix;
 - previous snapshot valid forever;
 - missing response ⇒ unsupported;

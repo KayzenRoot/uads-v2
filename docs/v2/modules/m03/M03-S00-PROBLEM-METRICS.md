@@ -24,6 +24,8 @@ Compatibility projection into the current tri-state runtime surface:
 
 This projection is one-way. Legacy `true` cannot manufacture a new proof record.
 
+**Evidence floor:** CEL `E1 DECLARED` is discovery input only and can never produce `SUPPORTED`. Every enabling `SUPPORTED` result requires at least `E2 DETERMINISTIC_LOCAL_FACT`, or a stronger rung.
+
 ## Host capability vocabulary
 
 ### Existing capability IDs to preserve
@@ -38,7 +40,7 @@ This projection is one-way. Legacy `true` cannot manufacture a new proof record.
 - usageTelemetry
 - visionInput
 
-### Proposed M03 V2 host-only additions for S05 schema work
+### Proposed M03 V2 host/control additions for S05 schema work
 - modelEnumeration
 - reasoningEffortControl
 - backgroundExecution

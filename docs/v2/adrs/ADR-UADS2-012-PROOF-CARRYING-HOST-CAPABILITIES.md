@@ -17,12 +17,14 @@ M03 SHALL use evidence-bound per-capability proof records.
 
 A host-dependent capability may project to enabled `true` only when:
 1. state is `SUPPORTED`;
-2. evidence meets the capability's minimum CEL rung;
+2. evidence meets the capability's minimum CEL rung, with a global enabling floor of E2;
 3. subject/probe/policy/evidence digests remain current;
 4. freshness/lease requirements remain valid;
 5. proof integrity validates.
 
 `UNKNOWN`, `BLOCKED` and `STALE` always project to legacy `unknown`.
+
+`E1 DECLARED` is discovery input only and never produces `SUPPORTED`.
 
 `UNSUPPORTED` is permitted only through the Negative Proof Contract.
 

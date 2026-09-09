@@ -17,7 +17,7 @@ Vendor-specific active probes are separate EXPERIMENT cases and cannot be requir
 - M03-T003 UNKNOWN projects `unknown`.
 - M03-T004 BLOCKED projects `unknown`.
 - M03-T005 STALE projects `unknown`.
-- M03-T006 declaration below minimum CEL rung cannot project `true`.
+- M03-T006 E1 DECLARED can never project `true`, regardless of capability.
 - M03-T007 legacy `true` cannot self-upgrade into PCCR SUPPORTED.
 - M03-T008 same inputs produce same proof digest.
 - M03-T009 changed evidence produces a different proof digest.
