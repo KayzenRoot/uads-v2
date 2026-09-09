@@ -322,7 +322,7 @@ describe("M03 PCCR core - frozen S04 mapping", () => {
   it("M03-T049 control-character, secret-like and path-like evidence metadata is rejected", () => {
     expect(() => proof({ adapterId: "bad\u0000adapter" })).toThrow();
     expect(() => proof({ runtimeVersion: "C:\\Users\\example\\runtime" })).toThrow();
-    expect(() => proof({ runtimeVersion: "apiKey=ghp_1234567890abcdefghijklmnop" })).toThrow();
+    expect(() => proof({ runtimeVersion: "ghp_1234567890abcdefghijklmnopqrstuvwxyzABCD" })).toThrow();
   });
 
   it("M03-T050 durable proof record contains no absolute host path or raw evidence field", () => {
