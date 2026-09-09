@@ -1,117 +1,120 @@
-# UADS
+# UADS V2
 
-**Universal Autonomous Development Studio** by **NexLabs**.
+**Universal Autonomous Development Studio V2** by **NexLabs**.
 
-[![CI](https://github.com/KayzenRoot/uads/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads/actions/workflows/ci.yml) [![CodeQL](https://github.com/KayzenRoot/uads/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads/security/code-scanning) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![CI](https://github.com/KayzenRoot/uads-v2/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads-v2/actions/workflows/ci.yml) [![CodeQL](https://github.com/KayzenRoot/uads-v2/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads-v2/actions/workflows/codeql.yml) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-UADS is a pre-1.0, global-first autonomous software engineering orchestration framework for specialist delegation, independent review, evidence-based quality gates, context intelligence, and cost-aware execution.
+> **Status:** V2 bootstrap and architecture/discovery program. Runtime V2 capabilities are not considered implemented until their governed Work Orders are merged with evidence.
 
-This repository is the public open-source UADS product. Releases are published from exact validated SHAs in the [GitHub Releases](https://github.com/KayzenRoot/uads/releases) page. The TypeScript kernel remains provider-neutral: it does not edit customer projects or call model-provider APIs.
+UADS V2 is a controlled continuation of UADS V1, preserving the frozen V1 baseline while evolving orchestration, review, context, model/effort routing, fault resolution, cost governance and optional Hive V2 interoperability.
 
-## Architecture Freeze v0.2 (summary)
+## Standalone first
 
-- **Global-first install** under `~/.uads/`
-- **Zero project footprint** by default — no operational UADS state in the managed project
-- **Sidecar workspace** at `~/.uads/workspaces/<project-id>/`
-- Agent Skills entrypoint, Cursor + Codex/generic adapters
-- Context routing, repository map, dependency/impact map
-- Token budget manager and cache-first prompt architecture
-- Provider-neutral model routing, evidence protocol, review ZIP workflow
-- Global specialist registry with 25 bounded built-in profiles, deterministic domain/gate/evidence obligation coverage, independent assurance, and semantic stale-plan binding
-- Common Cursor/Codex/Generic Agent Skills adapters with ownership-safe global installation, sidecar-only Host Dispatch Bundles, and the bounded Host Execution handoff/Receipt Boundary with current-authority revalidation and 32-entry history retention
-- Two-stage GitHub Direct Review Evidence with exact-SHA CI receipt, canonical workflow artifact, and release cross-checks
-- Staged implementation roadmap
+UADS V2 has two explicit modes:
 
-Normative detail: [`docs/`](docs/).
+```text
+SOLO
+User → UADS V2 Core → Result / Evidence
 
-## Quick start
+HIVE_CONNECTED
+HiveTaskEnvelope → Optional Hive Bridge → UADS V2 Core → UADSQualityBundle → Hive
+```
 
-Requires Node.js 20+.
+`SOLO` is mandatory and first-class. Hive V2 is an optional additive integration, never a required dependency for core UADS operation.
+
+## Canonical V2 source
+
+Start with [`docs/v2/README.md`](docs/v2/README.md). Source authority is:
+
+1. [`docs/v2/11-CHECKPOINT.md`](docs/v2/11-CHECKPOINT.md)
+2. [`docs/v2/10-DECISIONS-LEDGER.md`](docs/v2/10-DECISIONS-LEDGER.md)
+3. [`docs/v2/03-SCOPE.md`](docs/v2/03-SCOPE.md)
+4. [`docs/v2/09-DEFINITION-OF-DONE.md`](docs/v2/09-DEFINITION-OF-DONE.md)
+5. [`docs/v2/04-ARCHITECTURE.md`](docs/v2/04-ARCHITECTURE.md)
+6. [`docs/v2/02-REQUIREMENTS.md`](docs/v2/02-REQUIREMENTS.md)
+7. [`docs/v2/13-REVIEW-PROTOCOL.md`](docs/v2/13-REVIEW-PROTOCOL.md)
+8. active Work Order / Context Lock / Evidence Bundle / PR.
+
+Inherited V1 documentation remains authoritative wherever the V2 overlay has not explicitly superseded it.
+
+## 26-module V2 program
+
+The complete discovery inventory is under [`docs/v2/modules/`](docs/v2/modules/README.md). Each module follows sessions S00–S07:
+
+```text
+S00 Problem & Success Metrics
+S01 Technology Radar
+S02 Architecture & Boundaries
+S03 Failure / Security Model
+S04 Test & Benchmark Design
+S05 Implementation Slicing
+S06 Integration & Hardening
+S07 Module Freeze
+```
+
+Ideas remain `CANDIDATE` until approved. Approved sessions update GitHub before the next session begins.
+
+## Chat/session continuity
+
+A fresh ChatGPT/Cursor/Codex session does not need old conversation history. If the user says **“vamos continuar do chat antigo”** or equivalent, bootstrap from:
+
+- [`docs/v2/continuity/CURRENT.json`](docs/v2/continuity/CURRENT.json)
+- [`docs/v2/operations/CHAT-CONTINUITY-PROTOCOL.md`](docs/v2/operations/CHAT-CONTINUITY-PROTOCOL.md)
+- [`docs/v2/operations/RESPONSE-AND-PROGRESS-STANDARD.md`](docs/v2/operations/RESPONSE-AND-PROGRESS-STANDARD.md)
+- [`AGENTS.md`](AGENTS.md)
+
+GitHub is project memory; conversation memory is only convenience.
+
+## Build V2 using the installed UADS
+
+The existing globally installed UADS V1 runtime remains the execution foundation while V2 is built:
 
 ```bash
-./scripts/install/install.ps1   # Windows
-./scripts/install/install.sh    # Unix
 uads doctor
-uads review
+uads status
 ```
 
-If the installer used `~/.uads/npm` (or `UADS_NPM_PREFIX`), add that prefix (Unix: `.../bin`) to PATH.
+Operational state remains global/sidecar-first under `~/.uads/`. Repository `.engineering/` records are static governance/evidence, not runtime state.
 
-From source:
+## Engineering lifecycle
 
-```bash
-npm install
-npm run build
-node dist/cli.js --help
-node dist/cli.js doctor
-node dist/cli.js inspect
-node dist/cli.js plan --request "Change the primary button color."
-node dist/cli.js index --json
-node dist/cli.js impact --path src/cli.ts --json
-node dist/cli.js context pack --json
-node dist/cli.js dispatch --json
-node dist/cli.js verify --json
-node dist/cli.js status
-node dist/cli.js resume
-node dist/cli.js failure record --source test --input ./fail.txt --json
-node dist/cli.js diagnose --failure <id> --json
-node dist/cli.js cache status --json
-node dist/cli.js cost status --json
-node dist/cli.js models status --json
-node dist/cli.js capabilities status --json
-node dist/cli.js specialists list --json
-node dist/cli.js specialists status --json
-node dist/cli.js specialists explain --json
-node dist/cli.js adapters list --json
-node dist/cli.js adapters detect --json
-node dist/cli.js adapters status --json
-node dist/cli.js adapters prepare generic-agent-skills --json
-node dist/cli.js adapters handoff generic-agent-skills --json
-node dist/cli.js adapters receipt generic-agent-skills --state <state> --json
-node dist/cli.js review
+```text
+ANALYZE → SOURCE CHECK → NEXT NECESSARY INCREMENT
+→ WORK ORDER → CONTEXT LOCK → PREFLIGHT
+→ EXECUTOR → TESTS/EVIDENCE → PR → AUDIT
+→ APPROVED / CORRECTION REQUIRED / BLOCKED
+→ CHECKPOINT DELTA → MERGE → NEXT
 ```
 
-Host Execution is a bounded handoff and receipt capability after adapter
-preparation. Receipts remain global and sidecar-only, with current and
-immutable history. UADS does not invoke model providers, execute arbitrary
-host commands, or create approval proof; the host owns IDE/agent/provider
-execution, and approval-gated intent fails closed without durable proof.
+Primary optimization target: **Time-to-Trusted-Merge**, while preserving security, correctness and required assurance.
 
-`npm run lint` is TypeScript `tsc --noEmit` (compile/static check; not ESLint).
+## V1 lineage
 
-## Project and release documentation
+Frozen source baseline:
 
-- [Releases](https://github.com/KayzenRoot/uads/releases) and [changelog](CHANGELOG.md)
-- [Security policy](SECURITY.md)
-- [Contributing](CONTRIBUTING.md)
-- [Governance](GOVERNANCE.md)
-- [Release policy](RELEASING.md)
-- [CI and security workflows](.github/workflows/)
+- repository: `KayzenRoot/uads`
+- commit: `312e32946798eb3abbb49a79af08e13efb7719dc`
+- tree: `b2a6763045fc1dbb81b6ba2880bf1f77167d7133`
+- inherited version: `0.12.1`
+- tracked files: `489`
 
-Review bundles and validation evidence are written **outside** the project:
+The UADS V1 repository remains untouched and independently usable.
 
-`~/.uads/workspaces/<project-id>/reviews/`
-`~/.uads/workspaces/<project-id>/evidence/`
+## Current development entry points
 
-## Layout
-
-Prompt 010 adds strict host adapter state and Host Dispatch Bundle contracts alongside the existing schemas.
-
-| Path | Role |
+| Path | Purpose |
 | --- | --- |
-| `src/` | CLI + orchestrator kernel |
-| `skills/uads-orchestrator/` | Agent Skill + `references/` |
-| `agents/` | Canonical `uads-*` specialist markdown |
-| `evals/` | Orchestrator, execution, context, fault, cost, model-routing, specialist-routing, adapter, assurance, and fault-injection evals |
-| `core/` | Reserved orchestrator modules |
-| `adapters/` | Common Cursor / Codex / Generic Agent Skills host adapters |
-| `schemas/` | Checkpoint, work order, evidence, review, profile, repo map, execution-run, index/impact/context pack, failure/diagnosis/memory, model-routing, and specialist-routing contracts |
-| `.engineering/` | Static engineering delivery protocol, contracts, templates, adoption records, and cleanup reports; never UADS runtime sidecar state |
-| `docs/` | Architecture Freeze v0.2 |
-| `scripts/` | Install, GitHub audit/direct-review, release, review, validate |
+| `docs/v2/` | V2 canonical Source Pack |
+| `docs/v2/modules/` | 26-module discovery program |
+| `docs/v2/operations/` | review, continuity, response and session contracts |
+| `docs/v2/continuity/` | machine-readable current state |
+| `.engineering/` | Work Orders, locks, evidence and checkpoint deltas |
+| `AGENTS.md` | executor/fresh-session bootstrap |
+| `.cursorrules` | Cursor-specific execution rules |
+| `src/`, `tests/`, `evals/` | inherited V1 implementation/test baseline to evolve under V2 Work Orders |
 
 ## License
 
-Apache License 2.0. See `LICENSE` and `NOTICE`.
+Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
 Copyright 2026 NexLabs.
