@@ -1,7 +1,6 @@
 {
   "schema": "uads2.wo-004.dependency-graph-validation",
   "schemaVersion": "1.0.0",
-  "sourceHead": "d09c0c692e3bc07519aa39b1d12358f96ef0bac2",
   "nodeCount": 31,
   "hardEdgeCount": 60,
   "missingRefs": [],
@@ -42,5 +41,86 @@
   "manifestMismatch": [],
   "selectedNext": "M03",
   "selectedNextHardPredecessors": [],
-  "pass": true
+  "pass": true,
+  "source": "docs/v2/planning/GLOBAL-MODULE-DEPENDENCIES.json",
+  "validatedFromSameCommitContent": true,
+  "topologicalLayers": [
+    {
+      "id": "T0",
+      "modules": [
+        "M03",
+        "M07",
+        "M14",
+        "M17",
+        "M19",
+        "M25",
+        "M29",
+        "M30"
+      ]
+    },
+    {
+      "id": "T1",
+      "modules": [
+        "M01",
+        "M04",
+        "M06",
+        "M09",
+        "M10",
+        "M23",
+        "M24",
+        "M27",
+        "M28",
+        "M31"
+      ]
+    },
+    {
+      "id": "T2",
+      "modules": [
+        "M02",
+        "M05",
+        "M11",
+        "M15",
+        "M16",
+        "M18",
+        "M20"
+      ]
+    },
+    {
+      "id": "T3",
+      "modules": [
+        "M12",
+        "M21"
+      ]
+    },
+    {
+      "id": "T4",
+      "modules": [
+        "M22"
+      ]
+    },
+    {
+      "id": "T5",
+      "modules": [
+        "M08",
+        "M13"
+      ]
+    },
+    {
+      "id": "T6",
+      "modules": [
+        "M26"
+      ]
+    }
+  ],
+  "currentHardRoots": [
+    "M03",
+    "M07",
+    "M14",
+    "M17",
+    "M19",
+    "M25",
+    "M29",
+    "M30"
+  ],
+  "m30BoundedFoundationIsNotS07Freeze": true
 }

@@ -1739,16 +1739,8 @@
   ],
   "waves": [
     {
-      "id": "W0",
-      "status": "FOUNDATION_PRESENT",
-      "modules": [
-        "M30"
-      ],
-      "note": "M30 foundation merged in UADS2-WO-003; module may still receive future bounded slices."
-    },
-    {
-      "id": "W1",
-      "status": "ELIGIBLE_ROOTS",
+      "id": "T0",
+      "kind": "TOPOLOGICAL_LAYER",
       "modules": [
         "M03",
         "M07",
@@ -1757,72 +1749,80 @@
         "M19",
         "M25",
         "M29",
-        "M10"
+        "M30"
       ],
-      "note": "No unsatisfied HARD predecessor other than already-present M30 where applicable."
+      "note": "HARD roots. Current runtime foundation exists for M30, but WO-003 did not constitute full M30 S07 module freeze."
     },
     {
-      "id": "W2",
-      "status": "AFTER_W1_PREDECESSORS",
+      "id": "T1",
+      "kind": "TOPOLOGICAL_LAYER",
       "modules": [
         "M01",
         "M04",
+        "M06",
         "M09",
-        "M20",
+        "M10",
         "M23",
         "M24",
         "M27",
         "M28",
         "M31"
       ],
-      "note": "Becomes eligible as hard predecessors freeze."
+      "note": "Requires only T0 HARD predecessors."
     },
     {
-      "id": "W3",
-      "status": "CONVERGENCE",
+      "id": "T2",
+      "kind": "TOPOLOGICAL_LAYER",
       "modules": [
         "M02",
         "M05",
-        "M06",
         "M11",
         "M15",
         "M16",
         "M18",
-        "M21"
+        "M20"
       ],
-      "note": "Execution, routing, adapter and outcome layers."
+      "note": "Requires predecessors from T0/T1."
     },
     {
-      "id": "W4",
-      "status": "CONTROL_CONVERGENCE",
+      "id": "T3",
+      "kind": "TOPOLOGICAL_LAYER",
       "modules": [
         "M12",
-        "M22"
+        "M21"
       ],
-      "note": "Policy memory and evidence-driven escalation."
+      "note": "Requires predecessors through T2."
     },
     {
-      "id": "W5",
-      "status": "QUALITY_LEARNING",
+      "id": "T4",
+      "kind": "TOPOLOGICAL_LAYER",
+      "modules": [
+        "M22"
+      ],
+      "note": "Requires routing/gate/retry/context predecessors."
+    },
+    {
+      "id": "T5",
+      "kind": "TOPOLOGICAL_LAYER",
       "modules": [
         "M08",
         "M13"
       ],
-      "note": "Full review runtime and adaptive routing learner."
+      "note": "Full review runtime and adaptive learner convergence."
     },
     {
-      "id": "W6",
-      "status": "SAFE_LEARNING",
+      "id": "T6",
+      "kind": "TOPOLOGICAL_LAYER",
       "modules": [
         "M26"
       ],
-      "note": "Learning activation/rollback after prerequisites."
+      "note": "Safe learned-policy rollout/rollback after all HARD predecessors."
     }
   ],
   "selectionPolicy": {
     "concurrency": "one deep-discovery module at a time",
     "numericOrderRequired": false,
-    "chooseFrom": "currently eligible modules whose HARD predecessors are frozen",
+    "chooseFrom": "currently eligible modules whose HARD predecessors have reached S07 freeze; roots have no HARD predecessors",
     "scoreFactors": [
       "critical-path unlock count",
       "safety/risk",
@@ -1831,7 +1831,17 @@
       "integration/rework reduction"
     ],
     "selectedNext": "M03",
-    "selectedNextRationale": "M03 unlocks M01, M04, M06 and M23 directly and reduces capability-assumption risk across adapters and worker execution."
+    "selectedNextRationale": "M03 is a HARD root and directly unlocks M01, M04, M06 and M23 while reducing unsafe host/provider capability assumptions.",
+    "currentEligibleRoots": [
+      "M03",
+      "M07",
+      "M14",
+      "M17",
+      "M19",
+      "M25",
+      "M29",
+      "M30"
+    ]
   },
   "reconciliation": {
     "defaultEveryCompletedModuleFreezes": 4,
@@ -1844,5 +1854,10 @@
       "cross-module regression",
       "new HIGH/CRITICAL risk"
     ]
+  },
+  "freezeSemantics": {
+    "boundedFoundationIsNotModuleFreeze": true,
+    "m30State": "WO-003 delivered a bounded M30 foundation; M30 remains a module requiring its own later deep-discovery/S07 freeze before HARD dependents that require full M30 freeze may themselves freeze.",
+    "rule": "A HARD predecessor requirement is satisfied only by S07 module freeze unless an explicit contract-first ADR creates a narrower exception."
   }
 }

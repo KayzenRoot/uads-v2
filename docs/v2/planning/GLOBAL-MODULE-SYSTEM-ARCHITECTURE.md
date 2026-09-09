@@ -106,6 +106,8 @@ This is an architectural topology, not a claim that every module is implemented.
 
 ## Deep-discovery eligibility
 
+A bounded runtime foundation is not automatically a full module S07 freeze. WO-003 established an M30 foundation, but M30 remains eligible for later deep discovery/freeze.
+
 A module enters S00/S01 only when:
 1. all HARD predecessors are frozen or an explicit contract-first ADR exists;
 2. no current Work Order is BLOCKED/CORRECTION REQUIRED;

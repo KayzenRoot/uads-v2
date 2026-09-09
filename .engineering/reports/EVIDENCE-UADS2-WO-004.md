@@ -22,7 +22,10 @@ All 31 module discovery documents plus current Architecture, Decisions Ledger, M
 - dependency types separate runtime prerequisite from optional/event/governance/crosscut concerns;
 - M27–M31 remain cross-cutting rather than becoming functional owners;
 - module number is not implementation order;
+- topological layers are distinguished from actual eligibility;
+- bounded foundation state is distinguished from S07 module freeze;
 - only one module is selected for deep discovery at a time;
+- current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30;
 - next selected module is M03 for critical-path unlock and capability-safety reasons.
 
 ## Deterministic graph validation
@@ -36,6 +39,7 @@ Result:
 - manifestMismatch = 0;
 - selectedNext = M03;
 - validation PASS.
+- topological-layer correction: PASS; M10 is T1, not a root.
 
 The manifest and machine-readable graph agree on `requiredPredecessorsForFreeze`.
 

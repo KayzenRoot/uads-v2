@@ -81,19 +81,19 @@ graph TD
 
 The HARD graph is acyclic at WO-004 source lock.
 
-## Eligibility waves
+## Topological layers
 
 | Wave | Modules | Meaning |
 | --- | --- | --- |
-| W0 | M30 | Existing runtime foundation from WO-003. |
-| W1 | M03, M07, M14, M17, M19, M25, M29, M10 | Root/near-root candidates after M30. |
-| W2 | M01, M04, M09, M20, M23, M24, M27, M28, M31 | Eligible as W1 predecessors freeze. |
-| W3 | M02, M05, M06, M11, M15, M16, M18, M21 | Execution/routing/adapter/outcome convergence. |
-| W4 | M12, M22 | Policy memory + escalation convergence. |
-| W5 | M08, M13 | Full review runtime + adaptive learner. |
-| W6 | M26 | Safe learned-policy rollout/rollback. |
+| T0 | M03, M07, M14, M17, M19, M25, M29, M30 | HARD roots. M30 has a bounded runtime foundation from WO-003 but is not yet an S07 module freeze. |
+| T1 | M01, M04, M06, M09, M10, M23, M24, M27, M28, M31 | Depends only on T0 HARD predecessors. |
+| T2 | M02, M05, M11, M15, M16, M18, M20 | Depends on T0/T1 predecessors. |
+| T3 | M12, M21 | Depends through T2. |
+| T4 | M22 | Control convergence after routing/gate/retry/context predecessors. |
+| T5 | M08, M13 | Review and learning convergence. |
+| T6 | M26 | Safe learned-policy rollout/rollback. |
 
-Waves are **eligibility sets**, not parallel implementation authorization. Only one module enters deep discovery at a time by default.
+These are **topological layers**, not current eligibility sets and not parallel implementation authorization. Current eligibility is recomputed from S07-frozen HARD predecessors. Only one module enters deep discovery at a time by default.
 
 ## First selected module after WO-004
 
@@ -105,4 +105,4 @@ Rationale:
 - removes a major class of fabricated/assumed-capability defects;
 - required in SOLO and useful before adapter/worker deepening.
 
-After every module freeze, recalculate currently eligible modules from the machine-readable graph. Do not blindly follow a static numeric list.
+Current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30. M03 is selected first. After every module S07 freeze, recalculate eligibility from the machine-readable graph. A bounded foundation such as WO-003 M30 does not by itself satisfy a HARD predecessor freeze requirement. Do not blindly follow a static numeric list.

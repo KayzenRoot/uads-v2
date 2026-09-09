@@ -34,6 +34,8 @@ UADS2-WO-004 is planning/governance only. No new deep module runtime implementat
 ## Dependency graph
 Deterministic validation: 31 nodes, 60 HARD edges, 0 missing references, 0 cycles, 0 manifest mismatches.
 
+Topological layers are not eligibility sets. Current HARD roots are M03, M07, M14, M17, M19, M25, M29 and M30. WO-003 delivered a bounded M30 foundation, not an S07 M30 module freeze.
+
 First selected deep-discovery module after approval: **M03 Host Capability Detector**.
 
 ## Repository follow-up
