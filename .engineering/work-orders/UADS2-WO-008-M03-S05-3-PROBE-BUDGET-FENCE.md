@@ -1,12 +1,13 @@
 # Work Order — UADS2-WO-008
 
-Status: ACTIVE — M03 S05.3 CONTRACT FROZEN
+Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Slice: S05.3 — Probe Budget Fence Core & Generic Safe Probe Executor
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-008-m03-probe-budget-fence`
 Base SHA: `f320243d28d95037f9e270e2d500606e791855c3`
 Issue: #32
+PR: #33
 Risk: HIGH
 ADRs: ADR-UADS2-011 / ADR-UADS2-012 — ACCEPTED
 
@@ -250,3 +251,27 @@ STOP with CORRECTION REQUIRED/BLOCKED if:
 - single-flight fails;
 - generic self-test creates positive capability truth;
 - HIGH/CRITICAL defect remains.
+
+
+## Implementation evidence snapshot
+
+Implementation head: `cf53be42fe74075071edaac6c2eb90935f0a215f`
+CI run: `34413709632`
+CI job: `102673708260`
+
+Hosted implementation-head result:
+- lint/typecheck/build PASS;
+- 54/54 test files PASS;
+- 508/508 tests PASS;
+- all standard evals/validation PASS;
+- Dependency Review SUCCESS;
+- CodeQL SUCCESS;
+- Cross-Platform Linux/Windows SUCCESS.
+
+Benchmark primary sample:
+- WO008-B2 p50 = 4.376403 ms; p95 = 5.926256 ms <= 2000 ms;
+- WO008-B5 100 callers -> 1 executionId / 1 receiptDigest / 1 spawn / 0 in-flight after settle; 106.387404 ms;
+- WO008-B3 = 1,137 bytes <= 65,536;
+- WO008-B4 all safety counters = 0.
+
+Final exact HEDS head will be auditor-bound after the evidence-only commit.
