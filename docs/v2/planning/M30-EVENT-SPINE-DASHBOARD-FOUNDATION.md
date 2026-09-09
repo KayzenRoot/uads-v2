@@ -100,5 +100,5 @@ Future modules emit through a small M30 event API. They must not write dashboard
   and rate `0.5`. This remains transport/schema proof only; M08 semantics are
   not implemented here.
 
-The implementation snapshot is `e156bd2`; hosted exact-head gates and final
+The implementation snapshot is `e156bd2738ce10d30da4b0881e37709eadd8716b`; hosted exact-head gates and final
 HEDS approval remain pending before merge.

@@ -207,7 +207,7 @@ HEDS delta-first exact-head review. Runtime implementation starts only after pre
 
 ## Implementation checkpoint
 
-The implementation snapshot is `e156bd2` and adds the bounded event spine,
+The implementation snapshot is `e156bd2738ce10d30da4b0881e37709eadd8716b` and adds the bounded event spine,
 immutable sidecar records, health projection, loopback dashboard/SSE surface,
 CLI inspection commands, focused tests, B-001 proof and isolated benchmark.
 The branch remains unmerged and is ready for a new exact-head HEDS final audit.

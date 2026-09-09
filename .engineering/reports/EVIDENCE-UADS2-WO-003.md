@@ -4,7 +4,7 @@ WORK ORDER: `UADS2-WO-003`
 
 BASE SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
 
-HEAD SHA: `e156bd2` (implementation snapshot; final PR head and hosted gates remain auditor-bound)
+HEAD SHA: `e156bd2738ce10d30da4b0881e37709eadd8716b` (implementation snapshot; final PR head and hosted gates remain auditor-bound)
 
 ## IMPLEMENTATION
 
