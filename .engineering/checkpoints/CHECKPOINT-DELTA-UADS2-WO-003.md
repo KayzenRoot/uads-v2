@@ -1,10 +1,10 @@
 # Checkpoint Delta — UADS2-WO-003 / M30
 
-Status: `READY_FOR_FINAL_HEDS_AUDIT`
+Status: `CORRECTION IMPLEMENTED — READY_FOR_FINAL_HEDS_AUDIT`
 
 Base SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
 
-Implementation snapshot: `e156bd2738ce10d30da4b0881e37709eadd8716b`
+Implementation snapshot: `60b3f26f276a8f22fafb73b7d33f60cef16d053f`
 
 Active branch: `work/uads2-wo-003-m30-event-dashboard-foundation`
 
@@ -22,14 +22,22 @@ Active PR: `#22`
   SSE updates, security headers and an inline dark operator shell.
 - Added additive `dashboard` and `observability` CLI inspection/start commands.
 - Added focused M30 tests, an isolated benchmark and the two-event B-001 proof.
+- Closed HEDS CR-001 with fail-closed size/key, reload, retention-isolation,
+  invalid-record, SSE-limit/disconnect, error/diagnostic and unavailable-source
+  proof.
+- Closed HEDS CR-002 with locale-independent canonical key ordering and nested
+  payload insertion-order hash proof, preserving the B-001 signature.
+- Closed HEDS CR-003 with bounded Work Order/correlation/execution identity and
+  selected existing UADS status panels, using `UNAVAILABLE` for missing fields.
 
 ## Proof state
 
-Local lint, typecheck, build, focused M30 tests, orchestration/execution evals
-and engineering protocol validation passed. Full Vitest and `npm run validate`
-are INCONCLUSIVE because their runner did not return a final result. The exact
-implementation snapshot is recorded above; hosted exact-head gates and final
-HEDS are still pending.
+Local npm ci, lint, typecheck, build, focused M30 tests (10/10; regression
+selection 31/31), orchestration/execution evals and engineering protocol
+validation passed. Full Vitest is INCONCLUSIVE because its runner did not
+return a final result; `npm run validate` remains gated by that same condition.
+The exact correction implementation snapshot is recorded above; hosted
+exact-head gates and final HEDS are still pending.
 
 ## Safety and rollback
 

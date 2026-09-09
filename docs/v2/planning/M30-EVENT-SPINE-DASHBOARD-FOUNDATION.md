@@ -1,6 +1,6 @@
 # M30 S00/S02 — Event Spine & Dashboard Operator Foundation
 
-Status: IMPLEMENTED — LOCAL VALIDATION / FINAL HEDS PENDING
+Status: CORRECTION IMPLEMENTED — LOCAL FOCUSED VALIDATION PASS / FINAL HEDS PENDING
 Work Order: UADS2-WO-003
 
 ## Technology decision for this slice
@@ -99,6 +99,10 @@ Future modules emit through a small M30 event API. They must not write dashboard
   recomputes the unchanged B-001 signature with denominator `2`, numerator `1`
   and rate `0.5`. This remains transport/schema proof only; M08 semantics are
   not implemented here.
+- The correction proof covers fail-closed size/key limits, nested canonical
+  hash stability, reload and M30-only retention, degraded invalid-record
+  handling, bounded SSE lifecycle, and objective dashboard identity/status
+  rendering. Missing fields remain `UNAVAILABLE`.
 
-The implementation snapshot is `e156bd2738ce10d30da4b0881e37709eadd8716b`; hosted exact-head gates and final
+The correction implementation snapshot is `60b3f26f276a8f22fafb73b7d33f60cef16d053f`; hosted exact-head gates and final
 HEDS approval remain pending before merge.

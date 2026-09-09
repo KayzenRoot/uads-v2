@@ -4,15 +4,18 @@ WORK ORDER: `UADS2-WO-003`
 
 BASE SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
 
-HEAD SHA: `e156bd2738ce10d30da4b0881e37709eadd8716b` (implementation snapshot; final PR head and hosted gates remain auditor-bound)
+HEAD SHA: `60b3f26f276a8f22fafb73b7d33f60cef16d053f` (correction implementation snapshot; final PR head and hosted gates remain auditor-bound)
 
 ## IMPLEMENTATION
 
-Implemented the bounded M30 runtime surface on the existing global-first
+Implemented and corrected the bounded M30 runtime surface on the existing global-first
 sidecar. The slice adds a closed `uads.operational-event` v1.0.0 contract,
 UUID identity, canonical SHA-256 integrity, immutable one-event-per-file
 creation, bounded reads/retention, health projection, sanitized diagnostics and
 errors, loopback HTTP/SSE dashboard, and additive CLI inspection commands.
+The correction closes HEDS CR-001 through CR-003 with fail-closed and
+retention-isolation proof, locale-independent nested canonical hashing, and a
+bounded operator identity/status panel.
 No M01 orchestration, M08 semantic review pipeline, background worker, Hive
 dependency, V1 mutation, release/version change or runtime dependency was added.
 
@@ -38,13 +41,37 @@ dependency, V1 mutation, release/version change or runtime dependency was added.
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
 | `npm run build` | PASS |
-| focused M30 Vitest | PASS — 2 files / 6 tests |
+| focused M30 Vitest | PASS — 2 files / 10 tests |
+| focused regression selection | PASS — 6 files / 31 tests |
 | `npm run eval:orchestrator` | PASS — 9/9 |
 | `npm run eval:execution` | PASS — 9/9 |
 | `npm run validate:engineering` | PASS |
 | `npm audit --audit-level=high` | PASS exit code; moderate advisory remains outside this scope |
-| `npm test` | INCONCLUSIVE — Vitest runner stayed open without final output after approximately nine minutes and was stopped; no failure result was emitted |
+| `npm test` | INCONCLUSIVE — correction rerun stayed open without final output during a controlled window and was stopped; no failure result was emitted |
 | `npm run validate` | INCONCLUSIVE — reaches the same full Vitest runner behavior; no final result emitted |
+
+## CR-001
+
+Closed with deterministic focused tests for the serialized event byte ceiling,
+payload key ceiling, reload/reinstantiation, corrupt/unsupported/hash-mismatch
+degradation while preserving valid records, M30-only retention with an
+adjacent sidecar sentinel, max SSE clients, disconnect cleanup, visible
+error/diagnostic projections and missing-source `UNAVAILABLE` behavior.
+
+## CR-002
+
+Closed with `compareCanonicalKeys`, an explicit locale-independent UTF-16
+code-unit comparator used by canonical hashing. Nested payload objects with
+different insertion order produce identical hashes. The B-001 signature remains
+exactly `eventType | gate | normalizedSubjectPath | normalizedFindingCode |
+evidenceDigest`.
+
+## CR-003
+
+Closed with a minimal dashboard panel showing Work Order ID, correlation ID and
+execution identity from the latest objective event, plus a bounded selection of
+existing `uadsStatus` fields. Missing values render as `UNAVAILABLE`; no mock or
+external asset was added.
 
 ## BENCHMARK
 
@@ -55,12 +82,16 @@ The isolated result is stored at
 - Method: synchronous local sidecar operations measured with
   `performance.now()` in an isolated temporary `UADS_HOME`.
 - Sample count: `24` writes, `24` bounded reads and `24` snapshots.
-- Write throughput: `28.12` events/second; p50 `33.387 ms`; p95 `47.059 ms`.
-- Bounded read p50 `30.412 ms`; p95 `38.117 ms`.
-- Dashboard snapshot p50 `1501.025 ms`; p95 `2018.625 ms`.
+- Write throughput: `26.04` events/second; p50 `35.402 ms`; p95 `58.961 ms`.
+- Bounded read p50 `37.066 ms`; p95 `50.903 ms`.
+- Dashboard snapshot p50 `1659.012 ms`; p95 `2174.484 ms`.
 - Retained events: `24`; configured retention cap: `1000`.
+- Retention proof: explicit cap `8`, input `10`, retained `8`, removed `2`,
+  `withinCap=true`, `oldestRemoved=true`, `newestRetained=true`, health
+  `HEALTHY`.
 - Limitations: one developer host, synchronous filesystem path, no production
-  SLO inferred, bounded 24-event sample.
+  SLO inferred; latency sample is bounded to 24 events and the retention proof
+  uses an explicit bounded cap of 8.
 
 ## ENTERPRISE PILLARS
 
@@ -88,8 +119,8 @@ The persisted proof is stored at
   `eventType | gate | normalizedSubjectPath | normalizedFindingCode | evidenceDigest`.
 - Signature version: `normalized-structured-analysis-signature-v1`.
 - Deterministic numerator: `1`; denominator: `2`; rate: `0.5`.
-- Raw event hashes: `0f792c0c035bb5fe93854a6dbaab0849058aee57d34831745ab284a6b1991cfa`,
-  `af79974e71e8d6a843978504ba8bcab08a5e506c118f22c48cba75c4bf0f34e3`.
+- Raw event hashes: `2d892da7bde71a7594a21e967dc61081814f184c8df13a7b7d4e6d2ad10abd9d`,
+  `6d1c8a54df434ef71f40607dfdbd5d0ac5558af6886e5202fd6f424f3bbf9b1c`.
 - This is M30 transport/schema proof only. It does not claim M08 semantic
   review-analysis integration.
 
@@ -97,29 +128,32 @@ The persisted proof is stored at
 
 The server accepts only `127.0.0.1`. The objective endpoints are
 `/api/snapshot`, `/api/events?limit=...` and `/api/stream`; `/` serves the
-compiled no-external-asset dark operator shell. Missing telemetry is shown as
-`UNAVAILABLE`; no mock metrics are emitted. Error and diagnostic events appear
-as first-class snapshot data.
+compiled no-external-asset dark operator shell. The shell now includes bounded
+Work Order/correlation/execution identity and selected existing UADS status
+fields. Missing telemetry is shown as `UNAVAILABLE`; no mock metrics are
+emitted. Error and diagnostic events appear as first-class snapshot data.
 
 ## SECURITY
 
 The focused proof covers secret/path sanitization, closed schema rejection,
 payload bounds, non-loopback rejection, security headers, traversal rejection,
-and absence of external asset references. Event files are contained in the
-global sidecar workspace and created without replacing an existing event ID.
+absence of external asset references, M30-only cleanup and SSE lifecycle
+limits. Event files are contained in the global sidecar workspace and created
+without replacing an existing event ID. The prior HEDS audit identified no
+HIGH/CRITICAL defect; the final audit of this correction remains pending.
 
 ## LIMITATIONS
 
 Final exact-head hosted CI, CodeQL, Dependency Review, Cross-Platform
-Compatibility and HEDS audit have not yet run on the implementation snapshot.
+Compatibility and HEDS audit have not yet run on the correction PR head.
 The full local Vitest and `validate` commands are INCONCLUSIVE due to the
 non-returning runner described above. Visual fidelity to the owner binary
 reference is not claimed because that binary is not versioned in the repository.
 
 ## CI
 
-`PENDING — must be read from the exact pushed PR #22 head; no remote PASS is
-claimed in this local evidence bundle.`
+`PENDING — correction snapshot is ready to push; exact pushed PR #22 head must
+be read before claiming hosted PASS.`
 
 ## EVIDENCE
 

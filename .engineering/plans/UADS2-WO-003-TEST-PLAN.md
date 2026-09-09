@@ -1,6 +1,6 @@
 # Test Plan — UADS2-WO-003 / M30 Foundation
 
-Status: PREFLIGHT
+Status: CORRECTION VALIDATION — FOCUSED PASS / FULL VITEST INCONCLUSIVE
 
 ## Unit / schema
 

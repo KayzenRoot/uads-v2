@@ -1,6 +1,6 @@
 # Work Order — `UADS2-WO-003`
 
-Status: `ACTIVE — IMPLEMENTATION COMPLETE / FINAL HEDS AUDIT PENDING`
+Status: `ACTIVE — CORRECTION IMPLEMENTED / FINAL HEDS AUDIT PENDING`
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-003-m30-event-dashboard-foundation`
 Base Git SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
@@ -205,9 +205,26 @@ STOP if:
 
 HEDS delta-first exact-head review. Runtime implementation starts only after preflight source/contract review is acceptable.
 
+## Correction closure
+
+HEDS CR-001 is addressed with deterministic focused proof for serialized-size
+and payload-key ceilings, restart/reinstantiation reload, M30-only retention
+with adjacent sidecar preservation, corrupt/unsupported/hash-mismatched record
+degradation, SSE client limits and disconnect cleanup, objective error/
+diagnostic projection, and missing-source `UNAVAILABLE` behavior.
+
+HEDS CR-002 is addressed with a locale-independent UTF-16 code-unit comparator
+for canonical hashing. Nested payload objects with different insertion order
+now produce the same event hash; the B-001 signature contract is unchanged.
+
+HEDS CR-003 is addressed with bounded dashboard panels for Work Order ID,
+correlation ID, execution identity and selected existing UADS status fields.
+Missing values render as `UNAVAILABLE`.
+
 ## Implementation checkpoint
 
-The implementation snapshot is `e156bd2738ce10d30da4b0881e37709eadd8716b` and adds the bounded event spine,
+The correction implementation snapshot is `60b3f26f276a8f22fafb73b7d33f60cef16d053f` and adds the bounded event spine,
 immutable sidecar records, health projection, loopback dashboard/SSE surface,
-CLI inspection commands, focused tests, B-001 proof and isolated benchmark.
+CLI inspection commands, correction-focused tests, refreshed B-001 proof and
+retention benchmark evidence.
 The branch remains unmerged and is ready for a new exact-head HEDS final audit.
