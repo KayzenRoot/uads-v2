@@ -9,7 +9,7 @@ Status: CANONICAL OVERLAY IN REVIEW
 | ADR-UADS2-003 | One visible primary session; background workers only with proven host capability | ACCEPTED |
 | ADR-UADS2-004 | Capability-aware automatic model + reasoning-effort routing | ACCEPTED |
 | ADR-UADS2-005 | Hive owns macro/canonical truth; UADS owns bounded execution/micro-orchestration | ACCEPTED |
-| ADR-UADS2-006 | Adopt HEDS-compatible delta-first/evidence-driven review delivery | ACCEPTED |
+| ADR-UADS2-006 | Adopt HEDS as the canonical UADS V2 review & engineering-delivery model in SOLO and HIVE_CONNECTED modes | ACCEPTED |
 | ADR-UADS2-007 | Experience Engine / Policy Memory activation requires measured experiment and rollback | PROPOSED / EXPERIMENT REQUIRED |
 | ADR-UADS2-008 | UADS V2 is standalone-first; Hive integration is optional and additive | ACCEPTED |
 
