@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.local/schemas/host-capability-probe-receipt.schema.json",
+  "title": "UADS Host Capability Probe Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema","schemaVersion","executionId","probeId","descriptorDigest","subjectDigest",
+    "capabilityId","status","executableIdentityBefore","executableIdentityAfter",
+    "startedAt","finishedAt","exitCode","signal","stdoutDigest","stderrDigest",
+    "stdoutBytes","stderrBytes","parserId","parsedSummary","reasonCodes","receiptDigest"
+  ],
+  "properties": {
+    "schema": { "const": "uads.host-capability-probe-receipt" },
+    "schemaVersion": { "const": "1.0.0" },
+    "executionId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$" },
+    "probeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$" },
+    "descriptorDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "subjectDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "capabilityId": {
+      "anyOf": [
+        { "type": "null" },
+        { "enum": ["modelSelection","toolCalling","structuredOutput","promptCache","explicitCache","persistentContext","subagents","parallelAgents","usageTelemetry","visionInput"] }
+      ]
+    },
+    "status": { "enum": ["SUCCEEDED","FAILED","TIMED_OUT","OUTPUT_LIMIT","BLOCKED","IDENTITY_DRIFT"] },
+    "executableIdentityBefore": { "anyOf": [{ "type": "null" },{ "type": "string","pattern": "^[a-f0-9]{64}$" }] },
+    "executableIdentityAfter": { "anyOf": [{ "type": "null" },{ "type": "string","pattern": "^[a-f0-9]{64}$" }] },
+    "startedAt": { "type": "string","format": "date-time" },
+    "finishedAt": { "type": "string","format": "date-time" },
+    "exitCode": { "anyOf": [{ "type": "null" },{ "type": "integer" }] },
+    "signal": { "anyOf": [{ "type": "null" },{ "type": "string","minLength": 1,"maxLength": 32 }] },
+    "stdoutDigest": { "type": "string","pattern": "^[a-f0-9]{64}$" },
+    "stderrDigest": { "type": "string","pattern": "^[a-f0-9]{64}$" },
+    "stdoutBytes": { "type": "integer","minimum": 0,"maximum": 65536 },
+    "stderrBytes": { "type": "integer","minimum": 0,"maximum": 65536 },
+    "parserId": { "enum": ["node-version-v1","exit-code-v1","echo-safe-v1"] },
+    "parsedSummary": { "anyOf": [{ "type": "null" },{ "type": "string","maxLength": 128 }] },
+    "reasonCodes": {
+      "type": "array","maxItems": 32,"uniqueItems": true,
+      "items": { "type": "string","minLength": 1,"maxLength": 128,"pattern": "^[A-Z0-9._:-]+$" }
+    },
+    "receiptDigest": { "type": "string","pattern": "^[a-f0-9]{64}$" }
+  }
+}

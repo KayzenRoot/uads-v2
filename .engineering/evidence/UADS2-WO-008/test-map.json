@@ -1,0 +1,109 @@
+{
+  "schema": "uads2.wo008.test-map",
+  "schemaVersion": "1.0.0",
+  "implementationHead": "cf53be42fe74075071edaac6c2eb90935f0a215f",
+  "sourceRunId": 34413709632,
+  "status": "PASS_IMPLEMENTATION_HEAD",
+  "focusedCases": [
+    {
+      "id": "M03-T031",
+      "name": "arbitrary executable rule rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T032",
+      "name": "shell field rejected; production execution uses shell=false",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T033",
+      "name": "unbounded/free-form arguments rejected; no runtime args override",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T034",
+      "name": "inherited secret environment absent in child",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T035",
+      "name": "stdout ceiling enforced",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T036",
+      "name": "stderr ceiling enforced",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T037",
+      "name": "timeout aborts hung probe",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T038",
+      "name": "MUTATING auto-run BLOCKED without spawn",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T039",
+      "name": "NETWORK_OBSERVE auto-run BLOCKED without spawn",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T040",
+      "name": "COST_BEARING auto-run BLOCKED without spawn",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T041",
+      "name": "PATH search/shadow cannot select executable",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T042",
+      "name": "pre/post executable identity drift produces IDENTITY_DRIFT",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T043",
+      "name": "100 same-key callers single-flight to one execution",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T044",
+      "name": "generic executor creates zero PCCR proof; corrupt receipt rejected",
+      "status": "PASS"
+    }
+  ],
+  "additional": [
+    {
+      "name": "descriptor digest deterministic/registry closed",
+      "status": "PASS"
+    },
+    {
+      "name": "TEST_ONLY policy blocked outside test mode",
+      "status": "PASS"
+    },
+    {
+      "name": "receipt tamper/path binding fail closed",
+      "status": "PASS"
+    },
+    {
+      "name": "receipt privacy excludes executable path/env dump/secret",
+      "status": "PASS"
+    },
+    {
+      "name": "production Node version parser bounded",
+      "status": "PASS"
+    }
+  ],
+  "mandatoryRegression": {
+    "fullTest": {
+      "filesPassed": 54,
+      "testsPassed": 508,
+      "failed": 0
+    },
+    "allStandardEvals": "PASS"
+  }
+}
