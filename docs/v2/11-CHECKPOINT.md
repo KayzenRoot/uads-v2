@@ -5,9 +5,10 @@ Date: 2026-09-09
 Completed Work Order: UADS2-WO-002
 Active Work Order: UADS2-WO-003
 Active Issue: #21
-Active PR: pending creation
+Active PR: #22
 Active Branch: `work/uads2-wo-003-m30-event-dashboard-foundation`
 UADS2-WO-003 base SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
+Preflight artifact commit: `d9cd18502c2b2a9284ef44eb7cf34800c931ea2b`
 
 ## Canonical truth
 
@@ -19,7 +20,7 @@ B-001 preserves frozen-V1 Duplicate Analysis Rate as `UNAVAILABLE (0/0)` and req
 
 `UADS2-WO-003 — M30 Event Spine & Dashboard Operator Foundation`.
 
-This is the first bounded V2 runtime implementation slice. Preflight artifacts are being reviewed before executor implementation.
+This is the first bounded V2 runtime implementation slice. Preflight artifacts are under exact-head HEDS review before executor implementation.
 
 ## Technology boundary
 
@@ -37,6 +38,13 @@ This is the first bounded V2 runtime implementation slice. Preflight artifacts a
 - Operational security: COVERED via M29 proof obligations.
 - Production observability: COVERED directly by M30.
 - Continuous safe operations: COVERED via M31 proof obligations.
+
+## Execution artifact
+
+Versioned Markdown executor prompt:
+`.engineering/executor-prompts/UADS2-WO-003-EXECUTOR-PROMPT.md`.
+
+User-facing execution copy must be delivered as PDF after preflight HEDS approval.
 
 ## Guardrail
 
