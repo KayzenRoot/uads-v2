@@ -98,14 +98,11 @@ found. The raw inspection is
 `.engineering/evidence/UADS2-WO-001/blocker-resolution/authoritative-analysis-event-inspection.json`.
 
 This does not resolve the original numeric acceptance criterion on frozen V1.
-It records the objective impossibility and the HEDS-conditionally approved,
-owner-approved amendment in
-`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`. The
-owner decision is recorded at
-`.engineering/evidence/UADS2-WO-001/blocker-resolution/owner-amendment-decision.json`.
-The rule and `0/0` unavailable rate are intentionally unchanged. Final HEDS
-audit and the mandatory V2 event-stream proof remain pending before checkpoint
-promotion.
+It records the objective impossibility and triggers the proposed amendment at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, whose
+status is `PROPOSED_PENDING_OWNER_AUDITOR_APPROVAL`. The rule and `0/0`
+unavailable rate are intentionally unchanged. No owner decision, checkpoint
+promotion, final HEDS approval or runtime authorization is recorded.
 
 ## Telemetry policy
 

@@ -20,20 +20,19 @@ V2 base `3eedf833c00b18755ce2b105f4df8c6c13269055`. The frozen V1 source is
 
 ## B-001 RESOLUTION
 
-`AMENDMENT_APPLIED — FINAL_HEDS_PENDING`.
+`BLOCKED — NO_AUTHORITATIVE_ANALYSIS_EVENT_STREAM_ON_FROZEN_V1_SUPPORTED_PATHS`.
 The exhaustive supported-path inspection found no authoritative structured
 analysis-event stream or artifact. The approved duplicate rule is preserved;
-the rate remains `UNAVAILABLE` with denominator zero. The owner explicitly
-approved the HEDS-recommended amendment, which is recorded at
-`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`; final
-HEDS approval remains pending.
+the rate remains `UNAVAILABLE` with denominator zero. The HEDS conditional
+amendment recommendation is recorded at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md` and
+remains pending explicit owner/auditor decision.
 
 ## HEAD SHA
 
-`50b811bcad1435ce65e682d6fb46fda8e3857897` — reviewed head for HEDS's
-conditional amendment decision and the owner's assent. The owner-assent
-canonical metadata commit is the amended head that still requires exact-head
-CI and final HEDS audit.
+`d466e0fcfc99cb893d295d3d2733ce246451fb52` — pre-correction head reviewed by
+HEDS and rejected for governance finding G-001. The correction commit is the
+next head and requires fresh exact-head checks before HEDS re-audit.
 
 ## SAMPLES
 
@@ -161,21 +160,21 @@ not fixes in this work order.
 
 ## CHECKPOINT DELTA
 
-`CHECKPOINT-DELTA-UADS2-WO-001.md` records the applied evidence-only delta:
-the owner-approved B-001 amendment is applied, final HEDS remains pending, V2
-implementation remains gated and unchanged, and no checkpoint promotion or
-final HEDS approval is asserted.
+`CHECKPOINT-DELTA-UADS2-WO-001.md` records the proposed evidence-only delta:
+B-001 remains blocked, the HEDS-recommended amendment is pending explicit
+owner/auditor decision, V2 implementation remains gated and unchanged, and no
+checkpoint promotion or HEDS approval is asserted.
 
 ## PR
 
 Existing PR: `#17`. This work stays on the existing branch and uses a normal
-push. The final state must wait for exact-head CI before requesting another
-HEDS audit; the reviewed head `50b811bc...` had all four required workflows
-green, while the amended head requires its own exact-head CI.
+push. The pre-correction head `d466e0f...` had all four required workflows
+green, but the governance correction requires fresh exact-head CI before
+requesting HEDS re-audit.
 
 ## STOP CONDITION
 
-Stop after the amended metadata is committed and pushed to PR #17, exact-head
-CI is green, and final HEDS audit is requested. Do not start M01/S00, implement
-the sequential executor, modify V1, or claim HEDS approval before that final
-audit.
+Stop after the governance correction is committed and pushed to PR #17 and
+its exact-head checks are complete, then await HEDS re-audit and explicit owner
+decision. Do not start M01/S00, implement the sequential executor, modify V1,
+or claim HEDS approval.

@@ -256,13 +256,10 @@ function blockerResolutionEvidence() {
   const relativeFiles = [
     "blocker-resolution/authoritative-analysis-event-inspection.json",
     "blocker-resolution/authoritative-analysis-event-inspection.txt",
-    "blocker-resolution/owner-amendment-decision.json",
   ];
   const inspection = readJson(relativeFiles[0]);
-  const ownerDecision = readJson(relativeFiles[2]);
   return {
     ...inspection,
-    ownerDecision,
     rawEvidence: relativeFiles.map((relative) => ({
       path: relative,
       sha256: sha256(fs.readFileSync(path.join(evidenceRoot, relative), "utf8")),

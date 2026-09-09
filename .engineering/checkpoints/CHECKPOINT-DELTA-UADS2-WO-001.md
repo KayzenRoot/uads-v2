@@ -2,10 +2,9 @@
 
 ## Proposed status
 
-`AMENDMENT_APPLIED / FINAL_HEDS_PENDING`. B-001 is owner-approved after HEDS
-conditional approval, and the amended contract is now recorded canonically.
-This is a proposed delta; it does not self-promote the canonical checkpoint
-and does not assert final HEDS approval.
+`BLOCKED` on B-001 with a proposed Work Order Amendment pending explicit
+owner/auditor approval. This is a proposed delta; it does not self-promote the
+canonical checkpoint and does not assert HEDS approval.
 
 ## Evidence basis
 
@@ -27,16 +26,16 @@ and does not assert final HEDS approval.
   tree;
 - proposed amendment is
   `.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`.
-- owner decision is explicitly recorded as `APPROVE_AMENDMENT` with the exact
-  assent text and reviewed head `50b811bc...`.
+- HEDS conditionally recommended the amendment on reviewed head `50b811bc...`;
+  owner/auditor decision is not recorded.
 
 ## Gate interpretation
 
-This delta records the V1 measurement/bootstrap result and the approved B-001
-amendment; it does not claim final HEDS approval or close the V2 event-stream
-proof obligation. The default V2 executor, M01/S00, BUG-UADS2-001..004,
-dashboard work, and any production routing remain out of scope and gated by the
-canonical checkpoint and HEDS.
+This delta records the V1 measurement/bootstrap result and the B-001 technical
+blocker with its proposed amendment; it does not close the duplicate-analysis
+criterion or the proposed V2 event-stream proof obligation. The default V2
+executor, M01/S00, BUG-UADS2-001..004, dashboard work, and any production
+routing remain out of scope and gated by the canonical checkpoint and HEDS.
 
 ## Blockers and limitations
 
@@ -48,5 +47,6 @@ baseline evidence, not successful execution evidence.
 
 ## Proposed next decision
 
-Run exact-head CI on the amended head, then request final HEDS audit. Do not
-merge, promote, or begin the next gated slice from this delta alone.
+Owner/auditor must explicitly approve or reject the proposed amendment. After
+that decision, run exact-head CI and request HEDS re-audit. Do not merge,
+promote, or begin the next gated slice from this delta alone.

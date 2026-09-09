@@ -3,7 +3,7 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "V1_OPERATIONAL_BASELINE_B001_AMENDMENT_APPLIED_FINAL_HEDS_PENDING",
+  "programState": "V1_OPERATIONAL_BASELINE_B001_AMENDMENT_RECOMMENDED_OWNER_DECISION_PENDING",
   "completedWorkOrder": "UADS2-BOOTSTRAP-001",
   "completedPullRequest": 8,
   "approvedHead": "7c5b56a998103494feea6dd91e386f5696d44384",
@@ -13,24 +13,13 @@
   "activePullRequest": 17,
   "activeBranch": "work/uads2-wo-001-v1-baseline",
   "activeModule": null,
-  "activeSession": "UADS2-WO-001 B-001 amendment applied; final HEDS pending",
-  "nextNecessaryAction": "Run exact-head CI on the amended head, then request final HEDS audit. Do not promote the checkpoint or begin V2 runtime module implementation before final HEDS APPROVED.",
+  "activeSession": "UADS2-WO-001 B-001 technical evidence retained; amendment pending owner/auditor decision",
+  "nextNecessaryAction": "After the governance correction is pushed, use its exact-head checks as the gate for HEDS re-audit. Do not promote the checkpoint or begin V2 runtime module implementation before explicit amendment decision and HEDS APPROVED.",
   "knownBlockers": [
-    "B-001 frozen-V1 analysis-event source is absent; approved amendment preserves V1 Duplicate Analysis Rate as UNAVAILABLE at 0/0 and requires structured V2 events before checkpoint promotion",
-    "Final HEDS audit is pending after the amendment commit and exact-head CI",
+    "B-001 frozen-V1 analysis-event source is absent; the HEDS-recommended amendment preserves V1 Duplicate Analysis Rate as UNAVAILABLE at 0/0 and remains pending owner/auditor decision",
+    "The governance correction head requires exact-head checks before HEDS re-audit; no owner approval or checkpoint promotion is recorded",
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
-  "amendmentDecision": {
-    "findingId": "B-001",
-    "status": "OWNER_APPROVED_HEDS_CONDITIONAL_FINAL_HEDS_PENDING",
-    "reviewedHead": "50b811bcad1435ce65e682d6fb46fda8e3857897",
-    "ownerDecision": "APPROVE_AMENDMENT",
-    "ownerDecisionText": "Aprovo a emenda B-001 do UADS2-WO-001.",
-    "v1AnalysisEventSource": "ABSENT_ON_FROZEN_V1_SUPPORTED_PATHS",
-    "v1DuplicateAnalysisRate": "UNAVAILABLE_0_OVER_0",
-    "v2EventProofRequiredBeforePromotion": true,
-    "checkpointPromotion": false
-  },
   "acceptedPriorities": [
     "ADR-UADS2-009 dashboard-first real-time operations applies immediately after the mandatory baseline gate and must shape subsequent module observability contracts"
   ],

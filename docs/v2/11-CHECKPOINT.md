@@ -1,6 +1,6 @@
 # UADS V2 — Current Checkpoint
 
-Status: BOOTSTRAP APPROVED / MERGED; UADS2-WO-001 ACTIVE; B-001 AMENDMENT APPLIED / FINAL HEDS PENDING
+Status: BOOTSTRAP APPROVED / MERGED; UADS2-WO-001 ACTIVE; B-001 AMENDMENT RECOMMENDED / OWNER DECISION PENDING
 Date: 2026-09-09  
 Completed Work Order: UADS2-BOOTSTRAP-001  
 Active Work Order: UADS2-WO-001  
@@ -87,22 +87,22 @@ ADR-UADS2-009 is accepted. After the mandatory V1 operational baseline is approv
 
 These remain unresolved product targets. Bootstrap does not claim they are fixed.
 
-## UADS2-WO-001 B-001 amendment state
+## UADS2-WO-001 B-001 governance state
 
-HEDS conditionally approved the B-001 amendment on reviewed head
-`50b811bcad1435ce65e682d6fb46fda8e3857897`, and the owner explicitly assented:
-`Aprovo a emenda B-001 do UADS2-WO-001.` The canonical Work Order,
-checkpoint delta, continuity metadata, and decision evidence now record that
-amendment.
+The exhaustive technical inspection found no authoritative structured
+analysis-event stream on the frozen V1 supported paths. HEDS conditionally
+recommended the B-001 amendment on reviewed head
+`50b811bcad1435ce65e682d6fb46fda8e3857897`; the amendment proposal remains
+pending explicit owner/auditor decision and has not been canonically applied.
 
 The frozen V1 analysis-event source remains absent, so its Duplicate Analysis
 Rate is retained as `UNAVAILABLE` (`0/0`) under the unchanged canonical rule.
-The replacement V2 obligation is mandatory: privacy-safe, identity-bound
-structured analysis events must provide deterministic numerator, denominator,
-rate, and raw-event hashes before checkpoint promotion.
+If approved, the replacement V2 obligation is mandatory: privacy-safe,
+identity-bound structured analysis events must provide deterministic numerator,
+denominator, rate, and raw-event hashes before checkpoint promotion.
 
-This is not checkpoint promotion or final HEDS approval. The final amended
-head must pass exact-head CI, receive final HEDS audit, and remain free of V2
+This is not checkpoint promotion or HEDS approval. The governance correction
+head must pass exact-head CI, receive HEDS re-audit, and remain free of V2
 runtime implementation before any promotion or merge.
 
 ## Repository governance follow-up

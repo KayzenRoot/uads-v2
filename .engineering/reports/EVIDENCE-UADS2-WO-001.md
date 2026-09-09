@@ -1,9 +1,9 @@
 # EVIDENCE-UADS2-WO-001
 
-This bundle includes the B-001 blocker-resolution inspection and the recorded
-owner assent to the HEDS-conditional amendment. It does not claim that the
-mandatory duplicate-analysis denominator was obtained or that final HEDS
-approval has been granted.
+This bundle includes the B-001 blocker-resolution inspection and the HEDS
+conditional amendment recommendation. It does not claim that the mandatory
+duplicate-analysis denominator was obtained, that the amendment was approved
+by the owner, or that HEDS approval has been granted.
 
 ## Scope and provenance
 
@@ -55,13 +55,13 @@ Raw evidence is under `.engineering/evidence/UADS2-WO-001/`:
 - `samples/ELEVATED-E7/`: plan, blocked checkpoint, and cost sidecars;
 - `samples/LOW-X6-CORRECTION/`: plan, dispatch, two-attempt execution,
   six evidence records, correction/final review, and cost sidecars.
-- `blocker-resolution/`: exhaustive supported-path inspection, sanitized
-  command transcript, and owner amendment decision.
+- `blocker-resolution/`: exhaustive supported-path inspection and sanitized
+  command transcript.
 
 The complete repository-relative path and SHA-256 inventory is embedded under
 `rawEvidence` for every sample in `UADS2-WO-001-BASELINE-DATA.json`.
-The blocker inspection and owner-decision files and their hashes are embedded
-under `blockerResolution.rawEvidence`.
+The blocker inspection files and their hashes are embedded under
+`blockerResolution.rawEvidence`.
 
 ## B-001 resolution
 
@@ -72,12 +72,11 @@ event under the approved duplicate rule. The rate therefore remains
 `UNAVAILABLE` with `0/0`, and no assignment or verdict is reinterpreted as an
 analysis event.
 
-The required response is the amendment at
-`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, now
-owner-approved after HEDS conditional approval. The canonical Work Order,
-checkpoint, continuity metadata, and decision evidence record that state.
-Final HEDS audit remains pending; this is not checkpoint promotion or runtime
-authorization.
+The required response is the proposed amendment at
+`.engineering/work-orders/UADS2-WO-001-B-001-AMENDMENT-PROPOSAL.md`, with
+status `PROPOSED_PENDING_OWNER_AUDITOR_APPROVAL`. HEDS conditionally
+recommended that amendment, but no owner decision is recorded. This is not
+checkpoint promotion, final HEDS approval, or runtime authorization.
 
 ## Sample evidence
 
@@ -143,13 +142,13 @@ V2 checks after evidence generation:
 | Focused V2 Vitest selection | 4 files, 77/77 PASS |
 | `npm run validate:engineering` | PASS; 23 required files, 6 schemas, 6 records |
 | `npm run validate` | INCONCLUSIVE; full test phase produced no result after startup and was stopped in bounded foreground run |
-| Dataset recomputation twice | PASS; byte-identical SHA-256 `CD5C848F5A1BE48A421EE90FE48D63BF08526F433E109887A20A1D561ACB8270` |
+| Dataset recomputation twice | PASS; byte-identical SHA-256 `4F0412659C63119532B3C87E412A1E0BE605D0EC2C92A814678E6965536C6991` |
 | Host-path scan over evidence/docs/scripts | PASS; clean |
 | Runtime scope/diff inspection | PASS; no V2 runtime source path changed |
 | B-001 supported-path inspection | PASS as an exhaustive inspection; required result is no authoritative event stream |
-| Pre-resolution exact-head CI (`d93a226...`) | PASS; CI, CodeQL, Dependency Review, Compatibility all completed successfully |
-| Owner amendment decision | PASS; exact assent recorded for reviewed head `50b811bc...` |
-| Amended canonical metadata head CI | PENDING until the owner-assent amendment commit is pushed |
+| Pre-correction exact-head CI (`d466e0f...`) | PASS; CI, CodeQL, Dependency Review, Compatibility all completed successfully; the head was rejected for governance finding G-001 |
+| Owner amendment decision | PENDING; no owner-decision artifact is recorded |
+| Post-correction exact-head CI | Required gate for HEDS re-audit; authoritative result is the GitHub status on the pushed correction head |
 
 ## Deterministic recomputation checks
 
@@ -168,6 +167,9 @@ edited; they are derived by this utility.
 3. The baseline recomputation utility had a variable-name error during local
    validation. It was corrected before dataset generation and passed
    `node --check` plus a successful write/recompute.
+4. HEDS identified an owner-decision attribution unsupported by authoritative
+   decision input on reviewed head `d466e0f...`; the artifact and all dependent
+   applied-state metadata were removed. Owner decision remains pending.
 
 ## Unavailable telemetry and impact
 
@@ -185,11 +187,10 @@ recomputation utility, and the proposed Work Order Amendment. No files under
 changed. The exact V1 source remains clean and its required ref/tree remain
 verifiable.
 
-## Applied checkpoint delta
+## Proposed checkpoint delta
 
-The applied delta is evidence-only: record the completed V1 baseline, preserve
+The proposed delta is evidence-only: record the completed V1 baseline, preserve
 the `NO_ELIGIBLE_MODEL` and telemetry limitations, retain the frozen-V1
-duplicate rate as `UNAVAILABLE` (`0/0`), and record the owner-approved B-001
-amendment. It does not promote the checkpoint, start M01/S00, fix
-BUG-UADS2-001..004, or assert final HEDS approval. The mandatory V2 structured
-analysis-event stream and rate proof remain required before promotion.
+duplicate rate as `UNAVAILABLE` (`0/0`), record the B-001 technical blocker,
+and submit the amendment for owner/auditor decision. It does not promote the
+checkpoint, start M01/S00, fix BUG-UADS2-001..004, or assert HEDS approval.

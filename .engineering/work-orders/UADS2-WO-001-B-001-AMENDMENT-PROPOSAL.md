@@ -1,12 +1,11 @@
 # Proposed Work Order Amendment — UADS2-WO-001 / B-001
 
-Status: `OWNER-APPROVED / HEDS-CONDITIONAL / FINAL-HEDS-PENDING`
+Status: `PROPOSED_PENDING_OWNER_AUDITOR_APPROVAL`
 
-The owner explicitly approved this amendment after HEDS conditional review:
-`Aprovo a emenda B-001 do UADS2-WO-001.` The canonical Work Order,
-checkpoint, and continuity metadata now record the amendment. It does not
-approve the baseline, promote the checkpoint, or authorize M01/S00/runtime
-work.
+HEDS conditionally recommended this amendment on reviewed head
+`50b811bcad1435ce65e682d6fb46fda8e3857897`, but no owner approval is recorded
+in this proposal. It does not amend the active Work Order, approve the
+baseline, promote the checkpoint, or authorize M01/S00/runtime work.
 
 ## Original proof obligation
 
@@ -71,23 +70,14 @@ and turns the gap into a testable V2 obligation. V2 can then be compared on
 the same workloads using the unchanged canonical rule, while the report keeps
 the V1 side explicitly non-comparable for this metric.
 
-## Recorded decision
+## Decision required
 
-Owner decision: `APPROVE_AMENDMENT`.
-
-HEDS decision: `CONDITIONAL_APPROVAL_OF_AMENDMENT`.
-
-The remaining required gate is final HEDS approval on the amended exact head,
-after all mandatory exact-head CI checks are green. The owner/auditor may
-still reject or supersede this amendment if new evidence shows a supported
-frozen-V1 event path.
-
-Before the explicit owner decision, the available choices were:
+The owner/auditor must explicitly choose one of:
 
 - approve this amendment and its V2 replacement obligation;
 - reject it and provide a supported frozen-V1 host path that emits the required
   authoritative events; or
 - leave B-001 blocked.
 
-No checkpoint promotion, merge, M01/S00, dashboard runtime, or V2 executor
-implementation is authorized by this amendment before final HEDS approval.
+Until that decision exists, no checkpoint promotion, merge, M01/S00, dashboard
+runtime, or V2 executor implementation is authorized by this proposal.
