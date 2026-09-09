@@ -3,30 +3,23 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_005_APPROVED_MERGED_M03_S05_SLICE1_NEXT",
+  "programState": "UADS2_WO_006_M03_S05_SLICE1_READY_FOR_EXECUTOR",
   "completedWorkOrder": "UADS2-WO-005",
   "completedPullRequest": 27,
   "approvedHead": "f6915633f2722ac7258e0c04e3931a90178b8e05",
   "mergeCommit": "91da3704dff14e6cb1bd81ba0370be20cde7cddc",
-  "lastRecordedHead": "91da3704dff14e6cb1bd81ba0370be20cde7cddc",
-  "activeWorkOrder": null,
+  "lastRecordedHead": "36b2019fc22b4d6c5d250e41edf12e737c4ddcfa",
+  "activeWorkOrder": "UADS2-WO-006",
   "activePullRequest": null,
-  "activeBranch": null,
+  "activeBranch": "work/uads2-wo-006-m03-pccr-core",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S00-S04 frozen; ADR-UADS2-012 accepted; first S05 implementation slice next",
-  "nextNecessaryAction": "Create UADS2-WO-006 for M03 S05 Slice 1: PCCR core + passive/deterministic-local proof + compatibility projector. Keep vendor-specific active probes out of scope.",
+  "activeSession": "S05 Slice 1 PCCR core implementation contract frozen; executor next",
+  "nextNecessaryAction": "Execute UADS2-WO-006 on branch work/uads2-wo-006-m03-pccr-core, create evidence and PR, then exact-head HEDS. Do not implement vendor-specific active probes.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
-  "acceptedPriorities": [
-    "ADR-UADS2-009 dashboard-first event-backed real-time operations",
-    "ADR-UADS2-010 enterprise production-readiness contract with M27-M31",
-    "ADR-UADS2-011 Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze",
-    "ADR-UADS2-012 Proof-Carrying Host Capabilities",
-    "B-001 V2 structured analysis-event proof"
-  ],
   "m03": {
-    "issue": 26,
+    "issue": 28,
     "sessionsFrozen": [
       "S00",
       "S01",
@@ -35,7 +28,7 @@
       "S03",
       "S04"
     ],
-    "runtimeImplementationAuthorizedOnlyViaBoundedWorkOrder": true,
+    "activeSlice": "S05.1",
     "acceptedArchitecture": [
       "PCCR",
       "CEL",
@@ -44,8 +37,8 @@
       "PBF"
     ],
     "proofFloor": "E2_DETERMINISTIC_LOCAL_FACT_MINIMUM_FOR_SUPPORTED",
-    "firstS05Slice": "PCCR core + passive/deterministic-local proof + compatibility projector",
-    "vendorSpecificActiveProbes": "EXPERIMENT_OUT_OF_SCOPE_FOR_SLICE1"
+    "slice1": "PCCR core + passive/deterministic-local proof + compatibility projector",
+    "activeProbes": "OUT_OF_SCOPE"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
