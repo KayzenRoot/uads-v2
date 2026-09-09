@@ -1,0 +1,213 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  foundation:
+    name: Foundation checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        id: install
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee "$RUNNER_TEMP/uads-install.log"
+
+      - name: Lint
+        id: lint
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run lint 2>&1 | tee "$RUNNER_TEMP/uads-lint.log"
+
+      - name: Typecheck
+        id: typecheck
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee "$RUNNER_TEMP/uads-typecheck.log"
+
+      - name: Build
+        id: build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee "$RUNNER_TEMP/uads-build.log"
+
+      - name: Validate immutable action pins
+        id: action_pins
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run validate:actions 2>&1 | tee "$RUNNER_TEMP/uads-action-pins.log"
+
+      - name: Test
+        id: tests
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee "$RUNNER_TEMP/uads-tests.log"
+
+      - name: Orchestrator eval
+        id: eval_orchestrator
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:orchestrator 2>&1 | tee "$RUNNER_TEMP/uads-eval-orchestrator.log"
+
+      - name: Execution eval
+        id: eval_execution
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:execution 2>&1 | tee "$RUNNER_TEMP/uads-eval-execution.log"
+
+      - name: Context eval
+        id: eval_context
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:context 2>&1 | tee "$RUNNER_TEMP/uads-eval-context.log"
+
+      - name: Fault eval
+        id: eval_fault
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:fault 2>&1 | tee "$RUNNER_TEMP/uads-eval-fault.log"
+
+      - name: Cost eval
+        id: eval_cost
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:cost 2>&1 | tee "$RUNNER_TEMP/uads-eval-cost.log"
+
+      - name: Model routing eval
+        id: eval_model_routing
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:model-routing 2>&1 | tee "$RUNNER_TEMP/uads-eval-model-routing.log"
+
+      - name: Specialist routing eval
+        id: eval_specialist_routing
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:specialist-routing 2>&1 | tee "$RUNNER_TEMP/uads-eval-specialist-routing.log"
+
+      - name: Adapter eval
+        id: eval_adapters
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:adapters 2>&1 | tee "$RUNNER_TEMP/uads-eval-adapters.log"
+
+      - name: Assurance eval
+        id: eval_assurance
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:assurance 2>&1 | tee "$RUNNER_TEMP/uads-eval-assurance.log"
+
+      - name: Fault-injection eval
+        id: eval_fault_injection
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run eval:fault-injection 2>&1 | tee "$RUNNER_TEMP/uads-eval-fault-injection.log"
+
+      - name: Skills preflight
+        id: skills_validation
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run validate:skills 2>&1 | tee "$RUNNER_TEMP/uads-skills-validation.log"
+
+      - name: Validate foundation
+        id: validate
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run validate 2>&1 | tee "$RUNNER_TEMP/uads-validate.log"
+
+      - name: Validate engineering protocol artifacts
+        id: engineering_validation
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run validate:engineering 2>&1 | tee "$RUNNER_TEMP/uads-engineering-validation.log"
+
+      - name: Audit dependencies
+        id: npm_audit
+        shell: bash
+        run: |
+          set -o pipefail
+          npm audit --audit-level=high 2>&1 | tee "$RUNNER_TEMP/uads-npm-audit.log"
+
+      - name: Packaging smoke test
+        id: packaging
+        shell: bash
+        run: |
+          set -o pipefail
+          npm pack --dry-run 2>&1 | tee "$RUNNER_TEMP/uads-packaging.log"
+
+      - name: Generate exact-SHA CI gate receipt
+        id: ci_gate_receipt
+        if: always()
+        env:
+          UADS_CI_JOB_NAME: Foundation checks
+          UADS_CI_GATE_STEPS: >-
+            {"install":"${{ steps.install.outcome }}","lint":"${{ steps.lint.outcome }}","typecheck":"${{ steps.typecheck.outcome }}","build":"${{ steps.build.outcome }}","action-pins":"${{ steps.action_pins.outcome }}","tests":"${{ steps.tests.outcome }}","eval-orchestrator":"${{ steps.eval_orchestrator.outcome }}","eval-execution":"${{ steps.eval_execution.outcome }}","eval-context":"${{ steps.eval_context.outcome }}","eval-fault":"${{ steps.eval_fault.outcome }}","eval-cost":"${{ steps.eval_cost.outcome }}","eval-model-routing":"${{ steps.eval_model_routing.outcome }}","eval-specialist-routing":"${{ steps.eval_specialist_routing.outcome }}","eval-adapters":"${{ steps.eval_adapters.outcome }}","eval-assurance":"${{ steps.eval_assurance.outcome }}","eval-fault-injection":"${{ steps.eval_fault_injection.outcome }}","skills-validation":"${{ steps.skills_validation.outcome }}","validate":"${{ steps.validate.outcome }}","engineering-validation":"${{ steps.engineering_validation.outcome }}","npm-audit":"${{ steps.npm_audit.outcome }}","packaging":"${{ steps.packaging.outcome }}"}
+          UADS_COMPARISON_BASE_SHA: ${{ github.event.before || github.event.pull_request.base.sha || '' }}
+        shell: bash
+        run: |
+          node scripts/github/generate-ci-gate-receipt.mjs \
+            --output "$RUNNER_TEMP/uads-ci-gate-receipt.json" \
+            --log-dir "$RUNNER_TEMP"
+
+      - name: Validate exact-SHA CI gate receipt
+        id: ci_gate_receipt_validation
+        if: always()
+        shell: bash
+        run: |
+          node scripts/github/validate-ci-gate-receipt.mjs \
+            --file "$RUNNER_TEMP/uads-ci-gate-receipt.json" \
+            --expected-sha "$GITHUB_SHA" \
+            --expected-run-id "$GITHUB_RUN_ID" \
+            --expected-run-attempt "$GITHUB_RUN_ATTEMPT"
+
+      - name: Upload exact-SHA CI gate receipt
+        id: ci_gate_receipt_artifact
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: uads-ci-gate-receipt-${{ github.sha }}
+          path: ${{ runner.temp }}/uads-ci-gate-receipt.json
+          retention-days: 90
+          if-no-files-found: error
