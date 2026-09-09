@@ -1,0 +1,546 @@
+{
+  "schema": "uads.work-order",
+  "schemaVersion": "0.2.0",
+  "workOrderId": "wo_191143702562d55e",
+  "projectId": "58233072c1c707ff",
+  "title": "Add an authenticated API endpoint that exposes a user billing profile.",
+  "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+  "status": "planned",
+  "createdAt": "2026-09-09T15:12:38.507Z",
+  "updatedAt": "2026-09-09T15:12:38.507Z",
+  "intakeRef": "intake:a354b5dbf844",
+  "routingDecisionId": "rd_191143702562d55e",
+  "scopeClass": "cross-cutting",
+  "includedScope": [
+    "Add an authenticated API endpoint that exposes a user billing profile."
+  ],
+  "outOfScope": [
+    "unrelated architecture refactors",
+    "unrelated Web3/tokenomics work",
+    "unrelated marketplace or dashboard features"
+  ],
+  "recommendations": [
+    "Record focused tests as IMPORTANT if not already requested"
+  ],
+  "riskLevel": "HIGH",
+  "riskReasons": [
+    "financial/economic correctness",
+    "authenticated access to financial data"
+  ],
+  "constraints": [],
+  "requestedArtifacts": [],
+  "destructiveSignals": [],
+  "domains": [
+    "api",
+    "security",
+    "backend",
+    "finance-economics",
+    "saas"
+  ],
+  "affectedAreas": [
+    "auth"
+  ],
+  "specialists": [
+    "repo-inspector",
+    "requirements-engineer",
+    "software-architect",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "backend-api-specialist",
+    "finance-math-specialist"
+  ],
+  "assuranceReviewers": [
+    "independent-reviewer",
+    "security-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_995d03589aea16e5",
+  "specialistSelectionDigest": "ee86963279bba1f2f06c45d74f005b558fe755dbccd124cbd423c704a66eac42",
+  "specialistRegistryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "specialistPolicyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "specialistChangeDigest": null,
+  "specialistImpactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "specialistGateContractDigest": "e35730cf50fea66be80a0aa3a6172526b6a72106ea027d58d649064d641e5412",
+  "specialistRiskSignals": [
+    "authentication",
+    "payments",
+    "public-api"
+  ],
+  "specialistDependencySignals": null,
+  "specialistAssignments": [
+    {
+      "specialistId": "backend-api-specialist",
+      "role": "Handle backend, API, and SaaS boundaries",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "api",
+        "backend",
+        "saas"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "backend/API verification"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must preserve authentication, contract, and data-boundary obligations.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "checkpoint-manager",
+      "role": "Persist bounded resume and checkpoint state",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "atomic checkpoint"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must persist only sanitized sidecar state outside the managed project.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "finance-math-specialist",
+      "role": "Handle finance, accounting, and numerical correctness",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "finance-economics",
+        "mathematics-simulation",
+        "tokenomics"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:financial-numerical-validation",
+        "numerical and edge-case validation"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not hard-code vendor prices or authorize financial transfers.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "implementation-agent",
+      "role": "Apply necessary in-scope product edits",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "in-scope change"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not perform approval-gated actions or serve as the sole final reviewer.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 4,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "implementation-planner",
+      "role": "Produce a bounded executable Work Order plan",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "Work Order plan"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not dispatch work outside the selected scope.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "independent-reviewer",
+      "role": "Independently review the implementation",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "independent review"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "implementing product changes",
+        "Must use an independent session and must not implement the reviewed change.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "repo-inspector",
+      "role": "Inspect repository metadata and project identity",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "repository map"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not edit product files or execute discovered project code.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "requirements-engineer",
+      "role": "Normalize requirements and acceptance criteria",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "requirements"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "acceptance criteria"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not broaden scope beyond the accepted Work Order.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "security-reviewer",
+      "role": "Provide security assurance for sensitive changes",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "security"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:security-review",
+        "security review"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "implementing product changes",
+        "Must not expose secrets or approve by implementing.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "software-architect",
+      "role": "Bound cross-cutting architecture decisions",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "architecture"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "architecture bounds"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not approve its own implementation or invent external capabilities.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "test-engineer",
+      "role": "Design and run focused verification",
+      "objective": "Add an authenticated API endpoint that exposes a user billing profile.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [
+        "auth"
+      ],
+      "relevantFiles": [
+        "auth"
+      ],
+      "relevantGates": [
+        "build",
+        "contract-test",
+        "financial-numerical-validation",
+        "integration-test",
+        "security-review",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:build",
+        "gate:contract-test",
+        "gate:integration-test",
+        "gate:static",
+        "gate:unit-test",
+        "test evidence"
+      ],
+      "riskLevel": "HIGH",
+      "forbiddenScope": [
+        "Must not self-approve implementation changes.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 3,
+      "parallelEligible": false
+    }
+  ],
+  "qualityGates": [
+    "static",
+    "unit-test",
+    "integration-test",
+    "contract-test",
+    "security-review",
+    "build",
+    "financial-numerical-validation"
+  ],
+  "contextRadius": "C3",
+  "tokenBudget": {
+    "softLimit": 48000,
+    "hardLimit": 96000,
+    "capabilityClass": "strong",
+    "cachePreference": "prefer-cache",
+    "expansionPolicy": "expand one radius level only when evidence shows missing context"
+  },
+  "dependencies": [
+    "inspect before edit",
+    "implement only NECESSARY scope",
+    "implementation-agent is not the sole final reviewer"
+  ],
+  "acceptanceCriteria": [
+    "Requested objective is met",
+    "Selected gates have evidence",
+    "Independent review completed if implementation occurred"
+  ],
+  "requiredEvidence": [
+    "gate:static",
+    "gate:unit-test",
+    "gate:integration-test",
+    "gate:contract-test",
+    "gate:security-review",
+    "gate:build",
+    "gate:financial-numerical-validation"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded"
+  ],
+  "autonomyBoundary": {
+    "safeAutonomous": [
+      "repository reads",
+      "local code edits",
+      "local tests",
+      "lint/typecheck/build",
+      "review-bundle generation",
+      "non-destructive Git inspection",
+      "normal commits/pushes in an authorized workflow"
+    ],
+    "requiresApproval": [
+      "production deployment",
+      "spending money",
+      "rotating real credentials",
+      "destructive Git history rewrite",
+      "publishing packages/releases when not already authorized"
+    ],
+    "activeApprovalGatedActions": [],
+    "activeApprovalIntentAmbiguous": false
+  },
+  "nextAction": "Execute only NECESSARY scope with selected specialists, collect required evidence, then independent review."
+}

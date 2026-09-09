@@ -1,0 +1,291 @@
+{
+  "schema": "uads.work-order",
+  "schemaVersion": "0.2.0",
+  "workOrderId": "wo_9bfd07a91b9b364f",
+  "projectId": "58233072c1c707ff",
+  "title": "Fix a typo in the README.",
+  "objective": "Fix a typo in the README.",
+  "status": "completed",
+  "createdAt": "2026-09-09T15:19:20.119Z",
+  "updatedAt": "2026-09-09T15:20:49.712Z",
+  "intakeRef": "intake:8ab815007fb3",
+  "routingDecisionId": "rd_9bfd07a91b9b364f",
+  "scopeClass": "trivial",
+  "includedScope": [
+    "Fix a typo in the README."
+  ],
+  "outOfScope": [
+    "unrelated architecture refactors",
+    "unrelated Web3/tokenomics work",
+    "unrelated marketplace or dashboard features"
+  ],
+  "recommendations": [],
+  "riskLevel": "LOW",
+  "riskReasons": [
+    "no high-risk structured signals in intake"
+  ],
+  "constraints": [],
+  "requestedArtifacts": [],
+  "destructiveSignals": [],
+  "domains": [
+    "documentation"
+  ],
+  "affectedAreas": [],
+  "specialists": [
+    "repo-inspector",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "documentation-dx-specialist"
+  ],
+  "assuranceReviewers": [
+    "independent-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_a0aecaafc9b8ca9c",
+  "specialistSelectionDigest": "84775798f3a91215c942e4abe6cbd89709a97ffa7a30c1f10b03b94da777ad4b",
+  "specialistRegistryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "specialistPolicyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "specialistChangeDigest": null,
+  "specialistImpactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "specialistGateContractDigest": "4502434cfdeebe3e465b6557c3b6d9b6e199ad6dd1d52872d427fccdca377b67",
+  "specialistRiskSignals": [],
+  "specialistDependencySignals": null,
+  "specialistAssignments": [
+    {
+      "specialistId": "checkpoint-manager",
+      "role": "Persist bounded resume and checkpoint state",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "atomic checkpoint"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must persist only sanitized sidecar state outside the managed project.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "documentation-dx-specialist",
+      "role": "Handle documentation and developer experience",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "documentation"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "documentation verification"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not spawn unrelated technical stacks for a documentation-only change.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "implementation-agent",
+      "role": "Apply necessary in-scope product edits",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "in-scope change"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not perform approval-gated actions or serve as the sole final reviewer.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 4,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "implementation-planner",
+      "role": "Produce a bounded executable Work Order plan",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "Work Order plan"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not dispatch work outside the selected scope.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "independent-reviewer",
+      "role": "Independently review the implementation",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "independent review"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "implementing product changes",
+        "Must use an independent session and must not implement the reviewed change.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "repo-inspector",
+      "role": "Inspect repository metadata and project identity",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "repository map"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not edit product files or execute discovered project code.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "test-engineer",
+      "role": "Design and run focused verification",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "gate:static",
+        "test evidence"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not self-approve implementation changes.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 3,
+      "parallelEligible": false
+    }
+  ],
+  "qualityGates": [
+    "static"
+  ],
+  "contextRadius": "C1",
+  "tokenBudget": {
+    "softLimit": 8000,
+    "hardLimit": 16000,
+    "capabilityClass": "economy",
+    "cachePreference": "prefer-cache",
+    "expansionPolicy": "expand one radius level only when evidence shows missing context"
+  },
+  "dependencies": [
+    "inspect before edit",
+    "implement only NECESSARY scope",
+    "implementation-agent is not the sole final reviewer"
+  ],
+  "acceptanceCriteria": [
+    "Requested objective is met",
+    "Selected gates have evidence",
+    "Independent review completed if implementation occurred"
+  ],
+  "requiredEvidence": [
+    "gate:static"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded"
+  ],
+  "autonomyBoundary": {
+    "safeAutonomous": [
+      "repository reads",
+      "local code edits",
+      "local tests",
+      "lint/typecheck/build",
+      "review-bundle generation",
+      "non-destructive Git inspection",
+      "normal commits/pushes in an authorized workflow"
+    ],
+    "requiresApproval": [
+      "production deployment",
+      "spending money",
+      "rotating real credentials",
+      "destructive Git history rewrite",
+      "publishing packages/releases when not already authorized"
+    ],
+    "activeApprovalGatedActions": [],
+    "activeApprovalIntentAmbiguous": false
+  },
+  "nextAction": "Generate a review ZIP if required. Do not deploy or transfer funds."
+}

@@ -1,0 +1,553 @@
+{
+  "schema": "uads.specialist-selection-plan",
+  "schemaVersion": "0.9.0",
+  "selectionPlanId": "sp_a0aecaafc9b8ca9c",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_9bfd07a91b9b364f",
+  "workOrderDigest": "310d0087adf4209fa7b1d18407824bef009af42c4814830312d9555d3a733e28",
+  "routingDigest": "3a61a02515916759f4c03b3f4df548f9306aea3e7b3759e013c46ae0240dc15a",
+  "registryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "policyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "changeDigest": null,
+  "impactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "gateContractDigest": "4502434cfdeebe3e465b6557c3b6d9b6e199ad6dd1d52872d427fccdca377b67",
+  "selected": [
+    {
+      "specialistId": "repo-inspector",
+      "kind": "core",
+      "role": "Inspect repository metadata and project identity",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "implementation-planner",
+      "kind": "core",
+      "role": "Produce a bounded executable Work Order plan",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "implementation-agent",
+      "kind": "core",
+      "role": "Apply necessary in-scope product edits",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "implementation"
+    },
+    {
+      "specialistId": "test-engineer",
+      "kind": "core",
+      "role": "Design and run focused verification",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED",
+        "GATE_REQUIRES_SPECIALIST"
+      ],
+      "coversDomains": [
+        "quality"
+      ],
+      "coversGates": [
+        "static"
+      ],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "checkpoint-manager",
+      "kind": "core",
+      "role": "Persist bounded resume and checkpoint state",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "documentation-dx-specialist",
+      "kind": "domain",
+      "role": "Handle documentation and developer experience",
+      "required": true,
+      "reasonCodes": [
+        "DOMAIN_COVERAGE"
+      ],
+      "coversDomains": [
+        "documentation"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    }
+  ],
+  "assurance": [
+    {
+      "specialistId": "independent-reviewer",
+      "kind": "core",
+      "role": "Independently review the implementation",
+      "required": true,
+      "reasonCodes": [
+        "INDEPENDENT_REVIEW_REQUIRED"
+      ],
+      "coversDomains": [
+        "quality"
+      ],
+      "coversGates": [],
+      "independenceClass": "independent-review"
+    }
+  ],
+  "assignments": [
+    {
+      "specialistId": "checkpoint-manager",
+      "role": "Persist bounded resume and checkpoint state",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "atomic checkpoint"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must persist only sanitized sidecar state outside the managed project.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "documentation-dx-specialist",
+      "role": "Handle documentation and developer experience",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "documentation"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "documentation verification"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not spawn unrelated technical stacks for a documentation-only change.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "implementation-agent",
+      "role": "Apply necessary in-scope product edits",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "in-scope change"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not perform approval-gated actions or serve as the sole final reviewer.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 4,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "implementation-planner",
+      "role": "Produce a bounded executable Work Order plan",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "Work Order plan"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not dispatch work outside the selected scope.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "independent-reviewer",
+      "role": "Independently review the implementation",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "independent review"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "implementing product changes",
+        "Must use an independent session and must not implement the reviewed change.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "repo-inspector",
+      "role": "Inspect repository metadata and project identity",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "repository map"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not edit product files or execute discovered project code.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "test-engineer",
+      "role": "Design and run focused verification",
+      "objective": "Fix a typo in the README.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [],
+      "relevantFiles": [],
+      "relevantGates": [
+        "static"
+      ],
+      "evidenceObligations": [
+        "gate:static",
+        "test evidence"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "Must not self-approve implementation changes.",
+        "out-of-scope work",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 3,
+      "parallelEligible": false
+    }
+  ],
+  "rejections": [
+    {
+      "specialistId": "backend-api-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "data-ai-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "database-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "finance-math-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "frontend-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "game-systems-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "mobile-client-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "performance-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "platform-cloud-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "product-requirements-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "quality-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "release-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "reliability-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "reliability-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "requirements-engineer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "security-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "software-architect",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "web3-contract-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    }
+  ],
+  "unmetCoverage": [],
+  "requiredObligations": [
+    {
+      "obligationId": "assurance:independent-reviewer",
+      "kind": "assurance",
+      "domainId": null,
+      "gateId": null,
+      "evidenceId": "independent review",
+      "affectedArea": null,
+      "specialistId": "independent-reviewer"
+    },
+    {
+      "obligationId": "domain:documentation",
+      "kind": "domain",
+      "domainId": "documentation",
+      "gateId": null,
+      "evidenceId": null,
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:static",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "static",
+      "evidenceId": "gate:static",
+      "affectedArea": null,
+      "specialistId": null
+    }
+  ],
+  "coveredObligations": [
+    {
+      "obligationId": "assurance:independent-reviewer",
+      "gateId": null,
+      "evidenceId": "independent review",
+      "specialistId": "independent-reviewer",
+      "reasonCode": "INDEPENDENT_REVIEW_REQUIRED",
+      "coverageKind": "assurance"
+    },
+    {
+      "obligationId": "domain:documentation",
+      "gateId": null,
+      "evidenceId": null,
+      "specialistId": "documentation-dx-specialist",
+      "reasonCode": "DOMAIN_COVERAGE",
+      "coverageKind": "domain"
+    },
+    {
+      "obligationId": "gate:static",
+      "gateId": "static",
+      "evidenceId": "gate:static",
+      "specialistId": "test-engineer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    }
+  ],
+  "unmetObligations": [],
+  "conflicts": [],
+  "dispatch": {
+    "dependencyGroups": [
+      [
+        "checkpoint-manager",
+        "repo-inspector"
+      ],
+      [
+        "documentation-dx-specialist",
+        "implementation-planner"
+      ],
+      [
+        "test-engineer"
+      ],
+      [
+        "implementation-agent"
+      ],
+      [
+        "independent-reviewer"
+      ]
+    ],
+    "parallelEligibleGroups": []
+  },
+  "status": "SELECTED",
+  "blockedReasonCodes": [],
+  "selectionDigest": "84775798f3a91215c942e4abe6cbd89709a97ffa7a30c1f10b03b94da777ad4b"
+}

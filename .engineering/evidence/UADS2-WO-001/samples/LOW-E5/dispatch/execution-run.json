@@ -1,0 +1,58 @@
+{
+  "schema": "uads.execution-run",
+  "schemaVersion": "0.3.0",
+  "executionRunId": "er_8ce6f0a2afdfc930",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_9bfd07a91b9b364f",
+  "routingDecisionId": "rd_9bfd07a91b9b364f",
+  "createdAt": "2026-09-09T15:19:32.828Z",
+  "updatedAt": "2026-09-09T15:20:49.713Z",
+  "attempt": 1,
+  "phase": "stopped",
+  "status": "completed",
+  "baseline": {
+    "gitHead": "312e32946798eb3abbb49a79af08e13efb7719dc",
+    "dirty": false,
+    "capturedAt": "2026-09-09T15:19:32.828Z"
+  },
+  "contextRadius": "C1",
+  "contextCandidates": [
+    "docs"
+  ],
+  "implementerRole": "implementation-agent",
+  "implementerSessionId": "wo001-low-implementer",
+  "requiredReviewers": [
+    "independent-reviewer"
+  ],
+  "selectedGates": [
+    "static"
+  ],
+  "currentChangeDigest": "4bc0e58695a2f39eb793091d78a91f93bb397703a54c6490cf75a2e4619e915a",
+  "reviewedChangeDigest": "4bc0e58695a2f39eb793091d78a91f93bb397703a54c6490cf75a2e4619e915a",
+  "changedFiles": [
+    "README.md"
+  ],
+  "scopeViolations": [],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_8ce6f0a2afdfc930/evidence/ev_a4f01df54d73b35c.json"
+  ],
+  "reviewRefs": [
+    "sidecar://execution-runs/er_8ce6f0a2afdfc930/reviews/rv_d46ca0dd40d25723.json"
+  ],
+  "blockers": [],
+  "nextAction": "Generate a review ZIP if required. Do not deploy or transfer funds.",
+  "expansionHistory": [],
+  "contextPackId": "cpk_e09006fa39341650",
+  "impactReportId": "imp_82ddc2972d5f9027",
+  "indexDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "modelPlanId": "mrp_f5c393ad9bd35256",
+  "selectedProfileId": null,
+  "selectedProviderId": null,
+  "selectedModelId": null,
+  "selectionMode": "host-managed",
+  "modelExecutionStrategy": {
+    "parallel": false,
+    "roleDispatch": "role-cycling",
+    "usageTelemetryAvailable": null
+  }
+}

@@ -1,0 +1,647 @@
+{
+  "schema": "uads.specialist-selection-plan",
+  "schemaVersion": "0.9.0",
+  "selectionPlanId": "sp_afad72b1e7e12a84",
+  "projectId": "8e4b5bd6a6c41b50",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "workOrderDigest": "29f8e64bf51dae5218e03e4f9d7bded9ce6d266b379ed0f6080569ad496c3d1b",
+  "routingDigest": "e48b6c2fbf86cb953c6769f92a3ce71d5ff51b5383df3ded933e71182e5031a4",
+  "registryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "policyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "changeDigest": null,
+  "impactDigest": "df7252c08f943657690dae6e6e5de57776d7823396dac8b00d6e9720a3bfab18",
+  "gateContractDigest": "ec2f65402bd1923cb24ba8df59ba1a06315bb221621e17d522448fe40b9f2d50",
+  "selected": [
+    {
+      "specialistId": "repo-inspector",
+      "kind": "core",
+      "role": "Inspect repository metadata and project identity",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "implementation-planner",
+      "kind": "core",
+      "role": "Produce a bounded executable Work Order plan",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "implementation-agent",
+      "kind": "core",
+      "role": "Apply necessary in-scope product edits",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "implementation"
+    },
+    {
+      "specialistId": "test-engineer",
+      "kind": "core",
+      "role": "Design and run focused verification",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED",
+        "GATE_REQUIRES_SPECIALIST"
+      ],
+      "coversDomains": [
+        "quality"
+      ],
+      "coversGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "checkpoint-manager",
+      "kind": "core",
+      "role": "Persist bounded resume and checkpoint state",
+      "required": true,
+      "reasonCodes": [
+        "CORE_REQUIRED"
+      ],
+      "coversDomains": [
+        "general"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    },
+    {
+      "specialistId": "frontend-specialist",
+      "kind": "domain",
+      "role": "Handle frontend and interaction concerns",
+      "required": true,
+      "reasonCodes": [
+        "DOMAIN_COVERAGE"
+      ],
+      "coversDomains": [
+        "frontend"
+      ],
+      "coversGates": [],
+      "independenceClass": "support"
+    }
+  ],
+  "assurance": [
+    {
+      "specialistId": "independent-reviewer",
+      "kind": "core",
+      "role": "Independently review the implementation",
+      "required": true,
+      "reasonCodes": [
+        "INDEPENDENT_REVIEW_REQUIRED"
+      ],
+      "coversDomains": [
+        "quality"
+      ],
+      "coversGates": [],
+      "independenceClass": "independent-review"
+    }
+  ],
+  "assignments": [
+    {
+      "specialistId": "checkpoint-manager",
+      "role": "Persist bounded resume and checkpoint state",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "atomic checkpoint"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must persist only sanitized sidecar state outside the managed project.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "frontend-specialist",
+      "role": "Handle frontend and interaction concerns",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "frontend"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "frontend verification"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not introduce unrelated backend, Web3, or finance work.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": true
+    },
+    {
+      "specialistId": "implementation-agent",
+      "role": "Apply necessary in-scope product edits",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "in-scope change"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not perform approval-gated actions or serve as the sole final reviewer.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 4,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "implementation-planner",
+      "role": "Produce a bounded executable Work Order plan",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "Work Order plan"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not dispatch work outside the selected scope.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 2,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "independent-reviewer",
+      "role": "Independently review the implementation",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "independent review"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "approving without independent evidence",
+        "backend",
+        "implementing product changes",
+        "Must use an independent session and must not implement the reviewed change.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 5,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "repo-inspector",
+      "role": "Inspect repository metadata and project identity",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "general"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "repository map"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not edit product files or execute discovered project code.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 1,
+      "parallelEligible": false
+    },
+    {
+      "specialistId": "test-engineer",
+      "role": "Design and run focused verification",
+      "objective": "Change the primary button color.",
+      "coveredDomains": [
+        "quality"
+      ],
+      "relevantAffectedAreas": [
+        "src"
+      ],
+      "relevantFiles": [
+        "src"
+      ],
+      "relevantGates": [
+        "build",
+        "static",
+        "unit-test"
+      ],
+      "evidenceObligations": [
+        "gate:build",
+        "gate:static",
+        "gate:unit-test",
+        "test evidence"
+      ],
+      "riskLevel": "LOW",
+      "forbiddenScope": [
+        "backend",
+        "Must not self-approve implementation changes.",
+        "out-of-scope work",
+        "unrelated",
+        "unrelated architecture refactors",
+        "unrelated marketplace or dashboard features",
+        "unrelated Web3/tokenomics work"
+      ],
+      "dependencyGroup": 3,
+      "parallelEligible": false
+    }
+  ],
+  "rejections": [
+    {
+      "specialistId": "backend-api-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "data-ai-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "database-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "documentation-dx-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "finance-math-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "game-systems-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "mobile-client-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "performance-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "platform-cloud-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "product-requirements-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "quality-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "release-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "reliability-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "reliability-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "requirements-engineer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "security-reviewer",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "software-architect",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    },
+    {
+      "specialistId": "web3-contract-specialist",
+      "reasonCodes": [
+        "MINIMUM_SUFFICIENT_SET"
+      ],
+      "reasons": [
+        "profile is outside the minimum sufficient set"
+      ]
+    }
+  ],
+  "unmetCoverage": [],
+  "requiredObligations": [
+    {
+      "obligationId": "assurance:independent-reviewer",
+      "kind": "assurance",
+      "domainId": null,
+      "gateId": null,
+      "evidenceId": "independent review",
+      "affectedArea": null,
+      "specialistId": "independent-reviewer"
+    },
+    {
+      "obligationId": "domain:frontend",
+      "kind": "domain",
+      "domainId": "frontend",
+      "gateId": null,
+      "evidenceId": null,
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:build",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "build",
+      "evidenceId": "gate:build",
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:static",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "static",
+      "evidenceId": "gate:static",
+      "affectedArea": null,
+      "specialistId": null
+    },
+    {
+      "obligationId": "gate:unit-test",
+      "kind": "gate",
+      "domainId": null,
+      "gateId": "unit-test",
+      "evidenceId": "gate:unit-test",
+      "affectedArea": null,
+      "specialistId": null
+    }
+  ],
+  "coveredObligations": [
+    {
+      "obligationId": "assurance:independent-reviewer",
+      "gateId": null,
+      "evidenceId": "independent review",
+      "specialistId": "independent-reviewer",
+      "reasonCode": "INDEPENDENT_REVIEW_REQUIRED",
+      "coverageKind": "assurance"
+    },
+    {
+      "obligationId": "domain:frontend",
+      "gateId": null,
+      "evidenceId": null,
+      "specialistId": "frontend-specialist",
+      "reasonCode": "DOMAIN_COVERAGE",
+      "coverageKind": "domain"
+    },
+    {
+      "obligationId": "gate:build",
+      "gateId": "build",
+      "evidenceId": "gate:build",
+      "specialistId": "test-engineer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    },
+    {
+      "obligationId": "gate:static",
+      "gateId": "static",
+      "evidenceId": "gate:static",
+      "specialistId": "test-engineer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    },
+    {
+      "obligationId": "gate:unit-test",
+      "gateId": "unit-test",
+      "evidenceId": "gate:unit-test",
+      "specialistId": "test-engineer",
+      "reasonCode": "GATE_REQUIRES_SPECIALIST",
+      "coverageKind": "gate"
+    }
+  ],
+  "unmetObligations": [],
+  "conflicts": [],
+  "dispatch": {
+    "dependencyGroups": [
+      [
+        "checkpoint-manager",
+        "repo-inspector"
+      ],
+      [
+        "frontend-specialist",
+        "implementation-planner"
+      ],
+      [
+        "test-engineer"
+      ],
+      [
+        "implementation-agent"
+      ],
+      [
+        "independent-reviewer"
+      ]
+    ],
+    "parallelEligibleGroups": []
+  },
+  "status": "SELECTED",
+  "blockedReasonCodes": [],
+  "selectionDigest": "57f8cb3df3982464fc0795de75580a3ead5ec09fefacc78ce6d804812ad6fd31"
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "uads.evidence-record",
+  "schemaVersion": "0.3.0",
+  "evidenceId": "ev_a4f01df54d73b35c",
+  "projectId": "58233072c1c707ff",
+  "workOrderId": "wo_9bfd07a91b9b364f",
+  "executionRunId": "er_8ce6f0a2afdfc930",
+  "changeDigest": "4bc0e58695a2f39eb793091d78a91f93bb397703a54c6490cf75a2e4619e915a",
+  "gateId": "static",
+  "sourceRole": "test-engineer",
+  "kind": "command",
+  "createdAt": "2026-09-09T15:20:30.845Z",
+  "status": "PASS",
+  "summary": "V1 LOW baseline static lint passed.",
+  "command": "npm run lint",
+  "exitCode": 0,
+  "outputRef": "sidecar://execution-runs/er_8ce6f0a2afdfc930/evidence/ev_a4f01df54d73b35c.output.txt",
+  "outputDigest": "cce2d766ae17ac93ba418496141472ddb3cafb4d36541888ed431d873613cc52",
+  "fileRef": null,
+  "fileDigest": null,
+  "source": "executed"
+}

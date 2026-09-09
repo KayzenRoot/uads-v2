@@ -1,0 +1,63 @@
+{
+  "schema": "uads.routing-decision",
+  "schemaVersion": "0.2.0",
+  "routingDecisionId": "rd_9bfd07a91b9b364f",
+  "projectId": "58233072c1c707ff",
+  "createdAt": "2026-09-09T15:19:20.119Z",
+  "scopeClass": "trivial",
+  "scopeReasons": [
+    "documentation/wording change"
+  ],
+  "riskLevel": "LOW",
+  "riskReasons": [
+    "no high-risk structured signals in intake"
+  ],
+  "domains": [
+    {
+      "id": "documentation",
+      "reason": "intake domain signal: documentation"
+    }
+  ],
+  "specialists": [
+    "repo-inspector",
+    "implementation-planner",
+    "implementation-agent",
+    "test-engineer",
+    "checkpoint-manager",
+    "documentation-dx-specialist"
+  ],
+  "assuranceSpecialists": [
+    "independent-reviewer"
+  ],
+  "specialistSelectionPlanId": "sp_a0aecaafc9b8ca9c",
+  "specialistSelectionDigest": "84775798f3a91215c942e4abe6cbd89709a97ffa7a30c1f10b03b94da777ad4b",
+  "specialistRegistryDigest": "e85c4d5081645bdcf5d5542505b1d43e37ea780be3374982c383db0e445cc9b7",
+  "specialistPolicyDigest": "44fee30855f39729a310fd1009069cf29beff8b094c0234f0c1160afb213d2cb",
+  "specialistChangeDigest": null,
+  "specialistImpactDigest": "72634fb077a6a3798883bad19077d58ce23583355db2a2409c44d1375bc2518e",
+  "specialistGateContractDigest": "4502434cfdeebe3e465b6557c3b6d9b6e199ad6dd1d52872d427fccdca377b67",
+  "specialistRiskSignals": [],
+  "specialistDependencySignals": null,
+  "gates": [
+    {
+      "id": "static",
+      "reason": "static analysis for every planned change"
+    }
+  ],
+  "contextRadius": "C1",
+  "contextReason": "trivial change: named/affected files only",
+  "capabilityClass": "economy",
+  "orderConstraints": [
+    "inspect before edit",
+    "implement only NECESSARY scope",
+    "implementation-agent is not the sole final reviewer"
+  ],
+  "stopConditions": [
+    "missing required evidence",
+    "approval-gated action requested",
+    "hard token budget exceeded"
+  ],
+  "warnings": [
+    "intake used conservative fallback-text classifier, not host semantic interpretation"
+  ]
+}

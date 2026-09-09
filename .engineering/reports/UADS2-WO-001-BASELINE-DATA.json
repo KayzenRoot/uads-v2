@@ -1,0 +1,1075 @@
+{
+  "schema": "uads2.wo-001.baseline-data",
+  "schemaVersion": "1.0.0",
+  "workOrderId": "UADS2-WO-001",
+  "repository": "KayzenRoot/uads-v2",
+  "baseSha": "3eedf833c00b18755ce2b105f4df8c6c13269055",
+  "v1Source": {
+    "repository": "KayzenRoot/uads",
+    "ref": "312e32946798eb3abbb49a79af08e13efb7719dc",
+    "tree": "b2a6763045fc1dbb81b6ba2880bf1f77167d7133",
+    "fingerprint": "b22017e779325cffaabb14de41742e01aa8e853d8aee96a8c21c8f35c9cf366a"
+  },
+  "duplicateAnalysisRule": {
+    "ruleId": "normalized-structured-analysis-signature-v1",
+    "procedure": "Compare canonicalized structured review-analysis events by event type, gate, normalized subject path, normalized finding code and evidence digest. Exact repeated signatures count as duplicates; semantic similarity is never used.",
+    "currentV1Limitation": "No V1 provider/analysis event stream was exposed, so the rate is UNAVAILABLE rather than inferred from specialist assignments."
+  },
+  "samples": [
+    {
+      "sampleId": "UADS2-WO-001-LOW-E5",
+      "fixture": "evals/orchestrator/e5-docs-typo.json",
+      "collection": "direct CLI plan/dispatch/verify/evidence/assurance/finalize run",
+      "riskClass": "LOW",
+      "internalRiskLevel": "LOW",
+      "input": {
+        "kind": "request-text",
+        "value": "Fix a typo in the README.",
+        "fingerprint": "8ab815007fb307eb72ad73513b6882f38076ad7edaa7cf1ec55bf1867bd6825a"
+      },
+      "v1Source": {
+        "repository": "KayzenRoot/uads",
+        "ref": "312e32946798eb3abbb49a79af08e13efb7719dc",
+        "tree": "b2a6763045fc1dbb81b6ba2880bf1f77167d7133",
+        "fingerprint": "b22017e779325cffaabb14de41742e01aa8e853d8aee96a8c21c8f35c9cf366a"
+      },
+      "identity": {
+        "projectId": "58233072c1c707ff",
+        "workOrderId": "wo_9bfd07a91b9b364f",
+        "executionRunId": "er_8ce6f0a2afdfc930",
+        "workOrderDigest": "54d793a74470f316c718ec60131667112cc9fcca6b763bc323e797c363b6c457",
+        "selectionPlanId": "sp_a0aecaafc9b8ca9c",
+        "selectionDigest": "84775798f3a91215c942e4abe6cbd89709a97ffa7a30c1f10b03b94da777ad4b"
+      },
+      "timestamps": {
+        "startAt": "2026-09-09T15:19:20.119Z",
+        "endAt": "2026-09-09T15:20:49.713Z",
+        "dispatchAt": "2026-09-09T15:19:32.828Z",
+        "finalReviewAt": "2026-09-09T15:20:43.207Z",
+        "reviewDurationMs": 70379,
+        "totalObservedMs": 89594
+      },
+      "verdict": "APPROVED",
+      "workflow": {
+        "checkpointStatus": "completed",
+        "checkpointPhase": "stopped",
+        "executionStatus": "completed",
+        "attempt": 1,
+        "retries": 0,
+        "correctionDepth": 0,
+        "reviewVerdicts": [
+          null,
+          "APPROVED"
+        ]
+      },
+      "routing": {
+        "plannedSpecialists": 6,
+        "plannedAssuranceReviewers": 1,
+        "plannedSpecialistTotal": 7,
+        "plannedParallelEligibleGroups": [],
+        "plannedParallelEligibleSpecialists": 0,
+        "modelStatus": "SELECTED",
+        "modelSelectionMode": "host-managed",
+        "requiredCapabilityClass": "economy",
+        "selectedModel": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "host-managed compatibility or no eligible profile"
+        },
+        "reasoningEffort": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 model plan exposes no provider reasoning-effort selection"
+        },
+        "executionStrategy": {
+          "parallel": false,
+          "roleDispatch": "role-cycling",
+          "usageTelemetryAvailable": null
+        }
+      },
+      "concurrency": {
+        "configuredMaxConcurrentSpecialistWorkers": {
+          "value": 1,
+          "status": "OBSERVED_POLICY",
+          "reason": "parallel=false with role-cycling"
+        },
+        "workerSpawnCountObserved": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No provider/worker spawn event or host execution receipt exists in the V1 sample evidence"
+        },
+        "maxObservedConcurrentWorkersInUadsPath": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No worker spawn event exists in the bounded V1 CLI path"
+        },
+        "hostActualMaxConcurrentWorkers": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "visibleWorkerConversationsInSidecar": {
+          "value": 0,
+          "status": "OBSERVED_NO_VISIBLE_WORKER_RECORD",
+          "reason": "Only sidecar execution/session identifiers exist; no worker conversation record exists"
+        },
+        "hostVisibleWorkerConversations": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Host UI/conversation telemetry is outside the V1 sidecar and was not observable"
+        }
+      },
+      "telemetry": {
+        "agentCallsReported": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "observedProviderTokens": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No provider token input/output telemetry"
+        },
+        "quotaAmplification": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Cannot calculate without source token/quota denominator"
+        },
+        "estimatedContextTokens": {
+          "value": 0,
+          "status": "OBSERVED_BYTE_HEURISTIC",
+          "reason": "This is a byte-heuristic estimate, not provider tokens"
+        },
+        "contextRadius": "C1",
+        "cacheReuse": {
+          "gateCacheHits": 0,
+          "evidenceReuseCount": 0,
+          "status": "OBSERVED"
+        }
+      },
+      "tttm": {
+        "planToDispatchMs": 12709,
+        "dispatchToFinalReviewMs": 70379,
+        "finalReviewToCompletionMs": 6506,
+        "blockedAfterPlanMs": null,
+        "totalObservedMs": 89594,
+        "status": "PARTIAL_COMPONENTS_OBSERVED"
+      },
+      "duplicateAnalysis": {
+        "ruleId": "normalized-structured-analysis-signature-v1",
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "status": "UNAVAILABLE",
+        "reason": "The V1 sidecar contains routing assignments but no review-analysis event/output signatures; assignments are not treated as semantic review analyses."
+      },
+      "quality": {
+        "firstPassApproved": true,
+        "defectsCaughtBeforeMerge": {
+          "value": 0,
+          "status": "OBSERVED_NO_REVIEW_FINDINGS"
+        },
+        "escapedDefects": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No post-merge or production evidence was included in the sampled run"
+        }
+      },
+      "rawEvidence": [
+        {
+          "path": "samples/LOW-E5/cost/ledger.json",
+          "sha256": "4ad93e4d8f2ad1bb8edcd627000ccd845528c4633bda4a0daff594b5af0d6e18"
+        },
+        {
+          "path": "samples/LOW-E5/cost/qpt-current.json",
+          "sha256": "cb72ac8fa9253a64ab86c959bd9e6bfce681d15c6a84585d04311114aaac8e6c"
+        },
+        {
+          "path": "samples/LOW-E5/dispatch/checkpoint.json",
+          "sha256": "c4083fe6bfa555b0a02cf80dfdcb9b35ec203c3b25c289a1002aae56ec319f0b"
+        },
+        {
+          "path": "samples/LOW-E5/dispatch/execution-packet.json",
+          "sha256": "a120c59efdafd9514b2941fe924b8225868797f071f23e4237698864d4b3a12e"
+        },
+        {
+          "path": "samples/LOW-E5/dispatch/execution-run.json",
+          "sha256": "97251528904d6b3dbab93a8d2e6eae994edea10e29b71a85caceade011bb80e3"
+        },
+        {
+          "path": "samples/LOW-E5/evidence/ev_a4f01df54d73b35c.json",
+          "sha256": "f4b01e55905e182a43dbea91c62e39c95c8fd16e1ae5b638fc77c6f1bf4870ae"
+        },
+        {
+          "path": "samples/LOW-E5/evidence/ev_a4f01df54d73b35c.output.txt",
+          "sha256": "cce2d766ae17ac93ba418496141472ddb3cafb4d36541888ed431d873613cc52"
+        },
+        {
+          "path": "samples/LOW-E5/plan/context-plan.json",
+          "sha256": "e840bcdf5b3a5a5ce72795d3516766e7a05f978fcddbd818636ff4e135a8f020"
+        },
+        {
+          "path": "samples/LOW-E5/plan/current-pack.json",
+          "sha256": "3953225ca759981718b28111c59d230c1f2e2552d45de42440c7b4098cbad296"
+        },
+        {
+          "path": "samples/LOW-E5/plan/model-plan.json",
+          "sha256": "30b2c10b502b1ca3c7f82fc544e86b80f8f97ce33d5bd977e3f2cf3a50ead112"
+        },
+        {
+          "path": "samples/LOW-E5/plan/routing-decision.json",
+          "sha256": "ec1d2c553d3fbb3fe238c009f357614627fafd74ce8f0bd02fbc4c059719ccc1"
+        },
+        {
+          "path": "samples/LOW-E5/plan/runtime-capabilities.json",
+          "sha256": "92218a9214c943a4d1985c3f78023d1bf45a8e5dad5c2ed9ca705502d8fffdea"
+        },
+        {
+          "path": "samples/LOW-E5/plan/specialist-selection-plan.json",
+          "sha256": "06504793268c3cc66ea83758cc13e1e27b03514d37b6a0b6118d3a2a00b0eb2e"
+        },
+        {
+          "path": "samples/LOW-E5/plan/work-order.json",
+          "sha256": "59030621638e6491efbe84cd964deca21c75603a6d829d219a692ff1ed739732"
+        },
+        {
+          "path": "samples/LOW-E5/review/packet.json",
+          "sha256": "3febb477329668df1a88027d1d98e99f7c99bcf55fe3fc67722fc7d4b621e432"
+        },
+        {
+          "path": "samples/LOW-E5/review/rv_d46ca0dd40d25723.json",
+          "sha256": "848d6087510ac56ceff49f807f152f9dbbad1e797e8331c4869761dc82ecb9c4"
+        }
+      ]
+    },
+    {
+      "sampleId": "UADS2-WO-001-STANDARD-E2",
+      "fixture": "evals/orchestrator/e2-auth-billing.json",
+      "collection": "direct CLI plan followed by dispatch refusal capture",
+      "riskClass": "STANDARD",
+      "internalRiskLevel": "HIGH",
+      "input": {
+        "kind": "request-text",
+        "value": "Add an authenticated API endpoint that exposes a user billing profile.",
+        "fingerprint": "a354b5dbf8442cde23d2c0ee88e01b09b508bd082395e1a7ce58f13ce2b1d209"
+      },
+      "v1Source": {
+        "repository": "KayzenRoot/uads",
+        "ref": "312e32946798eb3abbb49a79af08e13efb7719dc",
+        "tree": "b2a6763045fc1dbb81b6ba2880bf1f77167d7133",
+        "fingerprint": "b22017e779325cffaabb14de41742e01aa8e853d8aee96a8c21c8f35c9cf366a"
+      },
+      "identity": {
+        "projectId": "58233072c1c707ff",
+        "workOrderId": "wo_191143702562d55e",
+        "executionRunId": null,
+        "workOrderDigest": "5f93c4652a84f2f7e0cd6f0723c79c64f1c2a89ff9ec0873066ac59e6ee09099",
+        "selectionPlanId": "sp_995d03589aea16e5",
+        "selectionDigest": "ee86963279bba1f2f06c45d74f005b558fe755dbccd124cbd423c704a66eac42"
+      },
+      "timestamps": {
+        "startAt": "2026-09-09T15:12:38.507Z",
+        "endAt": "2026-09-09T15:12:48.687Z",
+        "dispatchAt": null,
+        "finalReviewAt": null,
+        "reviewDurationMs": null,
+        "totalObservedMs": 10180
+      },
+      "verdict": "BLOCKED",
+      "workflow": {
+        "checkpointStatus": "blocked",
+        "checkpointPhase": "plan",
+        "executionStatus": null,
+        "attempt": 0,
+        "retries": 0,
+        "correctionDepth": 0,
+        "reviewVerdicts": []
+      },
+      "routing": {
+        "plannedSpecialists": 9,
+        "plannedAssuranceReviewers": 2,
+        "plannedSpecialistTotal": 11,
+        "plannedParallelEligibleGroups": [
+          [
+            "backend-api-specialist",
+            "finance-math-specialist"
+          ]
+        ],
+        "plannedParallelEligibleSpecialists": 2,
+        "modelStatus": "BLOCKED",
+        "modelSelectionMode": "router",
+        "requiredCapabilityClass": "strong",
+        "selectedModel": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "host-managed compatibility or no eligible profile"
+        },
+        "reasoningEffort": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 model plan exposes no provider reasoning-effort selection"
+        },
+        "executionStrategy": {
+          "parallel": false,
+          "roleDispatch": "role-cycling",
+          "usageTelemetryAvailable": null
+        }
+      },
+      "concurrency": {
+        "configuredMaxConcurrentSpecialistWorkers": {
+          "value": 1,
+          "status": "OBSERVED_POLICY",
+          "reason": "parallel=false with role-cycling"
+        },
+        "workerSpawnCountObserved": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No provider/worker spawn event or host execution receipt exists in the V1 sample evidence"
+        },
+        "maxObservedConcurrentWorkersInUadsPath": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No worker spawn event exists in the bounded V1 CLI path"
+        },
+        "hostActualMaxConcurrentWorkers": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "visibleWorkerConversationsInSidecar": {
+          "value": 0,
+          "status": "OBSERVED_NO_VISIBLE_WORKER_RECORD",
+          "reason": "Only sidecar execution/session identifiers exist; no worker conversation record exists"
+        },
+        "hostVisibleWorkerConversations": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Host UI/conversation telemetry is outside the V1 sidecar and was not observable"
+        }
+      },
+      "telemetry": {
+        "agentCallsReported": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "observedProviderTokens": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No provider token input/output telemetry"
+        },
+        "quotaAmplification": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Cannot calculate without source token/quota denominator"
+        },
+        "estimatedContextTokens": {
+          "value": 0,
+          "status": "OBSERVED_BYTE_HEURISTIC",
+          "reason": "This is a byte-heuristic estimate, not provider tokens"
+        },
+        "contextRadius": "C3",
+        "cacheReuse": {
+          "gateCacheHits": 0,
+          "evidenceReuseCount": 0,
+          "status": "OBSERVED"
+        }
+      },
+      "tttm": {
+        "planToDispatchMs": null,
+        "dispatchToFinalReviewMs": null,
+        "finalReviewToCompletionMs": null,
+        "blockedAfterPlanMs": 10180,
+        "totalObservedMs": 10180,
+        "status": "NOT_REACHED_REVIEW"
+      },
+      "duplicateAnalysis": {
+        "ruleId": "normalized-structured-analysis-signature-v1",
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "status": "UNAVAILABLE",
+        "reason": "The V1 sidecar contains routing assignments but no review-analysis event/output signatures; assignments are not treated as semantic review analyses."
+      },
+      "quality": {
+        "firstPassApproved": null,
+        "defectsCaughtBeforeMerge": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No independent review reached this sample"
+        },
+        "escapedDefects": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No post-merge or production evidence was included in the sampled run"
+        }
+      },
+      "rawEvidence": [
+        {
+          "path": "samples/STANDARD-E2/cost/ledger.json",
+          "sha256": "d5dc845fb1f4dd2fd9b70b445d332fe96a4144d0e46b8515792bf2205f903e79"
+        },
+        {
+          "path": "samples/STANDARD-E2/plan/context-plan.json",
+          "sha256": "b95054c46c7a6501278ac5aabe1b25d711500e1a10b5102700b45c543b553681"
+        },
+        {
+          "path": "samples/STANDARD-E2/plan/model-plan.json",
+          "sha256": "c89c6fd5b54675ad9604a86a1607f443b95109bece8730fe391e944051064a70"
+        },
+        {
+          "path": "samples/STANDARD-E2/plan/routing-decision.json",
+          "sha256": "be66edcb7934ec4a6da366d008317ed2284767eb2f433bae3bf526d2a4261010"
+        },
+        {
+          "path": "samples/STANDARD-E2/plan/runtime-capabilities.json",
+          "sha256": "92218a9214c943a4d1985c3f78023d1bf45a8e5dad5c2ed9ca705502d8fffdea"
+        },
+        {
+          "path": "samples/STANDARD-E2/plan/specialist-selection-plan.json",
+          "sha256": "f8b1ad2d157e7bcd6b4cdbb5554611272363a4ec78f045a387355e5651d3f198"
+        },
+        {
+          "path": "samples/STANDARD-E2/plan/work-order.json",
+          "sha256": "3546fbc3c3a977240c27a666d8d372fcfa04fb5809e64c5184a95e88b7cd6273"
+        },
+        {
+          "path": "samples/STANDARD-E2/state/checkpoint.json",
+          "sha256": "6d2df64f7e420ed00718ee8b658acf3cfc35d5620878550a487626214fa4bf53"
+        }
+      ]
+    },
+    {
+      "sampleId": "UADS2-WO-001-ELEVATED-E7",
+      "fixture": "evals/orchestrator/e7-financial-ledger.json",
+      "collection": "direct CLI plan followed by dispatch refusal capture",
+      "riskClass": "ELEVATED",
+      "internalRiskLevel": "HIGH",
+      "input": {
+        "kind": "request-text",
+        "value": "Change fee accrual and rounding for a financial ledger.",
+        "fingerprint": "3412c9bfbbef4c822616b9630e94483458c2f8ebb579de73994323b870a5db86"
+      },
+      "v1Source": {
+        "repository": "KayzenRoot/uads",
+        "ref": "312e32946798eb3abbb49a79af08e13efb7719dc",
+        "tree": "b2a6763045fc1dbb81b6ba2880bf1f77167d7133",
+        "fingerprint": "b22017e779325cffaabb14de41742e01aa8e853d8aee96a8c21c8f35c9cf366a"
+      },
+      "identity": {
+        "projectId": "58233072c1c707ff",
+        "workOrderId": "wo_3af1677e2f4bb9bf",
+        "executionRunId": null,
+        "workOrderDigest": "e0ec4f23934d8083f600f9439f1e9aec93073b3a817ee5a74ff123576b402be6",
+        "selectionPlanId": "sp_a97cbe88b8c5d629",
+        "selectionDigest": "6fd291a24740eb20c29c4a3088d1b4e4c22f25896c7dc76f36de8ef4430a7d13"
+      },
+      "timestamps": {
+        "startAt": "2026-09-09T15:13:08.804Z",
+        "endAt": "2026-09-09T15:31:27.233Z",
+        "dispatchAt": null,
+        "finalReviewAt": null,
+        "reviewDurationMs": null,
+        "totalObservedMs": 1098429
+      },
+      "verdict": "BLOCKED",
+      "workflow": {
+        "checkpointStatus": "blocked",
+        "checkpointPhase": "plan",
+        "executionStatus": null,
+        "attempt": 0,
+        "retries": 0,
+        "correctionDepth": 0,
+        "reviewVerdicts": []
+      },
+      "routing": {
+        "plannedSpecialists": 8,
+        "plannedAssuranceReviewers": 2,
+        "plannedSpecialistTotal": 10,
+        "plannedParallelEligibleGroups": [
+          [
+            "backend-api-specialist",
+            "finance-math-specialist"
+          ]
+        ],
+        "plannedParallelEligibleSpecialists": 2,
+        "modelStatus": "BLOCKED",
+        "modelSelectionMode": "router",
+        "requiredCapabilityClass": "strong",
+        "selectedModel": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "host-managed compatibility or no eligible profile"
+        },
+        "reasoningEffort": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 model plan exposes no provider reasoning-effort selection"
+        },
+        "executionStrategy": {
+          "parallel": false,
+          "roleDispatch": "role-cycling",
+          "usageTelemetryAvailable": null
+        }
+      },
+      "concurrency": {
+        "configuredMaxConcurrentSpecialistWorkers": {
+          "value": 1,
+          "status": "OBSERVED_POLICY",
+          "reason": "parallel=false with role-cycling"
+        },
+        "workerSpawnCountObserved": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No provider/worker spawn event or host execution receipt exists in the V1 sample evidence"
+        },
+        "maxObservedConcurrentWorkersInUadsPath": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No worker spawn event exists in the bounded V1 CLI path"
+        },
+        "hostActualMaxConcurrentWorkers": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "visibleWorkerConversationsInSidecar": {
+          "value": 0,
+          "status": "OBSERVED_NO_VISIBLE_WORKER_RECORD",
+          "reason": "Only sidecar execution/session identifiers exist; no worker conversation record exists"
+        },
+        "hostVisibleWorkerConversations": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Host UI/conversation telemetry is outside the V1 sidecar and was not observable"
+        }
+      },
+      "telemetry": {
+        "agentCallsReported": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "observedProviderTokens": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No provider token input/output telemetry"
+        },
+        "quotaAmplification": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Cannot calculate without source token/quota denominator"
+        },
+        "estimatedContextTokens": {
+          "value": 0,
+          "status": "OBSERVED_BYTE_HEURISTIC",
+          "reason": "This is a byte-heuristic estimate, not provider tokens"
+        },
+        "contextRadius": "C3",
+        "cacheReuse": {
+          "gateCacheHits": 0,
+          "evidenceReuseCount": 0,
+          "status": "OBSERVED"
+        }
+      },
+      "tttm": {
+        "planToDispatchMs": null,
+        "dispatchToFinalReviewMs": null,
+        "finalReviewToCompletionMs": null,
+        "blockedAfterPlanMs": 1098429,
+        "totalObservedMs": 1098429,
+        "status": "NOT_REACHED_REVIEW"
+      },
+      "duplicateAnalysis": {
+        "ruleId": "normalized-structured-analysis-signature-v1",
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "status": "UNAVAILABLE",
+        "reason": "The V1 sidecar contains routing assignments but no review-analysis event/output signatures; assignments are not treated as semantic review analyses."
+      },
+      "quality": {
+        "firstPassApproved": null,
+        "defectsCaughtBeforeMerge": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No independent review reached this sample"
+        },
+        "escapedDefects": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No post-merge or production evidence was included in the sampled run"
+        }
+      },
+      "rawEvidence": [
+        {
+          "path": "samples/ELEVATED-E7/cost/ledger.json",
+          "sha256": "705c3c483c808b44466a7ff50175f41e51758ebf5a541721e71d797a6af61b69"
+        },
+        {
+          "path": "samples/ELEVATED-E7/plan/context-plan.json",
+          "sha256": "cb212f2e2c2ade77219bd5034af25116020058a92ec5a2aa97972363d19c0dad"
+        },
+        {
+          "path": "samples/ELEVATED-E7/plan/model-plan.json",
+          "sha256": "98bc42b489641e166f5a1d1c45adcfb4f0b2500cb8ecb6c5de8788e7ddb643ca"
+        },
+        {
+          "path": "samples/ELEVATED-E7/plan/routing-decision.json",
+          "sha256": "7555d3daebef527c3b364f21aacb29f59e20b27162d5c6b5286aee9a11847487"
+        },
+        {
+          "path": "samples/ELEVATED-E7/plan/runtime-capabilities.json",
+          "sha256": "92218a9214c943a4d1985c3f78023d1bf45a8e5dad5c2ed9ca705502d8fffdea"
+        },
+        {
+          "path": "samples/ELEVATED-E7/plan/specialist-selection-plan.json",
+          "sha256": "f03fe2433bd3608555a440c918ba5624f4c049076a7414005e8649e62148a76a"
+        },
+        {
+          "path": "samples/ELEVATED-E7/plan/work-order.json",
+          "sha256": "9a383a23fdeb239f9e1946910a09c743a009586abf2be18e9687f7c90080ccfc"
+        },
+        {
+          "path": "samples/ELEVATED-E7/state/checkpoint.json",
+          "sha256": "8d6f09a6b55da1f4ba353a5f957f73bd048ef8447afb0d22522264656db43446"
+        }
+      ]
+    },
+    {
+      "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+      "fixture": "evals/execution/x6-correction-loop.json",
+      "collection": "V1 execution eval X6 correction-loop fixture and persisted sidecar snapshot",
+      "riskClass": "LOW",
+      "internalRiskLevel": "LOW",
+      "input": {
+        "kind": "request-text",
+        "value": "Change the primary button color.",
+        "fingerprint": "6570adc0ec6d55710b4782ea36f988a35cf60bc8c02a28aee983724d3ae788c9"
+      },
+      "v1Source": {
+        "repository": "KayzenRoot/uads",
+        "ref": "312e32946798eb3abbb49a79af08e13efb7719dc",
+        "tree": "b2a6763045fc1dbb81b6ba2880bf1f77167d7133",
+        "fingerprint": "b22017e779325cffaabb14de41742e01aa8e853d8aee96a8c21c8f35c9cf366a"
+      },
+      "identity": {
+        "projectId": "8e4b5bd6a6c41b50",
+        "workOrderId": "wo_1a9bd8e2df2692e3",
+        "executionRunId": "er_47cc270c0ac2aee5",
+        "workOrderDigest": "efac3f6ce285e39e64da44eeec0d15dfe64150890cb7b0a97244685744c9192a",
+        "selectionPlanId": "sp_afad72b1e7e12a84",
+        "selectionDigest": "57f8cb3df3982464fc0795de75580a3ead5ec09fefacc78ce6d804812ad6fd31"
+      },
+      "timestamps": {
+        "startAt": "2026-09-09T15:14:57.631Z",
+        "endAt": "2026-09-09T15:15:10.194Z",
+        "dispatchAt": "2026-09-09T15:14:59.238Z",
+        "finalReviewAt": "2026-09-09T15:15:09.525Z",
+        "reviewDurationMs": 10287,
+        "totalObservedMs": 12563
+      },
+      "verdict": "APPROVED",
+      "workflow": {
+        "checkpointStatus": "completed",
+        "checkpointPhase": "stopped",
+        "executionStatus": "completed",
+        "attempt": 2,
+        "retries": 1,
+        "correctionDepth": 1,
+        "reviewVerdicts": [
+          null,
+          "APPROVED",
+          "CORRECTION_NEEDED"
+        ]
+      },
+      "routing": {
+        "plannedSpecialists": 6,
+        "plannedAssuranceReviewers": 1,
+        "plannedSpecialistTotal": 7,
+        "plannedParallelEligibleGroups": [],
+        "plannedParallelEligibleSpecialists": 0,
+        "modelStatus": "SELECTED",
+        "modelSelectionMode": "host-managed",
+        "requiredCapabilityClass": "economy",
+        "selectedModel": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "host-managed compatibility or no eligible profile"
+        },
+        "reasoningEffort": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 model plan exposes no provider reasoning-effort selection"
+        },
+        "executionStrategy": {
+          "parallel": false,
+          "roleDispatch": "role-cycling",
+          "usageTelemetryAvailable": null
+        }
+      },
+      "concurrency": {
+        "configuredMaxConcurrentSpecialistWorkers": {
+          "value": 1,
+          "status": "OBSERVED_POLICY",
+          "reason": "parallel=false with role-cycling"
+        },
+        "workerSpawnCountObserved": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No provider/worker spawn event or host execution receipt exists in the V1 sample evidence"
+        },
+        "maxObservedConcurrentWorkersInUadsPath": {
+          "value": 0,
+          "status": "OBSERVED_NO_PROVIDER_INVOCATION",
+          "reason": "No worker spawn event exists in the bounded V1 CLI path"
+        },
+        "hostActualMaxConcurrentWorkers": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "visibleWorkerConversationsInSidecar": {
+          "value": 0,
+          "status": "OBSERVED_NO_VISIBLE_WORKER_RECORD",
+          "reason": "Only sidecar execution/session identifiers exist; no worker conversation record exists"
+        },
+        "hostVisibleWorkerConversations": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Host UI/conversation telemetry is outside the V1 sidecar and was not observable"
+        }
+      },
+      "telemetry": {
+        "agentCallsReported": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "V1 sidecar has no provider/host event stream; agentCallsReported is null and no host UI is observable from this executor."
+        },
+        "observedProviderTokens": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No provider token input/output telemetry"
+        },
+        "quotaAmplification": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "Cannot calculate without source token/quota denominator"
+        },
+        "estimatedContextTokens": {
+          "value": 6,
+          "status": "OBSERVED_BYTE_HEURISTIC",
+          "reason": "This is a byte-heuristic estimate, not provider tokens"
+        },
+        "contextRadius": "C1",
+        "cacheReuse": {
+          "gateCacheHits": 0,
+          "evidenceReuseCount": 0,
+          "status": "OBSERVED"
+        }
+      },
+      "tttm": {
+        "planToDispatchMs": 1607,
+        "dispatchToFinalReviewMs": 10287,
+        "finalReviewToCompletionMs": 669,
+        "blockedAfterPlanMs": null,
+        "totalObservedMs": 12563,
+        "status": "PARTIAL_COMPONENTS_OBSERVED"
+      },
+      "duplicateAnalysis": {
+        "ruleId": "normalized-structured-analysis-signature-v1",
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "status": "UNAVAILABLE",
+        "reason": "The V1 sidecar contains routing assignments but no review-analysis event/output signatures; assignments are not treated as semantic review analyses."
+      },
+      "quality": {
+        "firstPassApproved": false,
+        "defectsCaughtBeforeMerge": {
+          "value": 1,
+          "status": "OBSERVED_FROM_CORRECTION_VERDICTS"
+        },
+        "escapedDefects": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "No post-merge or production evidence was included in the sampled run"
+        }
+      },
+      "rawEvidence": [
+        {
+          "path": "samples/LOW-X6-CORRECTION/cost/ledger.json",
+          "sha256": "c23b1553c857f5130e91e6a47683bc7ed1247d8484fa6dad1efc52aca86ba1d2"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/cost/qpt-current.json",
+          "sha256": "f047f95f3c0922912a853222563aa6d051f1643e52d487c0bc54b7df3d6a2adc"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/dispatch/checkpoint.json",
+          "sha256": "23131c1caec305e9ab6e4762b70cafdafce2c8d0b00b4149c6c3745a339b889c"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/dispatch/execution-packet.json",
+          "sha256": "1ebeb7a9f0cc06522e2d1ef9146b01785e2c25b644f14dd617cd6500a6a26e7a"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/dispatch/execution-run.json",
+          "sha256": "d654881c505f8537c4ffb5fd6f8f0e29f33309d7a0e6998a160604d6043d8723"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_0f69990e6c92a13c.json",
+          "sha256": "01be2b9b12368ce2236ac511576acb12cd2b67cbdbf9dfe0e48e069e4d212a3a"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_0f69990e6c92a13c.output.txt",
+          "sha256": "af77d548d9659ae56cccdf82d737e2f52274b9b7ffa113c90e259e67ea556333"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_2a14951f53d6ad90.json",
+          "sha256": "7c5d6bf5eb396ccafdf1dd058cd1f2ff0ae4c5c7cadf88fdca68c8436ef84f89"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_2a14951f53d6ad90.output.txt",
+          "sha256": "4fc6853bb8532d5f19ec3d67edd11b54889033f4f9c028cef0a33d50383563cd"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_2dcc61fdc46946d6.json",
+          "sha256": "95d321cca8423290a850ae2df870b3e49eede514998c8a16c307511531d36d17"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_2dcc61fdc46946d6.output.txt",
+          "sha256": "4fc6853bb8532d5f19ec3d67edd11b54889033f4f9c028cef0a33d50383563cd"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_3afd29d1cec8b017.json",
+          "sha256": "077810d45277fcdf1f2ada4bd7b4b459d2ba16d3adbd54b93fde1c841b720922"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_3afd29d1cec8b017.output.txt",
+          "sha256": "af77d548d9659ae56cccdf82d737e2f52274b9b7ffa113c90e259e67ea556333"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_6189bd1230082d73.json",
+          "sha256": "4451cb2b75001419a89b0898a7651009a1b74f9d1bf9df51091d3f27fe2f9c9e"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_6189bd1230082d73.output.txt",
+          "sha256": "8df80525f6b8ced7766cf625100a22ba75f811fb989f661d2baa607a1446624c"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_fc835fc2f34b9125.json",
+          "sha256": "0b4965f614109d2f8568afeb8335de9eb1120b814752132b258202db29d9a3f5"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/evidence/ev_fc835fc2f34b9125.output.txt",
+          "sha256": "8df80525f6b8ced7766cf625100a22ba75f811fb989f661d2baa607a1446624c"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/plan/context-plan.json",
+          "sha256": "b53f677fca5792b341e9daf8df8e3dc100789c3e9745d2b13259dbffd2f8b765"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/plan/model-plan.json",
+          "sha256": "56a564ffd51a9f1aa9ea1a4395bbc2a9e8a60acb6590115d721a77089aae3794"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/plan/routing-decision.json",
+          "sha256": "db1e7e9972a3488d1e0906fee596980c41319bbbaadff7a3ddc18823d22c00c3"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/plan/runtime-capabilities.json",
+          "sha256": "92218a9214c943a4d1985c3f78023d1bf45a8e5dad5c2ed9ca705502d8fffdea"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/plan/specialist-selection-plan.json",
+          "sha256": "b33b98b2e9e5478640406a0bb8088655e1b506a529af960f1d5e744f0252233f"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/plan/work-order.json",
+          "sha256": "e4a778c281501b515f052dfb015b43bd08827331512ee020536704c2a7b0a635"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/review/packet.json",
+          "sha256": "5bb06039265a3ee923f7c16114f69b99a88438138b47347a3e960534f679fbf4"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/review/rv_9f102402fba9bc10.json",
+          "sha256": "f60786a01ece310b3e9411954317bdf16095e60707ff28f9b55b40fc0efbcae1"
+        },
+        {
+          "path": "samples/LOW-X6-CORRECTION/review/rv_c26c0a1a0b9ef504.json",
+          "sha256": "17f69f81da5f56c00b2e2f0fd47119890843ce8f1442cfd603697e605d1c4a73"
+        }
+      ]
+    }
+  ],
+  "derivedMetrics": {
+    "workerSpawnCountPerSample": [
+      {
+        "sampleId": "UADS2-WO-001-LOW-E5",
+        "value": 0,
+        "status": "OBSERVED_NO_PROVIDER_INVOCATION"
+      },
+      {
+        "sampleId": "UADS2-WO-001-STANDARD-E2",
+        "value": 0,
+        "status": "OBSERVED_NO_PROVIDER_INVOCATION"
+      },
+      {
+        "sampleId": "UADS2-WO-001-ELEVATED-E7",
+        "value": 0,
+        "status": "OBSERVED_NO_PROVIDER_INVOCATION"
+      },
+      {
+        "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+        "value": 0,
+        "status": "OBSERVED_NO_PROVIDER_INVOCATION"
+      }
+    ],
+    "maxObservedConcurrentWorkersPerSample": [
+      {
+        "sampleId": "UADS2-WO-001-LOW-E5",
+        "value": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-STANDARD-E2",
+        "value": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-ELEVATED-E7",
+        "value": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+        "value": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      }
+    ],
+    "visibleWorkerConversationsPerSample": [
+      {
+        "sampleId": "UADS2-WO-001-LOW-E5",
+        "sidecarValue": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-STANDARD-E2",
+        "sidecarValue": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-ELEVATED-E7",
+        "sidecarValue": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+        "sidecarValue": 0,
+        "hostValue": null,
+        "status": "UNAVAILABLE"
+      }
+    ],
+    "reviewDurationMsPerSample": [
+      {
+        "sampleId": "UADS2-WO-001-LOW-E5",
+        "value": 70379,
+        "status": "OBSERVED"
+      },
+      {
+        "sampleId": "UADS2-WO-001-STANDARD-E2",
+        "value": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-ELEVATED-E7",
+        "value": null,
+        "status": "UNAVAILABLE"
+      },
+      {
+        "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+        "value": 10287,
+        "status": "OBSERVED"
+      }
+    ],
+    "retryCountPerSample": [
+      {
+        "sampleId": "UADS2-WO-001-LOW-E5",
+        "value": 0
+      },
+      {
+        "sampleId": "UADS2-WO-001-STANDARD-E2",
+        "value": 0
+      },
+      {
+        "sampleId": "UADS2-WO-001-ELEVATED-E7",
+        "value": 0
+      },
+      {
+        "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+        "value": 1
+      }
+    ],
+    "correctionDepthPerSample": [
+      {
+        "sampleId": "UADS2-WO-001-LOW-E5",
+        "value": 0
+      },
+      {
+        "sampleId": "UADS2-WO-001-STANDARD-E2",
+        "value": 0
+      },
+      {
+        "sampleId": "UADS2-WO-001-ELEVATED-E7",
+        "value": 0
+      },
+      {
+        "sampleId": "UADS2-WO-001-LOW-X6-CORRECTION",
+        "value": 1
+      }
+    ],
+    "duplicateAnalysisRate": {
+      "numerator": 0,
+      "denominator": 0,
+      "value": null,
+      "status": "UNAVAILABLE",
+      "reason": "No V1 analysis event stream"
+    },
+    "firstPassApprovalRate": {
+      "numerator": 1,
+      "denominator": 2,
+      "value": 0.5,
+      "formula": "first-pass APPROVED reviewed samples / samples reaching a final review verdict",
+      "excluded": [
+        "UADS2-WO-001-STANDARD-E2",
+        "UADS2-WO-001-ELEVATED-E7"
+      ]
+    },
+    "tokenQuotaAmplification": {
+      "numerator": null,
+      "denominator": null,
+      "value": null,
+      "status": "UNAVAILABLE",
+      "reason": "agentCallsReported and provider token counts are null"
+    },
+    "averageObservedReviewDurationMs": 40333,
+    "totalSamples": 4,
+    "completedReviewedSamples": 2
+  },
+  "limitations": [
+    "V1 plans and sidecar evidence are deterministic, but provider invocation is host-owned and no host event stream was available.",
+    "STANDARD and ELEVATED are risk-class labels for this baseline; V1 internally classified both as HIGH and fail-closed at NO_ELIGIBLE_MODEL.",
+    "The LOW-E5 final verdict is from a bounded synthetic independent-reviewer record in the V1 fixture flow, not HEDS approval.",
+    "uads review packaging was attempted after LOW-E5 finalization and failed closed because the default inspector required validation artifacts not present in this baseline; it does not alter the execution verdict.",
+    "No post-merge or production evidence was available for escaped-defect measurement."
+  ]
+}

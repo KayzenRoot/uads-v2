@@ -1,0 +1,25 @@
+{
+  "schema": "uads.review-record",
+  "schemaVersion": "0.3.0",
+  "reviewId": "rv_c26c0a1a0b9ef504",
+  "projectId": "8e4b5bd6a6c41b50",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "executionRunId": "er_47cc270c0ac2aee5",
+  "changeDigest": "58496ce2d1ab76e419dc7f9132ecd7c074b15b3779190b302b84eaa5a65a3f8a",
+  "reviewerRole": "independent-reviewer",
+  "reviewSessionId": "rev-1",
+  "implementerRole": "implementation-agent",
+  "implementerSessionId": "imp-1",
+  "verdict": "CORRECTION_NEEDED",
+  "summary": "needs a different color",
+  "findings": [],
+  "reasonCodes": [
+    "REVIEW_CORRECTION_REQUIRED"
+  ],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2dcc61fdc46946d6.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_3afd29d1cec8b017.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_6189bd1230082d73.json"
+  ],
+  "createdAt": "2026-09-09T15:15:05.100Z"
+}

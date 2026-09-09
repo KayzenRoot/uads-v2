@@ -1,0 +1,56 @@
+{
+  "schema": "uads.review-packet",
+  "schemaVersion": "0.3.0",
+  "executionRunId": "er_8ce6f0a2afdfc930",
+  "workOrderId": "wo_9bfd07a91b9b364f",
+  "objective": "Fix a typo in the README.",
+  "acceptanceCriteria": [
+    "Requested objective is met",
+    "Selected gates have evidence",
+    "Independent review completed if implementation occurred"
+  ],
+  "includedScope": [
+    "Fix a typo in the README."
+  ],
+  "outOfScope": [
+    "unrelated architecture refactors",
+    "unrelated Web3/tokenomics work",
+    "unrelated marketplace or dashboard features"
+  ],
+  "changedFiles": [
+    "README.md"
+  ],
+  "changeDigest": "4bc0e58695a2f39eb793091d78a91f93bb397703a54c6490cf75a2e4619e915a",
+  "gateStates": [
+    {
+      "gateId": "static",
+      "status": "PASS"
+    }
+  ],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_8ce6f0a2afdfc930/evidence/ev_a4f01df54d73b35c.json"
+  ],
+  "requiredReviewers": [
+    "independent-reviewer"
+  ],
+  "riskLevel": "LOW",
+  "roleToGateMapping": {
+    "independent-reviewer": [],
+    "security-reviewer": [],
+    "performance-reviewer": [],
+    "reliability-reviewer": []
+  },
+  "requiredEvidenceObligations": [
+    "gate:static"
+  ],
+  "unresolvedBlockers": [
+    "MISSING_REQUIRED_REVIEWER:independent-reviewer"
+  ],
+  "doNotImplement": [
+    "provider API calls or arbitrary external commands",
+    "out-of-scope files or project-local UADS operational state",
+    "approval-gated release, deployment, custody, or financial actions"
+  ],
+  "independentReviewInvariant": "Every required assurance role uses an exact recognized role and a distinct non-implementer session bound to this change digest.",
+  "nextAction": "Invoke distinct reviewer session(s). Do not self-approve. Record verdicts with uads assurance record."
+}

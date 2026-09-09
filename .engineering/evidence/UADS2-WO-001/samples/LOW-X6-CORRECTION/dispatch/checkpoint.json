@@ -1,0 +1,34 @@
+{
+  "schema": "uads.checkpoint",
+  "schemaVersion": "0.2.0",
+  "checkpointId": "cp_1a9bd8e2df2692e3",
+  "projectId": "8e4b5bd6a6c41b50",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "routingDecisionId": "rd_1a9bd8e2df2692e3",
+  "createdAt": "2026-09-09T15:14:57.631Z",
+  "updatedAt": "2026-09-09T15:15:10.194Z",
+  "phase": "stopped",
+  "status": "completed",
+  "completedSteps": [
+    "intake",
+    "classify",
+    "plan",
+    "dispatch",
+    "verify",
+    "assurance-start",
+    "finalize"
+  ],
+  "nextAction": "Generate a review ZIP if required. Do not deploy or transfer funds.",
+  "blockers": [],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2dcc61fdc46946d6.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_6189bd1230082d73.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_3afd29d1cec8b017.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2a14951f53d6ad90.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_fc835fc2f34b9125.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_0f69990e6c92a13c.json"
+  ],
+  "repositoryMapDigest": "e4f694d975290c036d16fc8185a669f8025bd95161a1492611e847a96e45dd36",
+  "contextPlanRef": "sidecar://context/plan.json",
+  "resumeCursor": "complete:await-review-bundle"
+}

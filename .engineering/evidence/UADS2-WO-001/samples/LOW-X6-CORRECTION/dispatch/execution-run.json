@@ -1,0 +1,66 @@
+{
+  "schema": "uads.execution-run",
+  "schemaVersion": "0.3.0",
+  "executionRunId": "er_47cc270c0ac2aee5",
+  "projectId": "8e4b5bd6a6c41b50",
+  "workOrderId": "wo_1a9bd8e2df2692e3",
+  "routingDecisionId": "rd_1a9bd8e2df2692e3",
+  "createdAt": "2026-09-09T15:14:59.238Z",
+  "updatedAt": "2026-09-09T15:15:10.194Z",
+  "attempt": 2,
+  "phase": "stopped",
+  "status": "completed",
+  "baseline": {
+    "gitHead": "cf95f144a2da198f032ae0dc51a7580416db80d0",
+    "dirty": false,
+    "capturedAt": "2026-09-09T15:14:59.238Z"
+  },
+  "contextRadius": "C1",
+  "contextCandidates": [
+    "src"
+  ],
+  "implementerRole": "implementation-agent",
+  "implementerSessionId": "imp-1",
+  "requiredReviewers": [
+    "independent-reviewer"
+  ],
+  "selectedGates": [
+    "static",
+    "unit-test",
+    "build"
+  ],
+  "currentChangeDigest": "844d441f03c19ed34bc658747850d0dc1edbc584c260d58a1fe38e4a46d8934e",
+  "reviewedChangeDigest": "844d441f03c19ed34bc658747850d0dc1edbc584c260d58a1fe38e4a46d8934e",
+  "changedFiles": [
+    "src/button.css"
+  ],
+  "scopeViolations": [],
+  "evidenceRefs": [
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2dcc61fdc46946d6.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_6189bd1230082d73.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_3afd29d1cec8b017.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_2a14951f53d6ad90.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_fc835fc2f34b9125.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/evidence/ev_0f69990e6c92a13c.json"
+  ],
+  "reviewRefs": [
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/reviews/rv_c26c0a1a0b9ef504.json",
+    "sidecar://execution-runs/er_47cc270c0ac2aee5/reviews/rv_9f102402fba9bc10.json"
+  ],
+  "blockers": [],
+  "nextAction": "Generate a review ZIP if required. Do not deploy or transfer funds.",
+  "expansionHistory": [],
+  "contextPackId": "cpk_3ea90ffffe3272e4",
+  "impactReportId": "imp_23c82503d7fd0f07",
+  "indexDigest": "df7252c08f943657690dae6e6e5de57776d7823396dac8b00d6e9720a3bfab18",
+  "modelPlanId": "mrp_e8aa5ed88fd5c205",
+  "selectedProfileId": null,
+  "selectedProviderId": null,
+  "selectedModelId": null,
+  "selectionMode": "host-managed",
+  "modelExecutionStrategy": {
+    "parallel": false,
+    "roleDispatch": "role-cycling",
+    "usageTelemetryAvailable": null
+  }
+}
