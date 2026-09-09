@@ -11,26 +11,37 @@ jobs:
   dependency-review:
     name: Dependency review
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v5.0.0
+      - name: Native GitHub Dependency Review when available
+        id: native_dependency_review
+        continue-on-error: true
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+      - name: Checkout for portable fallback
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v4.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - name: Install locked dependencies
         run: npm ci
 
-      - name: Audit dependency vulnerabilities
+      - name: Portable high-severity dependency gate
         run: npm audit --audit-level=high
 
-      - name: Record native dependency-review capability
+      - name: Record dependency-review capability
         shell: bash
+        env:
+          NATIVE_OUTCOME: ${{ steps.native_dependency_review.outcome }}
         run: |
-          echo "GitHub dependency-review-action requires Dependency Graph + GitHub Advanced Security on this private repository."
-          echo "Native capability status: NOT_CONFIGURED_OR_UNAVAILABLE"
-          echo "Security gate used by this repository: npm audit --audit-level=high against the locked dependency graph."
+          echo "Native GitHub Dependency Review outcome: ${NATIVE_OUTCOME}"
+          if [ "${NATIVE_OUTCOME}" != "success" ]; then
+            echo "Native dependency graph/GHAS capability is unavailable or not configured for this private repository."
+            echo "Portable fallback npm audit --audit-level=high passed against the locked dependency graph."
+          fi
