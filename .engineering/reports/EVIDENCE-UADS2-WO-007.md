@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-007 / M03 S05.2
 
-Status: IMPLEMENTATION VERIFIED / FINAL EXACT-HEAD HEDS PENDING
+Status: HEDS APPROVED / MERGED
 Issue: #30
 PR: #31
 Base main: `384e24ba947382d68a8215f494041cee7cf15670`
@@ -126,3 +126,35 @@ Do not merge until a fresh exact-head audit confirms:
 - CI / CodeQL / Dependency Review / Cross-Platform SUCCESS;
 - unresolved threads = 0;
 - no HIGH/CRITICAL defect.
+
+
+## Final exact-head HEDS evidence
+
+Exact reviewed head: `f20a5a2b5354c69886a6c0ca39fe301f3e87103f`
+Merge SHA: `a6b5e247065067d860627258fba7d123e465a78b`
+Exact-head CI run: `34411724139`
+Exact-head CI job: `102667437567`
+
+Final exact-head proof:
+- 53/53 test files PASS;
+- 489/489 tests PASS;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Cross-Platform Compatibility SUCCESS;
+- unresolved review threads = 0;
+- PR mergeable at audit = true.
+
+Exact-head benchmark sample:
+- B1 p50 = 1.095714 ms; p95 = 2.178033 ms; PASS;
+- B2 p50 = 1.835861 ms; p95 = 2.715253 ms; PASS;
+- B3 = 11,728 bytes/host; PASS;
+- B4 all four safety counters = 0; PASS.
+
+Validation rerun:
+- B1 p95 = 2.184672 ms;
+- B2 p95 = 2.808117 ms;
+- B3 = 11,728 bytes;
+- B4 all counters = 0.
+
+Runtime blobs on final HEDS head are identical to the implementation-tested snapshot.

@@ -3,39 +3,39 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_007_PR31_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
-  "completedWorkOrder": "UADS2-WO-006",
-  "completedPullRequest": 29,
-  "approvedHead": "7212f4f2f134589b655dcd4b480fa6dd699d8606",
-  "mergeCommit": "c1fff560a1a50a5806c6f84d6e7990e6d8bf07af",
-  "lastRecordedHead": "3683c3d125d32558409f2362ef722b414114fb14",
-  "activeWorkOrder": "UADS2-WO-007",
-  "activePullRequest": 31,
-  "activeBranch": "work/uads2-wo-007-m03-subject-passive-evidence",
+  "programState": "UADS2_WO_007_APPROVED_MERGED_M03_S05_3_NEXT",
+  "completedWorkOrder": "UADS2-WO-007",
+  "completedPullRequest": 31,
+  "approvedHead": "f20a5a2b5354c69886a6c0ca39fe301f3e87103f",
+  "mergeCommit": "a6b5e247065067d860627258fba7d123e465a78b",
+  "lastRecordedHead": "a6b5e247065067d860627258fba7d123e465a78b",
+  "activeWorkOrder": null,
+  "activePullRequest": null,
+  "activeBranch": null,
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.2 implemented; evidence frozen; fresh exact-head HEDS gates pending",
-  "nextNecessaryAction": "Wait for PR #31 fresh exact-head CI, CodeQL, Dependency Review and Cross-Platform SUCCESS, then HEDS. Do not merge/start active probes before APPROVED.",
+  "activeSession": "S05.2 approved/merged; S05.3 Probe Budget Fence core next",
+  "nextNecessaryAction": "Create UADS2-WO-008 for generic schema-closed READ_ONLY_LOCAL probe registry/executor. Use synthetic/cross-platform fixtures only; no Cursor/Codex-specific active probe or local-machine capability claim.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
   "m03": {
     "completedSlices": [
-      "S05.1"
+      "S05.1",
+      "S05.2"
     ],
-    "activeSlice": "S05.2",
-    "implementationHead": "3683c3d125d32558409f2362ef722b414114fb14",
-    "tests": {
-      "filesPassed": 53,
-      "testsPassed": 489
-    },
-    "benchmark": {
-      "B1P95Ms": 2.639622000000031,
-      "B2P95Ms": 3.453903999999966,
+    "nextSlice": "S05.3 Probe Budget Fence Core & Generic Safe Probe Executor",
+    "activeProbes": "GENERIC_SUBSTRATE_NEXT_VENDOR_SPECIFIC_NOT_AUTHORIZED",
+    "localMachineRequired": false,
+    "wo007": {
+      "approvedHead": "f20a5a2b5354c69886a6c0ca39fe301f3e87103f",
+      "mergeCommit": "a6b5e247065067d860627258fba7d123e465a78b",
+      "testFilesPassed": 53,
+      "testsPassed": 489,
+      "B1P95Ms": 2.178032999999971,
+      "B2P95Ms": 2.715252999999848,
       "B3Bytes": 11728,
       "B4AllZero": true
-    },
-    "passiveSupportedPath": false,
-    "activeProbes": "NOT_AUTHORIZED"
+    }
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [

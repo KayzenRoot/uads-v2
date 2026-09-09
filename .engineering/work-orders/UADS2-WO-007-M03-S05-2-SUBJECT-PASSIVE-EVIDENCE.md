@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-007
 
-Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
+Status: COMPLETED — HEDS APPROVED / MERGED
 Module: M03 — Host Capability Detector
 Slice: S05.2 — Host Subject Identity & Passive Evidence Bridge
 Repository: `KayzenRoot/uads-v2`
@@ -286,3 +286,22 @@ Benchmark sample:
 - U007-B4 all safety counters = 0.
 
 Final exact HEDS head will be auditor-bound after this evidence-only commit. Do not self-embed a mutable final SHA.
+
+
+## Final HEDS completion record
+
+- Exact reviewed head: `f20a5a2b5354c69886a6c0ca39fe301f3e87103f`
+- HEDS verdict: `APPROVED`
+- Review recording: exact-head COMMENT review because GitHub prohibits self-approval
+- CI: SUCCESS
+- CodeQL: SUCCESS
+- Dependency Review: SUCCESS
+- Cross-Platform Compatibility: SUCCESS
+- 53/53 test files PASS
+- 489/489 tests PASS
+- Exact-head U007-B1 p95: 2.178033 ms <= 25 ms
+- Exact-head U007-B2 p95: 2.715253 ms <= 100 ms
+- U007-B3: 11,728 bytes/host <= 65,536
+- U007-B4: inferredPositiveTrue=0 / absenceUnsupported=0 / replayAccepted=0 / driftMisses=0
+- PR #31 merge SHA: `a6b5e247065067d860627258fba7d123e465a78b`
+- M03 remains not S07-frozen

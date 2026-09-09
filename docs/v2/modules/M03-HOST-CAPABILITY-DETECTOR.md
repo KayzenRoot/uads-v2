@@ -1,6 +1,6 @@
 # M03 — Host Capability Detector
 
-Status: DISCOVERY — S00-S04 FROZEN / S05.1 APPROVED-MERGED / S05.2 NEXT
+Status: DISCOVERY — S00-S04 FROZEN / S05.1-S05.2 APPROVED-MERGED / S05.3 NEXT
 Class: NECESSARY
 
 Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools, telemetry or other host-dependent behavior.
@@ -29,8 +29,9 @@ Canonical accepted ADR:
 - S03: `docs/v2/modules/m03/M03-S03-FAILURE-SECURITY-RESILIENCE.md`
 - S04: `docs/v2/modules/m03/M03-S04-TEST-BENCHMARK-DESIGN.md`
 - S05.1: APPROVED / MERGED — PCCR core, integrity/freshness/drift, global proof store, conservative legacy projection and M30 best-effort telemetry.
-- S05.2: NEXT — stable host subject identity + passive evidence bridge using existing adapter/root facts. No subprocess or vendor-specific active probe yet.
-- Later S05 slices: bounded probe-registry/executor and vendor-specific experiments only after separate gates.
+- S05.2: APPROVED / MERGED — stable privacy-safe host subject identity, exact adapter/passive-state digests and passive PCCR evidence bridge. Host presence never becomes positive capability proof.
+- S05.3: NEXT — Probe Budget Fence core: schema-closed probe registry + bounded generic READ_ONLY_LOCAL executor using synthetic/cross-platform fixtures only. No Cursor/Codex-specific active probe.
+- Later S05 slices: vendor-specific experiments only after separate gates.
 - S06: future integration/hardening.
 - S07: future module freeze.
 

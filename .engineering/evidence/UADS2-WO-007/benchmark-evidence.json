@@ -1,7 +1,7 @@
 {
   "schema": "uads2.wo007.benchmark-evidence",
   "schemaVersion": "1.0.0",
-  "status": "IMPLEMENTATION_HEAD_VERIFIED_FINAL_HEDS_HEAD_PENDING",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "implementationHead": "3683c3d125d32558409f2362ef722b414114fb14",
   "sourceRunId": 34411074895,
   "sourceJobId": 102665372314,
@@ -50,6 +50,63 @@
       "B2": {
         "p50Ms": 2.2271729999999934,
         "p95Ms": 3.4402350000000297,
+        "targetP95Ms": 100,
+        "pass": true
+      },
+      "B3": {
+        "bytesPerHost": 11728,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "inferredPositiveTrue": 0,
+        "absenceUnsupported": 0,
+        "replayAccepted": 0,
+        "driftMisses": 0,
+        "pass": true
+      }
+    }
+  ],
+  "finalHead": "f20a5a2b5354c69886a6c0ca39fe301f3e87103f",
+  "finalSourceRunId": 34411724139,
+  "finalSourceJobId": 102667437567,
+  "finalSamples": [
+    {
+      "B1": {
+        "p50Ms": 1.0957140000000436,
+        "p95Ms": 2.178032999999971,
+        "targetP95Ms": 25,
+        "pass": true
+      },
+      "B2": {
+        "p50Ms": 1.8358610000000226,
+        "p95Ms": 2.715252999999848,
+        "targetP95Ms": 100,
+        "pass": true
+      },
+      "B3": {
+        "bytesPerHost": 11728,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "inferredPositiveTrue": 0,
+        "absenceUnsupported": 0,
+        "replayAccepted": 0,
+        "driftMisses": 0,
+        "pass": true
+      }
+    },
+    {
+      "B1": {
+        "p50Ms": 1.1136559999999918,
+        "p95Ms": 2.1846720000000914,
+        "targetP95Ms": 25,
+        "pass": true
+      },
+      "B2": {
+        "p50Ms": 1.8570479999998497,
+        "p95Ms": 2.808116999999811,
         "targetP95Ms": 100,
         "pass": true
       },

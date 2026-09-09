@@ -1,31 +1,28 @@
 # CHECKPOINT DELTA — UADS2-WO-007
 
-Status: IMPLEMENTED / NOT PROMOTED / HEDS PENDING
+Status: PROMOTED
 Module: M03 S05.2
 Issue: #30
 PR: #31
-Implementation head: `3683c3d125d32558409f2362ef722b414114fb14`
+Reviewed head: `f20a5a2b5354c69886a6c0ca39fe301f3e87103f`
+Merge SHA: `a6b5e247065067d860627258fba7d123e465a78b`
 
-## Candidate promotion after exact-head HEDS APPROVED
+## Promoted
+- HostCapabilitySubject.
+- Exact fixed adapter-contract digest.
+- Passive state digest.
+- Passive declaration-to-PCCR bridge.
+- Zero passive positive SUPPORTED path.
+- Exact generic negative E2 NPC path only when target/current basis is present.
+- Missing/blocked target -> UNKNOWN.
+- Root/status drift invalidation.
+- Conservative projection.
+- No process/shell/network/vendor-specific probe.
+- U007-T001..T025.
+- U007-B1..B4.
+- Exact-head hosted gates.
 
-- stable privacy-safe HostCapabilitySubject;
-- exact adapter contract digest;
-- passive state digest bound into PCCR configurationDigest;
-- passive adapter declaration -> PCCR bridge;
-- zero passive positive SUPPORTED path;
-- generic exact false declarations -> E2 NPC only when target present/current;
-- missing/blocked target -> UNKNOWN;
-- root/status drift invalidates old negative proof;
-- conservative proof-aware legacy projection;
-- no child process/shell/network/vendor-specific active probe;
-- U007-T001..T025 PASS;
-- U007-B1..B4 PASS;
-- WO-006 replay/integrity protections preserved.
+## Next
+UADS2-WO-008 — M03 S05.3 Probe Budget Fence Core & Generic Safe Probe Executor.
 
-## Not promoted
-
-- no positive host capability proof;
-- no active probe;
-- no future capability IDs;
-- no host-dispatch migration;
-- no M03 S07 freeze.
+Vendor-specific probes remain unauthorized.
