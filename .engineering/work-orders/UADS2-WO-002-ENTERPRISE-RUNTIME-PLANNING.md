@@ -1,10 +1,11 @@
 # Work Order — `UADS2-WO-002`
 
-Status: `ACTIVE — PLANNING/GOVERNANCE ONLY`
+Status: `READY_FOR_EXACT_HEAD_HEDS`
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-002-enterprise-runtime-planning`
 Base Git SHA: `097a09d9d49d3b3b732c0ba7a9cbd74b0a973731`
 Issue: #19
+PR: #20
 Scope class: `cross-cutting planning`
 Risk: `MEDIUM`
 
@@ -34,19 +35,19 @@ No runtime code, dashboard runtime, orchestrator implementation, V1 modification
 5. Continuous operations & safe delivery.
 
 ## Acceptance criteria
-- [ ] all 26 existing modules audited and mapped;
-- [ ] every necessary GAP has an explicit owner;
-- [ ] no new module duplicates an existing core mission;
-- [ ] ADR-UADS2-010 accepted and recorded;
-- [ ] Architecture defines a production-readiness plane;
-- [ ] Security includes threat model, least privilege, secrets, supply chain/SBOM, validation, audit and incident response;
-- [ ] Deployment includes migration, release gates, compatibility, post-deploy verification and rollback triggers;
-- [ ] DoD requires applicable SLI/SLO, capacity, resilience, security, observability and safe-delivery evidence;
-- [ ] B-001 V2 event proof has explicit ownership and cannot be weakened;
-- [ ] M01 S00 consumes WO-001 baseline rather than repeating unsupported V1 telemetry;
-- [ ] dashboard-first sequencing is objective and event-backed;
-- [ ] module manifest is consistent at 31 modules;
-- [ ] no runtime source path changed;
+- [x] all 26 existing modules audited and mapped;
+- [x] every necessary GAP has an explicit owner;
+- [x] no new module duplicates an existing core mission;
+- [x] ADR-UADS2-010 accepted and recorded;
+- [x] Architecture defines a production-readiness plane;
+- [x] Security includes threat model, least privilege, secrets, supply chain/SBOM, validation, audit and incident response;
+- [x] Deployment includes migration, release gates, compatibility, post-deploy verification and rollback triggers;
+- [x] DoD requires applicable SLI/SLO, capacity, resilience, security, observability and safe-delivery evidence;
+- [x] B-001 V2 event proof has explicit ownership and cannot be weakened;
+- [x] M01 S00 consumes WO-001 baseline rather than repeating unsupported V1 telemetry;
+- [x] dashboard-first sequencing is objective and event-backed;
+- [x] module manifest is consistent at 31 modules;
+- [x] no runtime source path changed;
 - [ ] exact-head CI gates pass;
 - [ ] HEDS returns `APPROVED` before runtime implementation.
 
@@ -62,4 +63,4 @@ M27/M28/M29/M31 shape every runtime slice from the beginning.
 Stop on runtime scope creep, duplicated authority, unsupported production-readiness claims, B-001 weakening, fabricated real-time UI data, stale source truth, or unresolved HIGH/CRITICAL governance defect.
 
 ## Review
-HEDS exact-head review. Issue #19. Target base: `main`.
+HEDS exact-head review. Issue #19. PR #20. Target base: `main`.
