@@ -4,15 +4,15 @@ Status: CANONICAL OVERLAY IN REVIEW
 
 | ID | Decision | Status |
 | --- | --- | --- |
-| ADR-UADS2-001 | Exact frozen V1 baseline; V1 untouched | ACCEPTED |
-| ADR-UADS2-002 | Coordinator + max one active specialist; sequential default | ACCEPTED |
-| ADR-UADS2-003 | One visible primary session; background only with proven capability | ACCEPTED |
-| ADR-UADS2-004 | Capability-aware model + reasoning-effort routing | ACCEPTED |
-| ADR-UADS2-005 | Hive macro/canonical truth; UADS bounded execution | ACCEPTED |
-| ADR-UADS2-006 | HEDS canonical review/delivery model | ACCEPTED |
-| ADR-UADS2-007 | Experience/Policy activation requires measured experiment + rollback | PROPOSED / EXPERIMENT REQUIRED |
-| ADR-UADS2-008 | Standalone-first; Hive optional/additive | ACCEPTED |
-| ADR-UADS2-009 | Dashboard-first event-backed real-time operations | ACCEPTED |
-| ADR-UADS2-010 | Enterprise production-readiness contract with mandatory five-pillar classification and M27–M31 cross-cutting owners | ACCEPTED |
+| ADR-UADS2-001 | Continue V2 from exact frozen V1 baseline; V1 remains untouched | ACCEPTED |
+| ADR-UADS2-002 | Coordinator + maximum one active specialist worker; sequential default | ACCEPTED |
+| ADR-UADS2-003 | One visible primary session; background workers only with proven host capability | ACCEPTED |
+| ADR-UADS2-004 | Capability-aware automatic model + reasoning-effort routing | ACCEPTED |
+| ADR-UADS2-005 | Hive owns macro/canonical truth; UADS owns bounded execution/micro-orchestration | ACCEPTED |
+| ADR-UADS2-006 | Adopt HEDS as the canonical UADS V2 review & engineering-delivery model in SOLO and HIVE_CONNECTED modes | ACCEPTED |
+| ADR-UADS2-007 | Experience Engine / Policy Memory activation requires measured experiment and rollback | PROPOSED / EXPERIMENT REQUIRED |
+| ADR-UADS2-008 | UADS V2 is standalone-first; Hive integration is optional and additive | ACCEPTED |
+| ADR-UADS2-009 | Dashboard-first real-time operations: live system state, errors, diagnostics and new module observability are first-class; latest owner-approved visual concept is canonical visual target | ACCEPTED |
+| ADR-UADS2-010 | Enterprise production-readiness contract: mandatory scale/load, resilience, operational security, production observability and continuous safe-operations classification with M27–M31 cross-cutting owners | ACCEPTED |
 
-Accepted decisions require explicit supersession, never silent overwrite.
+No accepted decision may be silently overwritten. Supersession requires a new ADR and checkpoint delta.
