@@ -58,6 +58,15 @@ function summary(values) {
 }
 
 const retained = readOperationalEvents(paths, { limit: 200 }).health.validEventCount;
+const retentionProbeCap = 8;
+const retentionProbeProjectId = `${projectId}-retention-probe`;
+const retentionProbePaths = ensureWorkspace(retentionProbeProjectId, home);
+const retentionProbeEvents = [];
+for (let index = 0; index < retentionProbeCap + 2; index += 1) {
+  retentionProbeEvents.push(persistOperationalEvent(retentionProbePaths, { ...event(index), projectId: retentionProbeProjectId }, { retention: retentionProbeCap }));
+}
+const retentionProbeRead = readOperationalEvents(retentionProbePaths, { limit: 200 });
+const retentionProbeIds = new Set(retentionProbeRead.events.map((item) => item.eventId));
 const result = {
   schema: "uads.m30-benchmark",
   schemaVersion: "1.0.0",
@@ -70,7 +79,17 @@ const result = {
   dashboardSnapshotLatency: summary(durations.snapshots),
   retentionCap: DEFAULT_OPERATIONAL_EVENT_RETENTION,
   retainedEventCount: retained,
-  limitations: ["single Windows developer host", "no production SLO inferred", "synchronous filesystem path", "benchmark uses bounded 24-event sample"],
+  retentionProbe: {
+    configuredCap: retentionProbeCap,
+    inputEventCount: retentionProbeEvents.length,
+    retainedEventCount: retentionProbeRead.events.length,
+    removedEventCount: retentionProbeEvents.length - retentionProbeRead.events.length,
+    withinCap: retentionProbeRead.events.length <= retentionProbeCap,
+    oldestRemoved: !retentionProbeIds.has(retentionProbeEvents[0].eventId),
+    newestRetained: retentionProbeIds.has(retentionProbeEvents.at(-1).eventId),
+    health: retentionProbeRead.health.status,
+  },
+  limitations: ["single Windows developer host", "no production SLO inferred", "synchronous filesystem path", "latency sample uses 24 events; retention probe uses an explicit bounded cap of 8 to exercise over-cap cleanup deterministically"],
 };
 
 const outputArgument = process.argv.find((argument) => argument.startsWith("--output="));

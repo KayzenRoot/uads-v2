@@ -40,6 +40,18 @@ function hubFor(paths: UadsPaths): EventHub {
   return hub;
 }
 
+/** Compare JavaScript strings by UTF-16 code units, without locale-dependent rules. */
+export function compareCanonicalKeys(left: string, right: string): number {
+  const length = Math.min(left.length, right.length);
+  for (let index = 0; index < length; index += 1) {
+    const difference = left.charCodeAt(index) - right.charCodeAt(index);
+    if (difference !== 0) {
+      return difference;
+    }
+  }
+  return left.length - right.length;
+}
+
 export function subscribeOperationalEvents(
   paths: UadsPaths,
   listener: (event: OperationalEvent) => void,
@@ -57,7 +69,7 @@ function canonicalValue(value: unknown): unknown {
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>)
         .filter(([, nested]) => nested !== undefined)
-        .sort(([left], [right]) => left.localeCompare(right))
+        .sort(([left], [right]) => compareCanonicalKeys(left, right))
         .map(([key, nested]) => [key, canonicalValue(nested)]),
     );
   }
@@ -186,7 +198,7 @@ export function enforceOperationalRetention(
         return { file, mtime: 0 };
       }
     })
-    .sort((left, right) => left.mtime - right.mtime || left.file.localeCompare(right.file));
+    .sort((left, right) => left.mtime - right.mtime || compareCanonicalKeys(left.file, right.file));
   let removed = 0;
   const errors: string[] = [];
   for (const item of ordered.slice(0, files.length - boundedRetention)) {

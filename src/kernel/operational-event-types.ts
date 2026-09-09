@@ -13,6 +13,12 @@ export type OperationalEventType =
 
 export type OperationalSeverity = "debug" | "info" | "warn" | "error" | "critical";
 export type OperationalState = "HEALTHY" | "DEGRADED" | "UNAVAILABLE";
+export type OperationalPayloadPrimitive = string | number | boolean | null;
+export interface OperationalPayloadValueArray extends Array<OperationalPayloadPrimitive | OperationalPayload | OperationalPayloadValueArray> {}
+export interface OperationalPayload {
+  [key: string]: OperationalPayloadPrimitive | OperationalPayload | OperationalPayloadValueArray;
+}
+export type OperationalPayloadValue = OperationalPayloadPrimitive | OperationalPayload | OperationalPayloadValueArray;
 
 export type OperationalEvent = {
   schema: typeof OPERATIONAL_EVENT_SCHEMA;
@@ -35,7 +41,7 @@ export type OperationalEvent = {
   normalizedSubjectPath?: string;
   normalizedFindingCode?: string;
   evidenceDigest?: string;
-  payload?: Record<string, string | number | boolean | null>;
+  payload?: OperationalPayload;
 };
 
 export type OperationalEventInput = Omit<

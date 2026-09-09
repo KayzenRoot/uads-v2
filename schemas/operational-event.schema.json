@@ -3,6 +3,26 @@
   "$id": "https://uads.dev/schemas/operational-event.schema.json",
   "title": "UADS Operational Event",
   "description": "Closed, versioned, privacy-safe operational event transported by M30.",
+  "$defs": {
+    "payloadValue": {
+      "anyOf": [
+        { "type": "string", "maxLength": 1000 },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" },
+        {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": { "$ref": "#/$defs/payloadValue" }
+        },
+        {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "$ref": "#/$defs/payloadValue" }
+        }
+      ]
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -63,14 +83,7 @@
     "payload": {
       "type": "object",
       "maxProperties": 32,
-      "additionalProperties": {
-        "anyOf": [
-          { "type": "string", "maxLength": 1000 },
-          { "type": "number" },
-          { "type": "boolean" },
-          { "type": "null" }
-        ]
-      }
+      "additionalProperties": { "$ref": "#/$defs/payloadValue" }
     }
   },
   "allOf": [

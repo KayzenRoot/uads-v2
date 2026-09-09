@@ -6,6 +6,8 @@ import { describe, expect, it } from "vitest";
 import { validateAgainstSchema } from "../src/lib/json-schema.js";
 import { ensureWorkspace } from "../src/lib/workspace.js";
 import {
+  MAX_OPERATIONAL_EVENT_BYTES,
+  MAX_OPERATIONAL_EVENT_PAYLOAD_KEYS,
   computeB001AnalysisMetrics,
   computeOperationalEventHash,
   createOperationalEvent,
@@ -57,6 +59,33 @@ describe("M30 operational event spine", () => {
     expect(validateAgainstSchema("operational-event.schema.json", { ...event, schemaVersion: "9.0.0" })).not.toEqual([]);
   });
 
+  it("fails closed at the serialized event and payload key ceilings", () => {
+    const oversizedPayload = Object.fromEntries(
+      Array.from({ length: MAX_OPERATIONAL_EVENT_PAYLOAD_KEYS }, (_, outer) => [
+        `group-${outer}`,
+        Object.fromEntries(Array.from({ length: MAX_OPERATIONAL_EVENT_PAYLOAD_KEYS }, (_, inner) => [`key-${inner}`, "x".repeat(100)])),
+      ]),
+    );
+    expect(() => createOperationalEvent(input({ payload: oversizedPayload }))).toThrow(new RegExp(`${MAX_OPERATIONAL_EVENT_BYTES} byte limit`));
+
+    const tooManyKeys = Object.fromEntries(Array.from({ length: MAX_OPERATIONAL_EVENT_PAYLOAD_KEYS + 1 }, (_, index) => [`key-${index}`, true]));
+    expect(() => createOperationalEvent(input({ payload: tooManyKeys }))).toThrow(/more than 32 properties|payload exceeds/);
+  });
+
+  it("hashes semantically identical nested payloads identically regardless of insertion order", () => {
+    const first = createOperationalEvent(input({
+      eventId: "11111111-1111-4111-8111-111111111111",
+      recordedAt: "2026-09-09T12:00:00.000Z",
+      payload: { outer: { zeta: 2, alpha: 1 }, list: [{ beta: true, alpha: null }] },
+    }));
+    const second = createOperationalEvent(input({
+      eventId: "11111111-1111-4111-8111-111111111111",
+      recordedAt: "2026-09-09T12:00:00.000Z",
+      payload: { list: [{ alpha: null, beta: true }], outer: { alpha: 1, zeta: 2 } },
+    }));
+    expect(second.eventHash).toBe(first.eventHash);
+  });
+
   it("redacts sensitive text, creates stable hashes, and preserves immutable records", () => {
     const home = temporaryHome();
     const paths = ensureWorkspace("project-m30", home);
@@ -79,17 +108,35 @@ describe("M30 operational event spine", () => {
     expect(read.health.status).toBe("HEALTHY");
   });
 
-  it("skips corrupt and hash-mismatched records with degraded health", () => {
+  it("skips corrupt, unsupported and hash-mismatched records with degraded health", () => {
     const home = temporaryHome();
     const paths = ensureWorkspace("project-m30", home);
     const valid = persistOperationalEvent(paths, input() as OperationalEventInput);
     fs.writeFileSync(path.join(paths.observabilityEvents, "corrupt.json"), "{not-json", "utf8");
     const tampered = { ...valid, message: "tampered" };
     fs.writeFileSync(path.join(paths.observabilityEvents, "tampered.json"), `${JSON.stringify(tampered)}\n`, "utf8");
+    fs.writeFileSync(path.join(paths.observabilityEvents, "unsupported.json"), `${JSON.stringify({ ...valid, schemaVersion: "9.0.0" })}\n`, "utf8");
     const read = readOperationalEvents(paths, { limit: 200 });
     expect(read.events.map((event) => event.eventId)).toEqual([valid.eventId]);
     expect(read.health.status).toBe("DEGRADED");
-    expect(read.health.invalidEventCount).toBe(2);
+    expect(read.health.invalidEventCount).toBe(3);
+    expect(read.health.reasonCodes).toEqual(expect.arrayContaining(["UNSUPPORTED_EVENT_VERSION", "EVENT_HASH_MISMATCH", "INVALID_EVENT_RECORD"]));
+  });
+
+  it("reloads after workspace re-instantiation and protects adjacent sidecar state", () => {
+    const home = temporaryHome();
+    const paths = ensureWorkspace("project-m30", home);
+    fs.writeFileSync(path.join(paths.evidence, "adjacent.json"), "adjacent-state", "utf8");
+    const persisted = persistOperationalEvent(paths, input({ eventId: "22222222-2222-4222-8222-222222222222" }), { retention: 2 });
+    const reloadedPaths = ensureWorkspace("project-m30", home);
+    const reloaded = readOperationalEvents(reloadedPaths);
+    expect(reloaded.events[0]?.eventId).toBe(persisted.eventId);
+    expect(reloaded.events[0]?.eventHash).toBe(persisted.eventHash);
+
+    persistOperationalEvent(reloadedPaths, input({ eventId: "33333333-3333-4333-8333-333333333333", occurredAt: "2026-09-09T12:00:01.000Z" }), { retention: 2 });
+    persistOperationalEvent(reloadedPaths, input({ eventId: "44444444-4444-4444-8444-444444444444", occurredAt: "2026-09-09T12:00:02.000Z" }), { retention: 2 });
+    expect(fs.readdirSync(reloadedPaths.observabilityEvents).filter((name) => name.endsWith(".json"))).toHaveLength(2);
+    expect(fs.readFileSync(path.join(reloadedPaths.evidence, "adjacent.json"), "utf8")).toBe("adjacent-state");
   });
 
   it("enforces bounded retention and recomputes B-001 duplicate metrics deterministically", () => {

@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ensureWorkspace } from "../src/lib/workspace.js";
-import { createDashboardServer } from "../src/commands/dashboard.js";
+import { createDashboardServer, MAX_SSE_CLIENTS } from "../src/commands/dashboard.js";
 import { persistOperationalEvent } from "../src/kernel/operational-events.js";
 import type { OperationalEventInput } from "../src/kernel/operational-event-types.js";
 
@@ -18,6 +18,15 @@ function get(port: number, requestPath: string): Promise<{ status: number; heade
       const chunks: Buffer[] = [];
       response.on("data", (chunk: Buffer) => chunks.push(chunk));
       response.on("end", () => resolve({ status: response.statusCode ?? 0, headers: response.headers, body: Buffer.concat(chunks).toString("utf8") }));
+    });
+    request.on("error", reject);
+  });
+}
+
+function openStream(port: number): Promise<{ request: http.ClientRequest; response: http.IncomingMessage }> {
+  return new Promise((resolve, reject) => {
+    const request = http.get({ host: "127.0.0.1", port, path: "/api/stream" }, (response) => {
+      response.once("data", () => resolve({ request, response }));
     });
     request.on("error", reject);
   });
@@ -60,7 +69,7 @@ describe("M30 dashboard operator surface", () => {
     const event: OperationalEventInput = {
       projectId: snapshotBody.projectId,
       correlationId: "dashboard-corr",
-      workOrderId: null,
+      workOrderId: "UADS2-WO-003",
       executionRunId: null,
       reviewId: null,
       eventType: "system.diagnostic",
@@ -73,7 +82,57 @@ describe("M30 dashboard operator surface", () => {
     const persisted = persistOperationalEvent(paths, event);
     const chunk = await nextEvent;
     expect(chunk).toContain(persisted.eventId);
+    persistOperationalEvent(paths, {
+      ...event,
+      eventId: undefined,
+      correlationId: "dashboard-error-corr",
+      eventType: "system.error",
+      severity: "error",
+      operationalState: "DEGRADED",
+      message: "objective error event",
+      occurredAt: "2026-09-09T12:00:01.000Z",
+    });
+    const populated = JSON.parse((await get(address.port, "/api/snapshot")).body) as {
+      latestActivity: { workOrderId: string | null; correlationId: string };
+      recentErrors: Array<{ message?: string }>;
+      recentDiagnostics: Array<{ message?: string }>;
+    };
+    expect(populated.latestActivity.workOrderId).toBe("UADS2-WO-003");
+    expect(populated.latestActivity.correlationId).toBe("dashboard-error-corr");
+    expect(populated.recentErrors.some((item) => item.message === "objective error event")).toBe(true);
+    expect(populated.recentDiagnostics.some((item) => item.message === "diagnostic event")).toBe(true);
+    const populatedHtml = await get(address.port, "/");
+    expect(populatedHtml.body).toContain("Work Order and correlation");
+    expect(populatedHtml.body).toContain("Existing UADS status");
     streamResponse.response.destroy();
+    await dashboard.stop();
+  });
+
+  it("enforces the SSE client bound and cleans up disconnected clients", async () => {
+    const home = temporaryHome();
+    const dashboard = createDashboardServer({ cwd: process.cwd(), uadsHome: home, host: "127.0.0.1", port: 0 });
+    const address = await dashboard.start();
+    const clients = await Promise.all(Array.from({ length: MAX_SSE_CLIENTS }, () => openStream(address.port)));
+    const rejected = await get(address.port, "/api/stream");
+    expect(rejected.status).toBe(503);
+    expect(rejected.body).toContain("sse-client-limit");
+    await new Promise<void>((resolve) => {
+      const response = clients[0]?.response;
+      if (!response) {
+        resolve();
+        return;
+      }
+      response.once("close", resolve);
+      response.destroy();
+      clients[0]?.request.destroy();
+    });
+    await new Promise<void>((resolve) => setTimeout(resolve, 50));
+    const replacement = await openStream(address.port);
+    expect(replacement.response.statusCode).toBe(200);
+    for (const client of [...clients.slice(1), replacement]) {
+      client.response.destroy();
+      client.request.destroy();
+    }
     await dashboard.stop();
   });
 

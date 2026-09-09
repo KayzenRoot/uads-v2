@@ -9,28 +9,38 @@
   },
   "method": "synchronous local sidecar writes and bounded reads measured with performance.now()",
   "sampleCount": 24,
-  "writeThroughputEventsPerSecond": 28.12,
+  "writeThroughputEventsPerSecond": 26.04,
   "writeLatency": {
-    "p50Ms": 33.387,
-    "p95Ms": 47.059,
+    "p50Ms": 35.402,
+    "p95Ms": 58.961,
     "samples": 24
   },
   "boundedReadLatency": {
-    "p50Ms": 30.412,
-    "p95Ms": 38.117,
+    "p50Ms": 37.066,
+    "p95Ms": 50.903,
     "samples": 24
   },
   "dashboardSnapshotLatency": {
-    "p50Ms": 1501.025,
-    "p95Ms": 2018.625,
+    "p50Ms": 1659.012,
+    "p95Ms": 2174.484,
     "samples": 24
   },
   "retentionCap": 1000,
   "retainedEventCount": 24,
+  "retentionProbe": {
+    "configuredCap": 8,
+    "inputEventCount": 10,
+    "retainedEventCount": 8,
+    "removedEventCount": 2,
+    "withinCap": true,
+    "oldestRemoved": true,
+    "newestRetained": true,
+    "health": "HEALTHY"
+  },
   "limitations": [
     "single Windows developer host",
     "no production SLO inferred",
     "synchronous filesystem path",
-    "benchmark uses bounded 24-event sample"
+    "latency sample uses 24 events; retention probe uses an explicit bounded cap of 8 to exercise over-cap cleanup deterministically"
   ]
 }

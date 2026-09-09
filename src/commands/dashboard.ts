@@ -17,7 +17,7 @@ import type { OperationalEvent, OperationalHealth } from "../kernel/operational-
 
 const LOOPBACK_HOST = "127.0.0.1";
 const DEFAULT_DASHBOARD_PORT = 8765;
-const MAX_SSE_CLIENTS = 8;
+export const MAX_SSE_CLIENTS = 8;
 const SSE_HEARTBEAT_MS = 15_000;
 const SSE_POLL_MS = 1_000;
 
@@ -106,11 +106,12 @@ const DASHBOARD_HTML = `<!doctype html>
 <style>
 :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#07111f;color:#d9e7f5}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#123050 0,#07111f 42%,#050a12 100%);min-height:100vh}.wrap{max-width:1180px;margin:auto;padding:32px 22px}.top{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:24px}.eyebrow{color:#63d5ff;letter-spacing:.18em;font-size:11px;text-transform:uppercase}.title{font-size:32px;margin:6px 0 0}.health{border:1px solid #2e5872;border-radius:14px;padding:14px 18px;min-width:170px}.health b{display:block;font-size:20px;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.panel{background:rgba(11,26,43,.88);border:1px solid #21435c;border-radius:14px;padding:18px;box-shadow:0 12px 38px #02060b66}.wide{grid-column:span 2}.label{color:#83a9c1;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.value{font-size:24px;margin-top:8px}.mono{font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px;word-break:break-word}.list{display:grid;gap:8px;margin-top:12px}.item{border-left:2px solid #2a91bd;padding:8px 10px;background:#091827}.muted{color:#83a9c1}.state-HEALTHY{color:#5be0a1}.state-DEGRADED{color:#ffd166}.state-UNAVAILABLE{color:#ff8b8b}@media(max-width:760px){.top{display:block}.health{margin-top:16px}.grid{grid-template-columns:1fr 1fr}.wide{grid-column:span 2}}@media(max-width:480px){.grid{grid-template-columns:1fr}.wide{grid-column:span 1}}
 </style></head><body><main class="wrap"><div class="top"><div><div class="eyebrow">UADS V2 / M30</div><h1 class="title">Operator dashboard</h1><div id="project" class="muted mono">Loading objective state…</div></div><div class="health"><span class="label">M30 health</span><b id="health">UNAVAILABLE</b></div></div>
-<section class="grid"><div class="panel"><div class="label">Events</div><div id="events" class="value">UNAVAILABLE</div></div><div class="panel"><div class="label">B-001 denominator</div><div id="denominator" class="value">UNAVAILABLE</div></div><div class="panel"><div class="label">B-001 duplicate rate</div><div id="rate" class="value">UNAVAILABLE</div></div><div class="panel"><div class="label">Stream</div><div id="stream" class="value">CONNECTING</div></div><div class="panel wide"><div class="label">Latest activity</div><div id="latest" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel wide"><div class="label">Recent errors and diagnostics</div><div id="issues" class="list"><div class="muted">UNAVAILABLE</div></div></div></section></main>
+<section class="grid"><div class="panel"><div class="label">Events</div><div id="events" class="value">UNAVAILABLE</div></div><div class="panel"><div class="label">B-001 denominator</div><div id="denominator" class="value">UNAVAILABLE</div></div><div class="panel"><div class="label">B-001 duplicate rate</div><div id="rate" class="value">UNAVAILABLE</div></div><div class="panel"><div class="label">Stream</div><div id="stream" class="value">CONNECTING</div></div><div class="panel wide"><div class="label">Work Order and correlation</div><div id="identity" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel wide"><div class="label">Existing UADS status</div><div id="uads-status" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel wide"><div class="label">Latest activity</div><div id="latest" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel wide"><div class="label">Recent errors and diagnostics</div><div id="issues" class="list"><div class="muted">UNAVAILABLE</div></div></div></section></main>
 <script>
 const esc=(v)=>String(v??"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const renderEvent=(e)=>e?'<div class="item"><div>'+esc(e.eventType)+' <span class="muted">'+esc(e.severity)+'</span></div><div class="mono muted">'+esc(e.message||e.sourceComponent)+' · '+esc(e.recordedAt)+'</div></div>':'<div class="muted">UNAVAILABLE</div>';
-function render(s){document.querySelector('#health').textContent=s.health.status;document.querySelector('#health').className='state-'+s.health.status;document.querySelector('#project').textContent='project '+s.projectId;document.querySelector('#events').textContent=String(s.eventCounts.total);document.querySelector('#denominator').textContent=s.b001.denominator?String(s.b001.denominator):'UNAVAILABLE';document.querySelector('#rate').textContent=s.b001.rate===null?'UNAVAILABLE':(s.b001.rate*100).toFixed(2)+'%';document.querySelector('#latest').innerHTML=renderEvent(s.latestActivity);const all=[...(s.recentErrors||[]),...(s.recentDiagnostics||[])].slice(0,8);document.querySelector('#issues').innerHTML=all.length?all.map(renderEvent).join(''):'<div class="muted">UNAVAILABLE</div>'}
+const field=(label,value)=>'<div class="item"><span class="muted">'+esc(label)+'</span><div class="mono">'+esc(value===null||value===undefined||value===''?'UNAVAILABLE':value)+'</div></div>';
+function render(s){document.querySelector('#health').textContent=s.health.status;document.querySelector('#health').className='state-'+s.health.status;document.querySelector('#project').textContent='project '+s.projectId;document.querySelector('#events').textContent=String(s.eventCounts.total);document.querySelector('#denominator').textContent=s.b001.denominator?String(s.b001.denominator):'UNAVAILABLE';document.querySelector('#rate').textContent=s.b001.rate===null?'UNAVAILABLE':(s.b001.rate*100).toFixed(2)+'%';const latest=s.latestActivity;document.querySelector('#identity').innerHTML=[['Work Order ID',latest?.workOrderId],['Correlation ID',latest?.correlationId],['Execution Run ID',latest?.executionRunId]].map(([label,value])=>field(label,value)).join('');const status=s.uadsStatus||{};document.querySelector('#uads-status').innerHTML=[['Phase',status.phase],['Next action',status.nextAction],['Working tree',status.workingTree],['Cost budget',status.costBudgetStatus],['Model routing',status.modelRoutingStatus],['Specialist selection',status.specialistSelectionStatus]].map(([label,value])=>field(label,value)).join('');document.querySelector('#latest').innerHTML=renderEvent(latest);const all=[...(s.recentErrors||[]),...(s.recentDiagnostics||[])].slice(0,8);document.querySelector('#issues').innerHTML=all.length?all.map(renderEvent).join(''):'<div class="muted">UNAVAILABLE</div>'}
 fetch('/api/snapshot').then(r=>r.json()).then(render).catch(()=>{});const stream=new EventSource('/api/stream');stream.onopen=()=>document.querySelector('#stream').textContent='CONNECTED';stream.onerror=()=>document.querySelector('#stream').textContent='DEGRADED';stream.addEventListener('operational',()=>fetch('/api/snapshot').then(r=>r.json()).then(render).catch(()=>{}));
 </script></body></html>`;
 
@@ -254,13 +255,13 @@ export class DashboardServer {
       return;
     }
     if (url.pathname === "/api/stream") {
-      this.openStream(res);
+      this.openStream(req, res);
       return;
     }
     jsonResponse(res, 404, { error: "not-found" });
   }
 
-  private openStream(res: http.ServerResponse): void {
+  private openStream(req: http.IncomingMessage, res: http.ServerResponse): void {
     if (this.clients.size >= MAX_SSE_CLIENTS) {
       res.setHeader("Retry-After", "5");
       jsonResponse(res, 503, { error: "sse-client-limit" });
@@ -276,7 +277,9 @@ export class DashboardServer {
     for (const event of initial) {
       res.write(`event: operational\ndata: ${JSON.stringify(event)}\n\n`);
     }
-    res.on("close", () => this.clients.delete(res));
+    const cleanup = () => this.clients.delete(res);
+    res.on("close", cleanup);
+    req.socket?.on("close", cleanup);
   }
 }
 

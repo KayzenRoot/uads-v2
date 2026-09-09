@@ -9,8 +9,8 @@
   "signatureVersion": "normalized-structured-analysis-signature-v1",
   "persistedEvents": [
     {
-      "eventId": "3f6dd012-a0ce-490b-936c-6f7aaba9b17e",
-      "eventHash": "0f792c0c035bb5fe93854a6dbaab0849058aee57d34831745ab284a6b1991cfa",
+      "eventId": "080348ef-d493-4f7e-baeb-489387f8dd90",
+      "eventHash": "6d1c8a54df434ef71f40607dfdbd5d0ac5558af6886e5202fd6f424f3bbf9b1c",
       "eventType": "review.analysis",
       "gate": "focused-review",
       "normalizedSubjectPath": "src/kernel/operational-events.ts",
@@ -18,8 +18,8 @@
       "evidenceDigest": "a0949209a4fb1d21086eb4c6c4a5a90dc01c32188276e80fc1363bc7c65fbe79"
     },
     {
-      "eventId": "92143adf-edf1-4358-9c45-2439afb43b21",
-      "eventHash": "af79974e71e8d6a843978504ba8bcab08a5e506c118f22c48cba75c4bf0f34e3",
+      "eventId": "17ca3f28-0f4c-4033-bc5d-76210cada516",
+      "eventHash": "2d892da7bde71a7594a21e967dc61081814f184c8df13a7b7d4e6d2ad10abd9d",
       "eventType": "review.analysis",
       "gate": "focused-review",
       "normalizedSubjectPath": "src/kernel/operational-events.ts",
@@ -33,8 +33,8 @@
     "denominator": 2,
     "rate": 0.5,
     "rawEventHashes": [
-      "0f792c0c035bb5fe93854a6dbaab0849058aee57d34831745ab284a6b1991cfa",
-      "af79974e71e8d6a843978504ba8bcab08a5e506c118f22c48cba75c4bf0f34e3"
+      "2d892da7bde71a7594a21e967dc61081814f184c8df13a7b7d4e6d2ad10abd9d",
+      "6d1c8a54df434ef71f40607dfdbd5d0ac5558af6886e5202fd6f424f3bbf9b1c"
     ]
   },
   "assertions": {
