@@ -12,5 +12,6 @@ Status: CANONICAL OVERLAY IN REVIEW
 | ADR-UADS2-006 | Adopt HEDS as the canonical UADS V2 review & engineering-delivery model in SOLO and HIVE_CONNECTED modes | ACCEPTED |
 | ADR-UADS2-007 | Experience Engine / Policy Memory activation requires measured experiment and rollback | PROPOSED / EXPERIMENT REQUIRED |
 | ADR-UADS2-008 | UADS V2 is standalone-first; Hive integration is optional and additive | ACCEPTED |
+| ADR-UADS2-009 | Dashboard-first real-time operations: live system state, errors, diagnostics and new module observability are first-class; latest owner-approved visual concept is canonical visual target | ACCEPTED |
 
 No accepted decision may be silently overwritten. Supersession requires a new ADR and checkpoint delta.
