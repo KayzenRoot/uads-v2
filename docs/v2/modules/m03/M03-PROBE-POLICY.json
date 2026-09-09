@@ -1,0 +1,31 @@
+{
+  "schema": "uads2.m03.probe-policy",
+  "schemaVersion": "1.0.0-planning",
+  "status": "FROZEN_CANDIDATE_HEDS_PENDING",
+  "automaticAllowed": [
+    "READ_ONLY_LOCAL"
+  ],
+  "conditional": [
+    "TEMPORARY_LOCAL"
+  ],
+  "blockedByDefault": [
+    "NETWORK_OBSERVE",
+    "MUTATING",
+    "COST_BEARING"
+  ],
+  "shellAllowed": false,
+  "arbitraryUserCommandAllowed": false,
+  "defaultPerHostProbeConcurrency": 1,
+  "requirements": [
+    "schema-closed descriptor",
+    "fixed/bounded args",
+    "explicit executable resolution policy",
+    "resolved executable identity binding",
+    "sanitized minimal environment",
+    "timeout and AbortSignal",
+    "stdout/stderr byte ceiling",
+    "versioned parser",
+    "pre/post subject identity check",
+    "privacy-safe normalized durable evidence"
+  ]
+}
