@@ -1,19 +1,19 @@
 # UADS V2 — Current Checkpoint
 
-Status: BOOTSTRAP APPROVED / MERGED; UADS2-WO-001 ACTIVE; B-001 AMENDMENT RECOMMENDED / OWNER DECISION PENDING
+Status: UADS2-WO-001 APPROVED / MERGED; B-001 AMENDMENT OWNER-APPROVED; NEXT PLANNING GATE PENDING
 Date: 2026-09-09  
-Completed Work Order: UADS2-BOOTSTRAP-001  
-Active Work Order: UADS2-WO-001  
-Active PR: #17  
-Merged PR: #8  
-Approved bootstrap PR head: `7c5b56a998103494feea6dd91e386f5696d44384`  
-Main merge SHA: `ce1655b2e5a5d1220ba3af78fe08af59af3ff6f0`
+Completed Work Order: UADS2-WO-001  
+Active Work Order: none  
+Active PR: none  
+Merged PR: #17  
+Approved UADS2-WO-001 PR head: `8f585caf15c2a3ccd217439bd989a1ba9309d8be`  
+Main merge SHA: `6ec3a4c025532ceafb67df79f07daf1b7c7042ad`
 
 ## Canonical execution truth
 
 UADS V1 remains the active existing product line. UADS V2 is the separately governed development line in `KayzenRoot/uads-v2`.
 
-The bootstrap is objectively complete for its declared scope and was merged after HEDS audit with exact-head CI evidence. `UADS2-WO-001` is the active mandatory pre-runtime baseline increment.
+The bootstrap and `UADS2-WO-001` are objectively complete for their declared scopes. PR #17 was merged after exact-head HEDS APPROVED on `8f585caf15c2a3ccd217439bd989a1ba9309d8be` with CI, CodeQL, Dependency Review and UADS Cross-Platform Compatibility all SUCCESS and zero unresolved review threads.
 
 ## Frozen lineage
 
@@ -89,44 +89,25 @@ These remain unresolved product targets. Bootstrap does not claim they are fixed
 
 ## UADS2-WO-001 B-001 governance state
 
-The exhaustive technical inspection found no authoritative structured
-analysis-event stream on the frozen V1 supported paths. HEDS conditionally
-recommended the B-001 amendment on reviewed head
-`50b811bcad1435ce65e682d6fb46fda8e3857897`; the amendment proposal remains
-pending explicit owner/auditor decision and has not been canonically applied.
+B-001 is resolved by the explicit owner-approved amendment. Exhaustive inspection found no authoritative structured analysis-event stream on frozen V1 supported paths, so the V1 Duplicate Analysis Rate remains `UNAVAILABLE (0/0)` under the unchanged canonical rule and no synthetic historical denominator is permitted.
 
-The frozen V1 analysis-event source remains absent, so its Duplicate Analysis
-Rate is retained as `UNAVAILABLE` (`0/0`) under the unchanged canonical rule.
-If approved, the replacement V2 obligation is mandatory: privacy-safe,
-identity-bound structured analysis events must provide deterministic numerator,
-denominator, rate, and raw-event hashes before checkpoint promotion.
+The carried-forward V2 obligation is mandatory: V2 must emit privacy-safe, identity-bound structured analysis events sufficient to produce deterministic numerator, denominator, rate and raw-event hashes at the relevant comparison gate. That future V2 proof obligation is not a blocker to the now-completed frozen-V1 baseline.
 
-This is not checkpoint promotion or HEDS approval. The governance correction
-head must pass exact-head CI, receive HEDS re-audit, and remain free of V2
-runtime implementation before any promotion or merge.
+Final HEDS verdict for UADS2-WO-001: `APPROVED`. PR #17 merged at `6ec3a4c025532ceafb67df79f07daf1b7c7042ad`.
 
 ## Repository governance follow-up
 
 Issue #9 remains open for admin-only repository configuration such as branch protection and supported security settings. This did not invalidate the technical bootstrap merge, but repository-administration setup must not be declared complete until an admin-capable executor applies and audits those settings.
 
-## Active NECESSARY increment
+## Next NECESSARY increment
 
-Execute `UADS2-WO-001 — V1 Operational Baseline & Multi-Agent Fan-out Reproduction` before implementing V2 runtime modules.
+Before runtime implementation, create a bounded planning Work Order that unifies:
 
-The baseline must measure at minimum:
-- worker/specialist spawn count;
-- maximum simultaneous specialists;
-- visible worker-conversation count;
-- token/quota amplification;
-- review duration / TTTM components;
-- retries/correction depth;
-- selected model and reasoning effort;
-- context radius;
-- duplicated analysis;
-- first-pass approval vs correction rate.
+- M01/S00 Sequential Agent Orchestrator planning;
+- ADR-UADS2-009 dashboard-first real-time observability contracts;
+- the owner-approved B-001 V2 structured analysis-event obligation;
+- issue #18 enterprise production-readiness pillars: scale/load, resilience, operational security, production observability, and continuous safe operations.
 
-The initial structural PR #17 checks completed successfully on head `24b97abc21500cc511d6c241c7d95e9b702f7818`: CI, CodeQL, Dependency Review and UADS Cross-Platform Compatibility all SUCCESS. This does not constitute baseline completion; representative runtime evidence and the required Evidence Bundle remain mandatory.
+This next increment is planning/governance only. It must classify the five enterprise pillars as `COVERED`, `NOT_APPLICABLE` with rationale, or `GAP`, and turn necessary gaps into explicit modules/workstreams before any affected runtime capability is declared production-ready.
 
-After the baseline is evidence-bound and exact-head HEDS review returns APPROVED, promote the checkpoint and begin runtime planning. ADR-UADS2-009 requires dashboard-first observability to shape that sequencing.
-
-Runtime V2 module implementation must not skip this baseline gate.
+Runtime implementation must not begin until that planning Work Order has its own bounded acceptance criteria and HEDS-approved source lock.
