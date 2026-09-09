@@ -11,5 +11,6 @@ Status: CANONICAL OVERLAY IN REVIEW
 | ADR-UADS2-005 | Hive owns macro/canonical truth; UADS owns bounded execution/micro-orchestration | ACCEPTED |
 | ADR-UADS2-006 | Adopt HEDS-compatible delta-first/evidence-driven review delivery | ACCEPTED |
 | ADR-UADS2-007 | Experience Engine / Policy Memory activation requires measured experiment and rollback | PROPOSED / EXPERIMENT REQUIRED |
+| ADR-UADS2-008 | UADS V2 is standalone-first; Hive integration is optional and additive | ACCEPTED |
 
 No accepted decision may be silently overwritten. Supersession requires a new ADR and checkpoint delta.
