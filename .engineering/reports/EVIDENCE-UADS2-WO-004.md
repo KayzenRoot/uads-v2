@@ -1,6 +1,6 @@
 # EVIDENCE — UADS2-WO-004
 
-Status: READY_FOR_EXACT_HEAD_HEDS after hosted gates
+Status: CONTENT FROZEN / EXACT_HEAD_HEDS PENDING
 
 ## Source lock
 - main/base: `d3f80ed352c8424853882bbf9041c386a93bd603`
@@ -8,7 +8,9 @@ Status: READY_FOR_EXACT_HEAD_HEDS after hosted gates
 - active issue: #24
 - active PR: #25
 - branch: `work/uads2-wo-004-global-module-architecture`
-- architecture snapshot: `d09c0c692e3bc07519aa39b1d12358f96ef0bac2`
+- initial architecture snapshot: `d09c0c692e3bc07519aa39b1d12358f96ef0bac2`
+- topology/S07 semantic correction snapshot: `4cf3884876f95949bbc5f51167649eb196c89e19`
+- final review head: auditor-bound after this metadata freeze
 
 ## Inspected system
 All 31 module discovery documents plus current Architecture, Decisions Ledger, Module Manifest, Module Session Lifecycle, Checkpoint and Continuity were reconciled.

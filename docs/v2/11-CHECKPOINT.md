@@ -1,6 +1,6 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-003 APPROVED / MERGED; UADS2-WO-004 GLOBAL ARCHITECTURE ACTIVE
+Status: UADS2-WO-003 APPROVED / MERGED; UADS2-WO-004 CONTENT FROZEN / HEDS PENDING
 Date: 2026-09-09
 
 Completed Work Order: UADS2-WO-003
@@ -10,7 +10,8 @@ Owner-decision source: #23
 Active PR: #25
 Active Branch: `work/uads2-wo-004-global-module-architecture`
 Base SHA: `d3f80ed352c8424853882bbf9041c386a93bd603`
-Architecture snapshot: `d09c0c692e3bc07519aa39b1d12358f96ef0bac2`
+Initial architecture snapshot: `d09c0c692e3bc07519aa39b1d12358f96ef0bac2`
+Topology/S07 correction snapshot: `4cf3884876f95949bbc5f51167649eb196c89e19`
 
 ## Active gate
 UADS2-WO-004 is planning/governance only. No new deep module runtime implementation is authorized until exact-head HEDS APPROVED.
