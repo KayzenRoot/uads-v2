@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/dependency-graph.schema.json",
+  "title": "UADS Dependency Graph",
+  "description": "Evidence-bearing repository dependency graph. schemaVersion 0.4.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "projectId",
+    "indexDigest",
+    "generatedAt",
+    "extractorVersion",
+    "nodes",
+    "edges",
+    "unresolved"
+  ],
+  "properties": {
+    "schema": { "const": "uads.dependency-graph" },
+    "schemaVersion": { "const": "0.4.0" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "indexDigest": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "extractorVersion": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "contentDigest"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "kind": { "type": "string", "enum": ["source", "test", "schema", "config", "docs", "manifest", "binary"] },
+          "contentDigest": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "source", "target", "method", "confidence", "evidence", "sourceDigest"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "imports",
+              "requires",
+              "dynamic-import",
+              "test-of",
+              "configures",
+              "documents",
+              "interface-reference",
+              "manifest-reference"
+            ]
+          },
+          "source": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "minLength": 1 },
+          "method": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidence": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "sourceDigest": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "specifier", "reason", "method", "confidence", "sourceDigest"],
+        "properties": {
+          "source": { "type": "string" },
+          "specifier": { "type": "string" },
+          "reason": { "type": "string" },
+          "method": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "line": { "type": "integer", "minimum": 1 },
+          "sourceDigest": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

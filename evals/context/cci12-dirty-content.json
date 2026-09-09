@@ -1,0 +1,5 @@
+{
+  "id": "CCI12",
+  "name": "Content-aware dirty identity",
+  "scenario": "dirty-digest"
+}

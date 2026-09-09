@@ -1,0 +1,5 @@
+{
+  "id": "CCI18",
+  "name": "Computed import determinism",
+  "scenario": "computed-import"
+}

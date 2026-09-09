@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KayzenRoot/uads/schemas/compatibility-evidence.schema.json",
+  "title": "UADS bounded cross-platform compatibility evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "repository", "platform", "nodeVersion", "nodeMajor", "commitSha", "sourceTreeSha", "workflowName", "jobName", "workflowRunId", "workflowRunAttempt", "event", "checks", "outcome", "reasonCodes", "evidenceDigest"],
+  "properties": {
+    "schema": { "const": "uads.compatibility-evidence" },
+    "schemaVersion": { "const": "0.2.0" },
+    "repository": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+    "platform": { "enum": ["linux", "windows"] },
+    "nodeVersion": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+" },
+    "nodeMajor": { "const": 20 },
+    "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sourceTreeSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "workflowName": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "jobName": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "workflowRunId": { "type": "integer", "minimum": 1 },
+    "workflowRunAttempt": { "type": "integer", "minimum": 1 },
+    "event": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "checks": { "type": "object", "additionalProperties": false, "required": ["npm-ci", "typecheck-build", "adapter-eval", "isolated-install", "root-resolution", "zero-project-footprint", "privacy-path-assertion"], "properties": {
+      "npm-ci": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+      "typecheck-build": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+      "adapter-eval": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+      "isolated-install": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+      "root-resolution": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+      "zero-project-footprint": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] },
+      "privacy-path-assertion": { "enum": ["success", "failure", "cancelled", "skipped", "unknown"] }
+    } },
+    "outcome": { "enum": ["success", "failure", "cancelled"] },
+    "reasonCodes": { "type": "array", "maxItems": 32, "items": { "type": "string", "pattern": "^[A-Z0-9_:-]{1,120}$" } },
+    "evidenceDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

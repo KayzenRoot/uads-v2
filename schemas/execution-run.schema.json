@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/execution-run.schema.json",
+  "title": "UADS Execution Run",
+  "description": "Authoritative bounded execution-run state stored in the global sidecar. schemaVersion 0.3.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "executionRunId",
+    "projectId",
+    "workOrderId",
+    "routingDecisionId",
+    "createdAt",
+    "updatedAt",
+    "attempt",
+    "phase",
+    "status",
+    "baseline",
+    "contextRadius",
+    "contextCandidates",
+    "implementerRole",
+    "implementerSessionId",
+    "requiredReviewers",
+    "selectedGates",
+    "currentChangeDigest",
+    "reviewedChangeDigest",
+    "changedFiles",
+    "scopeViolations",
+    "evidenceRefs",
+    "reviewRefs",
+    "blockers",
+    "nextAction",
+    "expansionHistory"
+  ],
+  "properties": {
+    "schema": { "const": "uads.execution-run" },
+    "schemaVersion": { "const": "0.3.0" },
+    "executionRunId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": "string", "minLength": 1 },
+    "routingDecisionId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "phase": {
+      "type": "string",
+      "enum": ["implement", "verify", "review", "stopped"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ready", "in_progress", "correction_needed", "blocked", "completed", "failed"]
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gitHead", "dirty", "capturedAt"],
+      "properties": {
+        "gitHead": { "type": ["string", "null"] },
+        "dirty": { "type": "boolean" },
+        "capturedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "contextRadius": {
+      "type": "string",
+      "enum": ["C0", "C1", "C2", "C3", "C4", "C5"]
+    },
+    "contextCandidates": { "type": "array", "items": { "type": "string" } },
+    "implementerRole": { "type": "string", "minLength": 1 },
+    "implementerSessionId": { "type": ["string", "null"] },
+    "requiredReviewers": { "type": "array", "items": { "type": "string" } },
+    "selectedGates": { "type": "array", "items": { "type": "string" } },
+    "currentChangeDigest": { "type": ["string", "null"] },
+    "reviewedChangeDigest": { "type": ["string", "null"] },
+    "changedFiles": { "type": "array", "items": { "type": "string" } },
+    "scopeViolations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "classification", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "classification": { "type": "string", "enum": ["out-of-scope", "sensitive"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "reviewRefs": { "type": "array", "items": { "type": "string" } },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "nextAction": { "type": "string" },
+    "expansionHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "reason", "at"],
+        "properties": {
+          "from": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+          "to": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+          "reason": { "type": "string" },
+          "at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "contextPackId": { "type": ["string", "null"] },
+    "impactReportId": { "type": ["string", "null"] },
+    "indexDigest": { "type": ["string", "null"] }
+    ,"modelPlanId": { "type": ["string", "null"] }
+    ,"selectedProfileId": { "type": ["string", "null"] }
+    ,"selectedProviderId": { "type": ["string", "null"] }
+    ,"selectedModelId": { "type": ["string", "null"] }
+    ,"selectionMode": { "enum": ["router", "host-managed"] }
+    ,"modelExecutionStrategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parallel", "roleDispatch", "usageTelemetryAvailable"],
+      "properties": {
+        "parallel": { "type": "boolean" },
+        "roleDispatch": { "enum": ["subagents", "role-cycling"] },
+        "usageTelemetryAvailable": { "type": ["boolean", "null"] }
+      }
+    }
+  }
+}

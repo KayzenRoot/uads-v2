@@ -1,0 +1,12 @@
+{
+  "id": "E8",
+  "name": "game combat formula",
+  "request": "Change critical-hit damage scaling and rebalance the combat formula.",
+  "expect": {
+    "domainsInclude": ["game-systems", "mathematics-simulation"],
+    "domainsExclude": ["ugas", "web3", "tokenomics"],
+    "specialistsExclude": ["ugas", "game-assets"],
+    "gatesInclude": ["simulation-invariant"],
+    "gatesExclude": ["web3-fuzz"]
+  }
+}

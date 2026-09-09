@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/review-packet.schema.json",
+  "title": "UADS bounded assurance review packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "executionRunId", "workOrderId", "objective", "acceptanceCriteria", "includedScope", "outOfScope", "changedFiles", "changeDigest", "gateStates", "evidenceRefs", "requiredReviewers", "riskLevel", "nextAction"],
+  "properties": {
+    "schema": { "const": "uads.review-packet" },
+    "schemaVersion": { "const": "0.3.0" },
+    "executionRunId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": "string", "minLength": 1 },
+    "objective": { "type": "string" },
+    "acceptanceCriteria": { "type": "array", "items": { "type": "string" } },
+    "includedScope": { "type": "array", "items": { "type": "string" } },
+    "outOfScope": { "type": "array", "items": { "type": "string" } },
+    "changedFiles": { "type": "array", "items": { "type": "string", "pattern": "^[A-Za-z0-9._/-]+$" } },
+    "changeDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gateStates": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["gateId", "status"], "properties": { "gateId": { "type": "string" }, "status": { "enum": ["PENDING", "PASS", "FAIL", "BLOCKED"] } } } },
+    "evidenceRefs": { "type": "array", "items": { "type": "string", "pattern": "^sidecar://execution-runs/[^/]+/evidence/[^/]+\\.json$" } },
+    "requiredReviewers": { "type": "array", "items": { "type": "string" } },
+    "riskLevel": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "roleToGateMapping": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } },
+    "requiredEvidenceObligations": { "type": "array", "items": { "type": "string" } },
+    "unresolvedBlockers": { "type": "array", "items": { "type": "string" } },
+    "doNotImplement": { "type": "array", "items": { "type": "string" } },
+    "independentReviewInvariant": { "type": "string" },
+    "nextAction": { "type": "string" }
+  }
+}

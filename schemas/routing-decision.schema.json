@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/routing-decision.schema.json",
+  "title": "UADS Routing Decision",
+  "description": "Operational routing conclusions. No chain-of-thought.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "routingDecisionId",
+    "projectId",
+    "createdAt",
+    "scopeClass",
+    "riskLevel",
+    "contextRadius",
+    "capabilityClass",
+    "scopeReasons",
+    "riskReasons",
+    "domains",
+    "specialists",
+    "assuranceSpecialists",
+    "gates",
+    "contextReason",
+    "orderConstraints",
+    "stopConditions",
+    "warnings"
+  ],
+  "properties": {
+    "schema": { "const": "uads.routing-decision" },
+    "schemaVersion": { "const": "0.2.0" },
+    "routingDecisionId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "scopeClass": {
+      "type": "string",
+      "enum": ["trivial", "local", "cross-cutting", "architectural"]
+    },
+    "scopeReasons": { "type": "array", "items": { "type": "string" } },
+    "riskLevel": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    },
+    "riskReasons": { "type": "array", "items": { "type": "string" } },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "reason"],
+        "properties": {
+          "id": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "specialists": { "type": "array", "items": { "type": "string" } },
+    "assuranceSpecialists": { "type": "array", "items": { "type": "string" } },
+    "specialistSelectionPlanId": { "type": "string", "pattern": "^sp_[a-f0-9]{16}$" },
+    "specialistSelectionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "specialistRegistryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "specialistPolicyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "specialistChangeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistImpactDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistGateContractDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "specialistRiskSignals": { "type": "array", "items": { "type": "string" } },
+    "specialistDependencySignals": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["crossCutting", "source"],
+      "properties": {
+        "crossCutting": { "type": "boolean" },
+        "source": { "enum": ["scope-classifier", "impact-report", "host-structured"] }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "reason"],
+        "properties": {
+          "id": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "contextRadius": {
+      "type": "string",
+      "enum": ["C0", "C1", "C2", "C3", "C4", "C5"]
+    },
+    "contextReason": { "type": "string" },
+    "capabilityClass": {
+      "type": "string",
+      "enum": ["economy", "balanced", "strong", "critical"]
+    },
+    "orderConstraints": { "type": "array", "items": { "type": "string" } },
+    "stopConditions": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

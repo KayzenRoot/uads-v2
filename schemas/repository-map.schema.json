@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/repository-map.schema.json",
+  "title": "UADS Repository Map",
+  "description": "Compact structural map cached in the sidecar. Relative paths only; no embeddings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "projectId",
+    "generatedAt",
+    "repositoryName",
+    "digest",
+    "gitHead",
+    "branch",
+    "dirty",
+    "dirtyDigest",
+    "signals",
+    "modules",
+    "locations"
+  ],
+  "properties": {
+    "schema": { "const": "uads.repository-map" },
+    "schemaVersion": { "const": "0.2.0" },
+    "projectId": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "mapVersion": { "type": "string" },
+    "repositoryName": { "type": "string" },
+    "digest": { "type": "string" },
+    "gitHead": { "type": ["string", "null"] },
+    "branch": { "type": ["string", "null"] },
+    "dirty": { "type": "boolean" },
+    "dirtyDigest": { "type": "string" },
+    "reused": { "type": "boolean" },
+    "languages": { "type": "array", "items": { "type": "string" } },
+    "packageManager": { "type": ["string", "null"] },
+    "frameworks": { "type": "array", "items": { "type": "string" } },
+    "commands": {
+      "type": "object",
+      "additionalProperties": { "type": ["string", "null"] }
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "path"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "path": { "type": "string" },
+          "kind": { "type": "string" }
+        }
+      }
+    },
+    "entrypoints": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "locations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentsMd", "cursor", "skills"],
+      "properties": {
+        "agentsMd": { "type": "array", "items": { "type": "string" } },
+        "cursor": { "type": "array", "items": { "type": "string" } },
+        "skills": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "manifestHashes": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

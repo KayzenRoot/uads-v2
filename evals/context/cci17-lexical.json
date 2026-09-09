@@ -1,0 +1,5 @@
+{
+  "id": "CCI17",
+  "name": "Lexical false-positive resistance",
+  "scenario": "lexical-mask"
+}

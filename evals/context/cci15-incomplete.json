@@ -1,0 +1,5 @@
+{
+  "id": "CCI15",
+  "name": "Truncated index fail-closed",
+  "scenario": "incomplete-index"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "E6",
+  "name": "performance hot path",
+  "request": "Reduce latency in a request-processing hot path without changing its public contract.",
+  "expect": {
+    "domainsInclude": ["backend", "performance"],
+    "domainsExclude": ["web3", "finance-economics", "tokenomics"],
+    "specialistsInclude": ["performance-reviewer"],
+    "specialistsExclude": ["security-reviewer"],
+    "gatesInclude": ["performance-check", "unit-test"],
+    "gatesExclude": ["web3-fuzz", "financial-numerical-validation"]
+  }
+}

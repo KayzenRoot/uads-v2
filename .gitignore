@@ -1,0 +1,48 @@
+# Dependencies and build
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Logs and OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
+secrets.json
+
+# Caches and generated artifacts
+.cache/
+.tmp/
+tmp/
+/release/
+.turbo/
+.next/
+.parcel-cache/
+.pytest_cache/
+.venv/
+__pycache__/
+
+# Local UADS / review output (zero footprint in-repo)
+.uads/
+reviews/
+*.zip
+*.zip.sha256
+memory-bank/
+
+# Editor
+.idea/
+.vscode/
+*.swp

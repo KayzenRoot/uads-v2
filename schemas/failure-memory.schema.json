@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/failure-memory.schema.json",
+  "title": "UADS Failure Memory",
+  "description": "Compact per-project failure memory. schemaVersion 0.5.0. Advisory unless validity is established.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "updatedAt", "entries"],
+  "properties": {
+    "schema": { "const": "uads.failure-memory" },
+    "schemaVersion": { "const": "0.5.0" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "failureSignature",
+          "firstSeenAt",
+          "lastSeenAt",
+          "occurrences",
+          "lastRepositoryHead",
+          "lastChangeDigest",
+          "sameDigestStreak",
+          "candidatePaths",
+          "candidateDigests",
+          "validityBasisPaths",
+          "validityBasisDigests",
+          "verifiedRootCausePaths",
+          "verifiedCorrectionPaths",
+          "disprovedPaths",
+          "resolutionSummary",
+          "resolutionEvidenceRefs",
+          "resolutionExecutionRunId",
+          "resolutionChangeDigest",
+          "resolutionIndexDigest",
+          "lastFailureRecordId",
+          "lastOutcome"
+        ],
+        "properties": {
+          "failureSignature": { "type": "string", "minLength": 1 },
+          "firstSeenAt": { "type": "string", "format": "date-time" },
+          "lastSeenAt": { "type": "string", "format": "date-time" },
+          "occurrences": { "type": "integer", "minimum": 1 },
+          "lastRepositoryHead": { "type": ["string", "null"] },
+          "lastChangeDigest": { "type": ["string", "null"] },
+          "sameDigestStreak": { "type": "integer", "minimum": 0 },
+          "candidatePaths": { "type": "array", "items": { "type": "string" } },
+          "candidateDigests": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "validityBasisPaths": { "type": "array", "items": { "type": "string" } },
+          "validityBasisDigests": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "verifiedRootCausePaths": { "type": "array", "items": { "type": "string" } },
+          "verifiedCorrectionPaths": { "type": "array", "items": { "type": "string" } },
+          "disprovedPaths": { "type": "array", "items": { "type": "string" } },
+          "resolutionSummary": { "type": ["string", "null"] },
+          "resolutionEvidenceRefs": { "type": "array", "items": { "type": "string" } },
+          "resolutionExecutionRunId": { "type": ["string", "null"] },
+          "resolutionChangeDigest": { "type": ["string", "null"] },
+          "resolutionIndexDigest": { "type": ["string", "null"] },
+          "lastFailureRecordId": { "type": ["string", "null"] },
+          "lastOutcome": {
+            "type": "string",
+            "enum": ["open", "loop", "historical", "resolved", "disproved-candidate"]
+          }
+        }
+      }
+    }
+  }
+}

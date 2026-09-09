@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report an exploitable security vulnerability privately
+    url: https://github.com/KayzenRoot/uads/security/advisories/new
+    about: Do not disclose exploitable vulnerabilities in public issues.
+  - name: Ask a question in Discussions
+    url: https://github.com/KayzenRoot/uads/discussions
+    about: Use Discussions for questions and design conversations.

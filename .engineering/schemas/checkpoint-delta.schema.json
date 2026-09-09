@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/checkpoint-delta.schema.json",
+  "title": "Engineering Checkpoint Delta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "workOrderId", "status", "before", "after", "completedSteps", "openItems"],
+  "properties": {
+    "schema": { "const": "uads.engineering-checkpoint-delta" },
+    "schemaVersion": { "const": "1.0.0" },
+    "workOrderId": { "type": "string", "pattern": "^ENG-[A-Z0-9-]+-[0-9]{3}$" },
+    "status": { "type": "string", "enum": ["PROPOSED", "ACCEPTED", "BLOCKED", "REJECTED"] },
+    "before": { "type": "string" },
+    "after": { "type": "string" },
+    "completedSteps": { "type": "array", "items": { "type": "string" } },
+    "openItems": { "type": "array", "items": { "type": "string" } },
+    "canonicalPromotion": { "type": "string", "enum": ["NOT_REQUESTED", "PENDING_MAINTAINER", "PROMOTED"] }
+  }
+}

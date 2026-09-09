@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/evidence-manifest.schema.json",
+  "title": "UADS Evidence Manifest",
+  "description": "Claims of completion must be backed by commands, outputs, or files.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "evidenceId", "projectId", "createdAt", "claims"],
+  "properties": {
+    "schema": { "const": "uads.evidence-manifest" },
+    "schemaVersion": { "const": "0.1.0" },
+    "evidenceId": { "type": "string" },
+    "projectId": { "type": "string" },
+    "workOrderId": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim", "kind", "artifact"],
+        "properties": {
+          "claim": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "enum": ["command", "output", "file", "test", "review"]
+          },
+          "artifact": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

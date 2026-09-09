@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/specialist-selection-plan.schema.json",
+  "title": "UADS Specialist Selection Plan",
+  "description": "Deterministic specialist domain/gate/evidence/assurance obligation coverage and dispatch binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "selectionPlanId", "projectId", "workOrderId", "workOrderDigest", "routingDigest", "registryDigest", "policyDigest", "changeDigest", "impactDigest", "gateContractDigest", "selected", "assurance", "assignments", "rejections", "unmetCoverage", "requiredObligations", "coveredObligations", "unmetObligations", "conflicts", "dispatch", "status", "blockedReasonCodes", "selectionDigest"],
+  "properties": {
+    "schema": { "const": "uads.specialist-selection-plan" },
+    "schemaVersion": { "const": "0.9.0" },
+    "selectionPlanId": { "type": "string", "pattern": "^sp_[a-f0-9]{16}$" },
+    "projectId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "workOrderId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "workOrderDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "routingDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "registryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "policyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "changeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "impactDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "gateContractDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "selected": { "type": "array", "minItems": 1, "maxItems": 32, "items": { "$ref": "#/$defs/selection" } },
+    "assurance": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "$ref": "#/$defs/selection" } },
+    "assignments": { "type": "array", "minItems": 1, "maxItems": 32, "items": { "$ref": "#/$defs/assignment" } },
+    "rejections": { "type": "array", "maxItems": 64, "items": { "type": "object", "additionalProperties": false, "required": ["specialistId", "reasonCodes", "reasons"], "properties": { "specialistId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" }, "reasonCodes": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "type": "string", "maxLength": 96 } }, "reasons": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "type": "string", "maxLength": 240 } } } } },
+    "unmetCoverage": { "type": "array", "maxItems": 128, "items": { "type": "string", "maxLength": 160 } },
+    "requiredObligations": { "type": "array", "minItems": 1, "maxItems": 128, "items": { "$ref": "#/$defs/obligation" } },
+    "coveredObligations": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/coverage" } },
+    "unmetObligations": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/unmetObligation" } },
+    "conflicts": { "type": "array", "maxItems": 64, "items": { "type": "string", "maxLength": 240 } },
+    "dispatch": { "type": "object", "additionalProperties": false, "required": ["dependencyGroups", "parallelEligibleGroups"], "properties": { "dependencyGroups": { "type": "array", "maxItems": 32, "items": { "type": "array", "maxItems": 32, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" } } }, "parallelEligibleGroups": { "type": "array", "maxItems": 32, "items": { "type": "array", "minItems": 2, "maxItems": 32, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" } } } } },
+    "status": { "enum": ["SELECTED", "BLOCKED"] },
+    "blockedReasonCodes": { "type": "array", "maxItems": 16, "uniqueItems": true, "items": { "type": "string", "maxLength": 96 } },
+    "selectionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["specialistId", "kind", "role", "required", "reasonCodes", "coversDomains", "coversGates", "independenceClass"],
+      "properties": {
+        "specialistId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+        "kind": { "enum": ["core", "domain", "assurance"] },
+        "role": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "required": { "type": "boolean" },
+        "reasonCodes": { "type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": { "type": "string", "maxLength": 96 } },
+        "coversDomains": { "type": "array", "maxItems": 32, "uniqueItems": true, "items": { "type": "string", "maxLength": 64 } },
+        "coversGates": { "type": "array", "maxItems": 32, "uniqueItems": true, "items": { "type": "string", "maxLength": 96 } },
+        "independenceClass": { "enum": ["implementation", "support", "independent-review", "assurance"] }
+      }
+    },
+    "obligation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligationId", "kind", "domainId", "gateId", "evidenceId", "affectedArea", "specialistId"],
+      "properties": {
+        "obligationId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,159}$" },
+        "kind": { "enum": ["domain", "gate", "evidence", "assurance", "affected-area", "dependency"] },
+        "domainId": { "type": ["string", "null"], "maxLength": 96 },
+        "gateId": { "type": ["string", "null"], "maxLength": 96 },
+        "evidenceId": { "type": ["string", "null"], "maxLength": 160 },
+        "affectedArea": { "type": ["string", "null"], "maxLength": 160 },
+        "specialistId": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligationId", "gateId", "evidenceId", "specialistId", "reasonCode", "coverageKind"],
+      "properties": {
+        "obligationId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,159}$" },
+        "gateId": { "type": ["string", "null"], "maxLength": 96 },
+        "evidenceId": { "type": ["string", "null"], "maxLength": 160 },
+        "specialistId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+        "reasonCode": { "type": "string", "maxLength": 96 },
+        "coverageKind": { "enum": ["domain", "gate", "evidence", "assurance", "affected-area", "dependency"] }
+      }
+    },
+    "unmetObligation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligationId", "gateId", "evidenceId", "specialistId", "reasonCode", "coverageKind"],
+      "properties": {
+        "obligationId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,159}$" },
+        "gateId": { "type": ["string", "null"], "maxLength": 96 },
+        "evidenceId": { "type": ["string", "null"], "maxLength": 160 },
+        "specialistId": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+        "reasonCode": { "type": "string", "maxLength": 96 },
+        "coverageKind": { "enum": ["domain", "gate", "evidence", "assurance", "affected-area", "dependency"] }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["specialistId", "role", "objective", "coveredDomains", "relevantAffectedAreas", "relevantFiles", "relevantGates", "evidenceObligations", "riskLevel", "forbiddenScope", "dependencyGroup", "parallelEligible"],
+      "properties": {
+        "specialistId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,95}$" },
+        "role": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "objective": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "coveredDomains": { "type": "array", "maxItems": 32, "uniqueItems": true, "items": { "type": "string", "maxLength": 64 } },
+        "relevantAffectedAreas": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 160 } },
+        "relevantFiles": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 240 } },
+        "relevantGates": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 96 } },
+        "evidenceObligations": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 160 } },
+        "riskLevel": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+        "forbiddenScope": { "type": "array", "maxItems": 32, "items": { "type": "string", "maxLength": 240 } },
+        "dependencyGroup": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "parallelEligible": { "type": "boolean" }
+      }
+    }
+  }
+}

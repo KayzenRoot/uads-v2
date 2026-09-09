@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/report.schema.json",
+  "title": "Engineering Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "workOrderId", "reportType", "status", "findings", "nextAction"],
+  "properties": {
+    "schema": { "const": "uads.engineering-report" },
+    "schemaVersion": { "const": "1.0.0" },
+    "workOrderId": { "type": "string", "pattern": "^ENG-[A-Z0-9-]+-[0-9]{3}$" },
+    "reportType": { "type": "string", "enum": ["BASELINE", "CLEANUP_INVENTORY", "EVIDENCE", "REVIEW"] },
+    "status": { "type": "string", "enum": ["DRAFT", "COMPLETE", "BLOCKED", "STALE"] },
+    "findings": { "type": "array", "items": { "type": "string" } },
+    "risks": { "type": "array", "items": { "type": "string" } },
+    "nextAction": { "type": "string" }
+  }
+}

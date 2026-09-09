@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/review-manifest.schema.json",
+  "title": "UADS Review Manifest",
+  "description": "Privacy-minimized metadata for a review ZIP generated outside the managed project.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "generatedAt",
+    "uadsVersion",
+    "projectId",
+    "fingerprint",
+    "repositoryName",
+    "sidecar",
+    "zipFileName",
+    "includedFiles",
+    "skipped",
+    "excludedDirectoryClasses",
+    "evidenceIncluded",
+    "exclusions",
+    "inspection"
+  ],
+  "properties": {
+    "schema": { "const": "uads.review-manifest" },
+    "schemaVersion": { "const": "0.1.0" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "uadsVersion": { "type": "string" },
+    "projectId": { "type": "string" },
+    "fingerprint": { "type": "string" },
+    "fingerprintSource": { "type": "string", "enum": ["remote", "path"] },
+    "repositoryName": { "type": "string" },
+    "sidecar": {
+      "type": "string",
+      "description": "Logical sidecar label, never an absolute host path.",
+      "pattern": "^sidecar://"
+    },
+    "zipFileName": { "type": "string" },
+    "git": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "branch": { "type": ["string", "null"] },
+        "head": { "type": ["string", "null"] },
+        "originUrl": { "type": ["string", "null"] },
+        "hasCommits": { "type": "boolean" }
+      }
+    },
+    "includedFiles": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "excludedDirectoryClasses": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "evidenceIncluded": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reviewEvidenceIncluded": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^(github|release)/" }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "inspection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "errors"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

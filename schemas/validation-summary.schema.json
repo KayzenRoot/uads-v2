@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/validation-summary.schema.json",
+  "title": "UADS Validation Summary",
+  "description": "Sidecar evidence index for foundation gates. Stored outside the managed repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "generatedAt", "runtime", "commands"],
+  "properties": {
+    "schema": { "const": "uads.validation-summary" },
+    "schemaVersion": { "const": "0.1.0" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "runtime": {
+      "type": "object",
+      "required": ["node", "npm", "os"],
+      "properties": {
+        "node": { "type": "string" },
+        "npm": { "type": "string" },
+        "os": { "type": "string" }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "command",
+          "startedAt",
+          "endedAt",
+          "durationMs",
+          "exitCode",
+          "status",
+          "toolVersion",
+          "outputArtifact"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "command": { "type": "string" },
+          "startedAt": { "type": "string" },
+          "endedAt": { "type": "string" },
+          "durationMs": { "type": "integer", "minimum": 0 },
+          "exitCode": { "type": ["integer", "null"] },
+          "status": { "type": "string", "enum": ["PASS", "FAIL", "NOT_RUN"] },
+          "toolVersion": { "type": "string" },
+          "outputArtifact": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+changelog:
+  categories:
+    - title: "Breaking Changes"
+      labels:
+        - "type:breaking"
+    - title: "Features"
+      labels:
+        - "type:feature"
+    - title: "Fixes"
+      labels:
+        - "type:bug"
+    - title: "Security"
+      labels:
+        - "type:security"
+    - title: "Performance"
+      labels:
+        - "type:performance"
+    - title: "Documentation"
+      labels:
+        - "type:docs"
+    - title: "Dependencies"
+      labels:
+        - dependencies
+    - title: "Internal / Maintenance"
+      labels:
+        - "type:maintenance"
+    - title: "Other Changes"
+      labels:
+        - "*"
+      exclude:
+        labels:
+          - "bot"

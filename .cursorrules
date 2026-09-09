@@ -1,0 +1,78 @@
+# UADS V2 Cursor rules
+
+UADS V2 is a NexLabs project and a controlled continuation of UADS V1.
+
+## Fresh-chat / fresh-session continuity
+
+If the user says **“vamos continuar do chat antigo”**, **“continue do chat anterior”**, or equivalent:
+1. reconcile current GitHub `main`, open PRs and active branch;
+2. read `docs/v2/continuity/CURRENT.json`;
+3. follow `docs/v2/operations/CHAT-CONTINUITY-PROTOCOL.md`;
+4. preserve the graphical status/progress format in `docs/v2/operations/RESPONSE-AND-PROGRESS-STANDARD.md`;
+5. do not ask the user to re-explain history Git can resolve.
+
+GitHub is canonical project memory. Chat memory is convenience only.
+
+## Source of truth
+
+Before material work, read in this order:
+1. `docs/v2/11-CHECKPOINT.md`
+2. `docs/v2/10-DECISIONS-LEDGER.md`
+3. `docs/v2/03-SCOPE.md`
+4. `docs/v2/09-DEFINITION-OF-DONE.md`
+5. `docs/v2/04-ARCHITECTURE.md`
+6. `docs/v2/02-REQUIREMENTS.md`
+7. `docs/v2/13-REVIEW-PROTOCOL.md`
+8. active Work Order / Context Lock / Evidence Bundle.
+
+Inherited V1 docs remain authoritative where the V2 overlay does not explicitly supersede them. Git/repository evidence prevails over conversational memory.
+
+## Module/session planning
+
+- All 26 modules are explicit under `docs/v2/modules/`.
+- Follow `docs/v2/operations/MODULE-SESSION-LIFECYCLE.md` (S00–S07).
+- Candidate technology is not canonical until approved.
+- After every approved session, update the module plus affected Requirements, Architecture, ADRs, Backlog, Checkpoint and `docs/v2/continuity/CURRENT.json` before continuing.
+- Tests/benchmarks are designed with each session, not appended after implementation.
+
+## Standalone-first architecture
+
+- `SOLO` is a mandatory first-class UADS V2 operating mode.
+- Hive V2 is optional and additive through the versioned integration bridge.
+- Do not introduce a core runtime dependency on Hive packages, services or availability.
+- When connected, complement Hive V2 rather than duplicate its canonical truth/governance authority.
+
+## Use the globally installed UADS
+
+- Prefer the globally installed UADS V1 runtime/skill for engineering execution while UADS V2 is under construction.
+- Start with `uads doctor` and `uads status` when host execution is available.
+- Use `skills/uads-orchestrator/SKILL.md` and the global Cursor adapter contract.
+- Runtime state stays under `~/.uads/`; do not create project-local caches, runtime work orders, indexes, model state or review archives.
+- Repository `.engineering/` files are static governance/evidence only.
+- Do not assume a V2 feature is available before its Work Order is APPROVED and merged.
+
+## Temporary V2 construction guard
+
+Until BUG-UADS2-001 is implemented and validated, do not manually fan out parallel review/specialist agents for this repository. Keep coordinator work plus at most one specialist active at a time when the host permits that control.
+
+Until BUG-UADS2-004 is implemented and validated, do not claim automatic model/effort routing exists merely because it is planned.
+
+## Governed delivery
+
+- Use one stable Work Order identity across branch, PR, Context Lock, evidence, corrections and checkpoint delta.
+- Freeze exact base/head identities.
+- Implement only the active Work Order.
+- No broad cleanup, dependency upgrade, migration, destructive action or product-scope expansion without explicit scope.
+- If a critical canonical source changes, mark Context Lock STALE, re-inspect and relock.
+- Run selected verification based on risk/impact and capture evidence.
+- Review using HEDS-compatible delta-first progressive disclosure.
+- Verdict is exactly APPROVED, CORRECTION REQUIRED or BLOCKED.
+- CORRECTION REQUIRED stays in the same Work Order/PR when safe.
+- Never advance with a known HIGH/CRITICAL defect.
+- Checkpoint promotion occurs only after objective approval.
+
+## Current bootstrap
+
+Active bootstrap Work Order: `UADS2-BOOTSTRAP-001`.
+
+Runtime V2 module implementation is not authorized until this bootstrap is APPROVED and merged.

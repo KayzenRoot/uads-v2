@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/project-profile.schema.json",
+  "title": "UADS Project Profile",
+  "description": "Sidecar identity for a managed project. Lives under ~/.uads/workspaces/<project-id>/.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "fingerprint", "repoRoot", "createdAt", "updatedAt"],
+  "properties": {
+    "schema": { "const": "uads.project-profile" },
+    "schemaVersion": { "const": "0.1.0" },
+    "projectId": { "type": "string" },
+    "fingerprint": { "type": "string" },
+    "fingerprintSource": { "type": "string", "enum": ["remote", "path"] },
+    "repoRoot": { "type": "string" },
+    "displayName": { "type": "string" },
+    "adapter": {
+      "type": "string",
+      "enum": ["cursor", "codex", "generic"]
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

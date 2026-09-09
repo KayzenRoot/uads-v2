@@ -1,0 +1,11 @@
+{
+  "id": "N1",
+  "name": "negative-routing frontend does not spawn Web3",
+  "request": "Change the primary button color.",
+  "expect": {
+    "domainsExclude": ["web3", "smart-contracts", "wallets", "tokenomics", "database", "cloud-devops"],
+    "specialistsExclude": ["security-reviewer", "performance-reviewer"],
+    "gatesExclude": ["web3-unit", "web3-fuzz", "web3-invariant", "database-migration", "financial-numerical-validation"],
+    "maxSpecialists": 8
+  }
+}

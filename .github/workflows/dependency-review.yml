@@ -1,0 +1,47 @@
+name: Dependency review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Native GitHub Dependency Review when available
+        id: native_dependency_review
+        continue-on-error: true
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+      - name: Checkout for portable fallback
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Portable high-severity dependency gate
+        run: npm audit --audit-level=high
+
+      - name: Record dependency-review capability
+        shell: bash
+        env:
+          NATIVE_OUTCOME: ${{ steps.native_dependency_review.outcome }}
+        run: |
+          echo "Native GitHub Dependency Review outcome: ${NATIVE_OUTCOME}"
+          if [ "${NATIVE_OUTCOME}" != "success" ]; then
+            echo "Native dependency graph/GHAS capability is unavailable or not configured for this private repository."
+            echo "Portable fallback npm audit --audit-level=high passed against the locked dependency graph."
+          fi

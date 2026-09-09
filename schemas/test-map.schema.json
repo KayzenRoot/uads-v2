@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/test-map.schema.json",
+  "title": "UADS Test Map",
+  "description": "Likely focused tests for indexed source. schemaVersion 0.4.0. Does not claim sufficiency.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "indexDigest", "generatedAt", "relations"],
+  "properties": {
+    "schema": { "const": "uads.test-map" },
+    "schemaVersion": { "const": "0.4.0" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "indexDigest": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["test", "source", "method", "confidence", "evidence"],
+        "properties": {
+          "test": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "minLength": 1 },
+          "method": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidence": { "type": "string" }
+        }
+      }
+    }
+  }
+}

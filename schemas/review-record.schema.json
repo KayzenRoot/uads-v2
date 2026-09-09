@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/review-record.schema.json",
+  "title": "UADS Assurance Review Record",
+  "description": "Independent review verdict bound to a change digest. schemaVersion 0.3.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "reviewId",
+    "projectId",
+    "workOrderId",
+    "executionRunId",
+    "changeDigest",
+    "reviewerRole",
+    "reviewSessionId",
+    "implementerRole",
+    "implementerSessionId",
+    "verdict",
+    "summary",
+    "findings",
+    "evidenceRefs",
+    "createdAt"
+  ],
+  "properties": {
+    "schema": { "const": "uads.review-record" },
+    "schemaVersion": { "const": "0.3.0" },
+    "reviewId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": "string", "minLength": 1 },
+    "executionRunId": { "type": "string", "minLength": 1 },
+    "changeDigest": { "type": "string", "minLength": 1 },
+    "reviewerRole": { "type": "string", "minLength": 1 },
+    "reviewSessionId": { "type": "string", "minLength": 1 },
+    "implementerRole": { "type": "string", "minLength": 1 },
+    "implementerSessionId": { "type": "string", "minLength": 1 },
+    "verdict": { "type": "string", "enum": ["APPROVED", "CORRECTION_NEEDED", "BLOCKED"] },
+    "summary": { "type": "string" },
+    "reasonCodes": { "type": "array", "maxItems": 64, "items": { "type": "string", "pattern": "^[A-Z0-9_:-]{1,120}$" } },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "category", "message"],
+        "properties": {
+          "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+          "category": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

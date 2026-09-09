@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/failure-record.schema.json",
+  "title": "UADS Failure Record",
+  "description": "Normalized secret-safe failure evidence. schemaVersion 0.5.0. Not a root-cause claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "failureRecordId",
+    "projectId",
+    "workOrderId",
+    "executionRunId",
+    "createdAt",
+    "source",
+    "command",
+    "exitCode",
+    "status",
+    "failureClass",
+    "messageSummary",
+    "stackFrames",
+    "failingTests",
+    "relatedEvidenceRefs",
+    "changeDigest",
+    "repositoryIndexDigest",
+    "repositoryHead",
+    "dirtyDigest",
+    "signature",
+    "sanitization"
+  ],
+  "properties": {
+    "schema": { "const": "uads.failure-record" },
+    "schemaVersion": { "const": "0.5.0" },
+    "failureRecordId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": ["string", "null"] },
+    "executionRunId": { "type": ["string", "null"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "string",
+      "enum": ["test", "lint", "typecheck", "build", "runtime", "gate", "manual-evidence"]
+    },
+    "command": { "type": ["string", "null"] },
+    "exitCode": { "type": ["integer", "null"] },
+    "status": { "type": "string", "enum": ["recorded", "diagnosed", "loop", "resolved"] },
+    "failureClass": {
+      "type": "string",
+      "enum": ["assertion", "exception", "compile", "type", "lint", "command", "timeout", "unknown"]
+    },
+    "messageSummary": { "type": "string" },
+    "stackFrames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["inRepo"],
+        "properties": {
+          "path": { "type": ["string", "null"] },
+          "line": { "type": ["integer", "null"] },
+          "column": { "type": ["integer", "null"] },
+          "functionName": { "type": ["string", "null"] },
+          "inRepo": { "type": "boolean" }
+        }
+      }
+    },
+    "failingTests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "file": { "type": ["string", "null"] },
+          "title": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "relatedEvidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "changeDigest": { "type": ["string", "null"] },
+    "repositoryIndexDigest": { "type": ["string", "null"] },
+    "repositoryHead": { "type": ["string", "null"] },
+    "dirtyDigest": { "type": ["string", "null"] },
+    "signature": { "type": "string", "minLength": 1 },
+    "sanitization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["redacted"],
+      "properties": {
+        "redacted": { "type": "boolean" },
+        "kinds": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

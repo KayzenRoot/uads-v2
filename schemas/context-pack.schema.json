@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/context-pack.schema.json",
+  "title": "UADS Context Pack",
+  "description": "Metadata-first Context Pack. schemaVersion 0.4.0. Does not persist source copies.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "contextPackId",
+    "projectId",
+    "workOrderId",
+    "executionRunId",
+    "impactReportId",
+    "indexDigest",
+    "gitHead",
+    "dirtyDigest",
+    "generatedAt",
+    "contextRadius",
+    "objective",
+    "tokenEstimateMethod",
+    "estimatedTokens",
+    "items",
+    "focusedTests",
+    "contracts",
+    "docs",
+    "unresolved",
+    "excludedSummary",
+    "expansionHistory"
+  ],
+  "properties": {
+    "schema": { "const": "uads.context-pack" },
+    "schemaVersion": { "const": "0.4.0" },
+    "contextPackId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "workOrderId": { "type": ["string", "null"] },
+    "executionRunId": { "type": ["string", "null"] },
+    "impactReportId": { "type": "string", "minLength": 1 },
+    "indexDigest": { "type": "string", "minLength": 1 },
+    "gitHead": { "type": ["string", "null"] },
+    "dirtyDigest": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "contextRadius": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5"] },
+    "objective": { "type": ["string", "null"] },
+    "tokenEstimateMethod": { "const": "byte-heuristic" },
+    "estimatedTokens": { "type": "integer", "minimum": 0 },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role", "relation", "reason", "confidence", "contentDigest", "estimatedTokens", "layer"],
+        "properties": {
+          "path": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["implementation", "test", "review", "security", "docs", "config", "contract"]
+          },
+          "relation": {
+            "type": "string",
+            "enum": ["direct", "dependency", "dependent", "test", "interface", "documentation", "config"]
+          },
+          "reason": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "contentDigest": { "type": "string" },
+          "estimatedTokens": { "type": "integer", "minimum": 0 },
+          "layer": { "type": "string", "enum": ["static", "semi-stable", "dynamic"] }
+        }
+      }
+    },
+    "focusedTests": { "type": "array", "items": { "type": "string" } },
+    "contracts": { "type": "array", "items": { "type": "string" } },
+    "docs": { "type": "array", "items": { "type": "string" } },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "specifier", "reason", "method", "confidence", "sourceDigest"],
+        "properties": {
+          "source": { "type": "string" },
+          "specifier": { "type": "string" },
+          "reason": { "type": "string" },
+          "method": { "type": "string" },
+          "confidence": { "type": "number" },
+          "line": { "type": "integer" },
+          "sourceDigest": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "excludedSummary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "staticLayerDigest": { "type": "string" },
+    "semiStableLayerDigest": { "type": "string" },
+    "dynamicLayerDigest": { "type": "string" },
+    "expansionHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "reason", "at"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "reason": { "type": "string" },
+          "at": { "type": "string" }
+        }
+      }
+    }
+  }
+}
