@@ -2,7 +2,7 @@
   "schema": "uads2.wo-006.s04-test-map",
   "schemaVersion": "1.0.0",
   "issue": 28,
-  "implementationHead": "d6a355106f600be43c53746a7a4cb6866473b458",
+  "implementationHead": "0c96f6c4b74e73157fae3cb9533ffdd3f3254a44",
   "tests": [
     "M03-T001",
     "M03-T002",
@@ -49,5 +49,36 @@
     "M03-T061-M03-T066 active-probe cross-platform"
   ],
   "benchmarkLinePrefix": "UADS2_WO_006_BENCHMARK",
-  "status": "HOSTED_VERIFICATION_PENDING"
+  "status": "PASSED_ON_IMPLEMENTATION_EQUIVALENT_HEAD",
+  "result": {
+    "testFilesPassed": 52,
+    "testsPassed": 462,
+    "testsFailed": 0,
+    "sourceRunId": 34407137445,
+    "benchmark": {
+      "B1": {
+        "p50Ms": 0.06329399999992802,
+        "p95Ms": 0.13411899999994148,
+        "targetP95Ms": 50,
+        "pass": true
+      },
+      "B3": {
+        "bytesPerHost": 10990,
+        "targetBytes": 65536,
+        "pass": true
+      },
+      "B4": {
+        "unsafeTrue": 0,
+        "tamperReplayAccepted": 0,
+        "driftMisses": 0,
+        "absenceUnsupported": 0,
+        "pass": true
+      },
+      "B7": {
+        "corruptAccepted": 0,
+        "recovered": true,
+        "pass": true
+      }
+    }
+  }
 }

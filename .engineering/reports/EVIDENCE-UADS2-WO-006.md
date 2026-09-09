@@ -1,7 +1,8 @@
 # Evidence Bundle — UADS2-WO-006 / M03 S05 Slice 1
 
-Status: IMPLEMENTED / HOSTED VERIFICATION PENDING
+Status: FINAL EVIDENCE FROZEN / EXACT-HEAD HEDS GATES PENDING
 Issue: #28
+PR: #29
 Base main: `36b2019fc22b4d6c5d250e41edf12e737c4ddcfa`
 Branch: `work/uads2-wo-006-m03-pccr-core`
 Implementation head at bundle creation: `d6a355106f600be43c53746a7a4cb6866473b458`
@@ -62,7 +63,15 @@ Required metrics:
 - B4 unsafe TRUE / tamper-replay / drift-miss / absence-to-UNSUPPORTED counters all zero;
 - B7 corrupt accepted = 0 and recovery = true.
 
-Measured hosted values: **PENDING EXACT-HEAD CI**.
+Measured on implementation-equivalent head `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`, CI run #80 / run id `34407137445`:
+
+- B1 full-test sample #1: p50 = **0.063294 ms**, p95 = **0.134119 ms**, target p95 <= 50 ms, PASS.
+- B1 full-test sample #2 from validation rerun: p50 = **0.053128 ms**, p95 = **0.129873 ms**, PASS.
+- B3 durable proof state: **10,990 bytes/host**, target <= 65,536 bytes, PASS.
+- B4: unsafeTrue=0, tamperReplayAccepted=0, driftMisses=0, absenceUnsupported=0, PASS.
+- B7: corruptAccepted=0, recovered=true, PASS.
+
+The final review head differs from `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44` only by evidence/checkpoint metadata. Hosted gates must rerun on that final head before HEDS.
 
 ## Privacy/security review
 
@@ -89,6 +98,22 @@ Absence cannot manufacture UNSUPPORTED.
 - no six future capability IDs in runtime vocabulary yet;
 - no active-probe PBF executor;
 - M03 is not S07-frozen by this slice.
+
+## Correction history
+
+Initial PR head `6206e221e7897f307ee84e1b8b8c795cf55f2e7b` failed exactly one new test: T049 used a fake GitHub token shorter than the repository's canonical secret detector threshold. Runtime code compiled cleanly and the benchmark already passed.
+
+Correction commit `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44` changed only the test fixture to a canonical 36+ character GitHub-token shape. On that implementation-equivalent head:
+- 52/52 test files passed;
+- 462/462 tests passed;
+- lint/typecheck/build passed;
+- all evals passed;
+- foundation/engineering validation passed;
+- dependency audit and packaging passed;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Cross-Platform SUCCESS.
 
 ## Verification gate
 

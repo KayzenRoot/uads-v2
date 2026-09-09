@@ -207,3 +207,29 @@ STOP and report BLOCKED/CORRECTION REQUIRED if:
 - current accepted ADR-UADS2-012 must be weakened;
 - a HIGH/CRITICAL security/integrity defect remains;
 - full required verification cannot be made objective.
+
+
+## Verification record before final HEDS
+
+Implementation-equivalent head: `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`
+PR: #29
+
+- lint: PASS
+- typecheck: PASS
+- build: PASS
+- full tests: 52/52 files, 462/462 tests PASS
+- all inherited evals: PASS
+- validate:engineering: PASS
+- validate: PASS
+- dependency gate: PASS
+- packaging smoke: PASS
+- CI: SUCCESS
+- CodeQL: SUCCESS
+- Dependency Review: SUCCESS
+- Cross-Platform: SUCCESS
+- B1/B3/B4/B7: PASS
+
+Initial test-only defect:
+T049 used a too-short fake GitHub token. The fixture was corrected to match the existing repository secret detector. Runtime implementation did not change.
+
+Final exact-head HEDS remains mandatory after this evidence-only metadata commit.

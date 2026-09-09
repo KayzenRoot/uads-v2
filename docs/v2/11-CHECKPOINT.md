@@ -1,42 +1,50 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-006 ACTIVE — M03 S05 SLICE 1 READY FOR EXECUTOR
+Status: UADS2-WO-006 PR #29 FINAL EVIDENCE FROZEN / EXACT-HEAD HEDS PENDING
 Date: 2026-09-09
 
 Completed Work Order: UADS2-WO-005
 Active Work Order: UADS2-WO-006
 Active Issue: #28
+Active PR: #29
 Active Branch: `work/uads2-wo-006-m03-pccr-core`
-Base SHA: `36b2019fc22b4d6c5d250e41edf12e737c4ddcfa`
+Base main SHA: `36b2019fc22b4d6c5d250e41edf12e737c4ddcfa`
+Implementation-equivalent verified head: `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`
 Active Module: M03 Host Capability Detector
 Active Session: S05.1
 
-## Authorized slice
+## Implemented slice
 
 **PCCR Core + Passive/Deterministic-Local Proof + Conservative Compatibility Projector**
 
-This is the first runtime implementation slice under accepted ADR-UADS2-012.
+Runtime scope remains exactly:
+- `schemas/host-capability-proof.schema.json`
+- `src/kernel/host-capability-proof.ts`
+- `tests/host-capability-proof.test.ts`
 
-## Hard boundaries
+No existing runtime/schema/package/workflow file was modified.
 
-- no Cursor/Codex-specific probe;
-- no subprocess/shell/network execution;
-- no new npm dependency;
-- no legacy runtime capability schema expansion;
-- no six future capability IDs in runtime yet;
-- no M01/M02/M04/M06/M23 implementation;
-- legacy true without valid PCCR must degrade to unknown.
+## Objective verification
 
-## Required proof
+On `0c96f6c4b74e73157fae3cb9533ffdd3f3254a44`:
+- 52/52 test files PASS;
+- 462/462 tests PASS;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Cross-Platform SUCCESS;
+- B1 p95 0.134119 ms <= 50 ms;
+- B3 10,990 bytes/host <= 65,536;
+- B4 all unsafe/tamper/drift/absence counters = 0;
+- B7 corruptAccepted=0 and recovered=true.
 
-Frozen S04 IDs applicable to Slice 1:
-T001-T010, T018-T030, T045-T060.
+## Correction record
 
-Benchmarks/evidence:
-B1, B3, B4, B7.
+An earlier run failed only T049 because the test used a fake GitHub token shorter than the existing canonical secret-pattern threshold. The fixture was corrected. Runtime code was unchanged.
 
-## Next gate
+## Final gate
 
-Executor implementation → tests/evidence → PR → exact-head HEDS.
+The evidence/checkpoint metadata is now frozen.
+Run all four hosted gates on the final PR head, confirm zero unresolved threads, then HEDS.
 
-No advancement to active host probes before this slice is APPROVED/MERGED.
+No active host probe or next module may start before UADS2-WO-006 is APPROVED/MERGED.
