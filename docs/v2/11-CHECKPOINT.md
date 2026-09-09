@@ -1,60 +1,71 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-002 APPROVED / MERGED; UADS2-WO-003 CORRECTION IMPLEMENTED / FINAL HEDS PENDING
+Status: UADS2-WO-003 APPROVED / MERGED; GLOBAL ARCHITECTURE PLANNING NEXT
 Date: 2026-09-09
-Completed Work Order: UADS2-WO-002
-Active Work Order: UADS2-WO-003
-Active Issue: #21
-Active PR: #22
-Active Branch: `work/uads2-wo-003-m30-event-dashboard-foundation`
-UADS2-WO-003 base SHA: `5a6e0d31ec99d2f89136fbd764257a588d625263`
-Preflight artifact commit: `d9cd18502c2b2a9284ef44eb7cf34800c931ea2b`
-Implementation snapshot: `60b3f26f276a8f22fafb73b7d33f60cef16d053f`
+
+Completed Work Order: UADS2-WO-003
+Active Work Order: none
+Active PR: none
+Merged PR: #22
+Approved UADS2-WO-003 head: `553ec1e66a84444d9944b45220ecdfe2160ced6b`
+UADS2-WO-003 merge SHA: `e54f70fd40bdc9b58c9145036b920f59879f6d63`
 
 ## Canonical truth
 
+UADS2-WO-001, UADS2-WO-002 and UADS2-WO-003 are complete and HEDS APPROVED.
+
 ADR-UADS2-009 requires dashboard-first event-backed real-time operations.
-ADR-UADS2-010 requires five enterprise production-readiness classifications and M27–M31 ownership.
+ADR-UADS2-010 requires five enterprise production-readiness classifications and M27-M31 ownership.
 B-001 preserves frozen-V1 Duplicate Analysis Rate as `UNAVAILABLE (0/0)` and requires deterministic structured analysis-event proof in V2.
 
-## Active NECESSARY increment
+## UADS2-WO-003 completion
 
-`UADS2-WO-003 — M30 Event Spine & Dashboard Operator Foundation`.
+M30 Event Spine & Dashboard Operator Foundation is merged as the first bounded V2 runtime slice.
 
-This is the first bounded V2 runtime implementation slice. The correction
-implementation, focused proof and refreshed evidence are complete; the branch
-is awaiting exact-head hosted gates and final HEDS audit before any merge.
+Accepted exact-head evidence:
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- UADS Cross-Platform Compatibility SUCCESS on Windows/Node 20 and Linux/Node 20;
+- focused M30 tests 10/10;
+- focused regression selection 31/31;
+- CR-001, CR-002 and CR-003 closed;
+- B-001 transport/schema proof denominator 2, numerator 1, rate 0.5;
+- immutable no-overwrite event storage;
+- loopback-only dashboard;
+- objective Work Order/correlation/status surfaces;
+- no new runtime dependency;
+- no broad M01/M08 implementation;
+- no V1 mutation.
 
-## Technology boundary
+The local full Vitest/validate non-returning behavior remains documented as local INCONCLUSIVE; hosted exact-head CI completed the full test/eval/validation pipeline successfully.
 
-- Node 20 / TypeScript existing stack.
-- No new runtime dependency.
-- Existing global sidecar workspace is extended, not replaced.
-- Local dashboard uses Node built-in HTTP and dependency-free real-time transport.
-- Loopback only.
-- Objective data only. Missing data = `UNAVAILABLE`/degraded.
+## Owner-approved construction model
 
-## Enterprise classification
+Issue #23 records the explicit owner decision:
 
-- Scale/load: COVERED via M27 proof obligations.
-- Resilience: COVERED via M28 proof obligations.
-- Operational security: COVERED via M29 proof obligations.
-- Production observability: COVERED directly by M30.
-- Continuous safe operations: COVERED via M31 proof obligations.
+**Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze**
 
-## Execution artifact
+This decision is preserved and MUST be canonically promoted by the next bounded planning Work Order before any new deep module implementation.
 
-Versioned Markdown executor prompt:
-`.engineering/executor-prompts/UADS2-WO-003-EXECUTOR-PROMPT.md`.
+## Next NECESSARY increment
 
-User-facing execution copy must be delivered as PDF after preflight HEDS approval.
+Create `UADS2-WO-004 — Global Module System Architecture & Dependency Graph`.
 
-## Guardrail
+Required planning scope:
+- promote issue #23 into an accepted ADR;
+- update Decisions Ledger, Architecture, module lifecycle/process docs, Checkpoint and Continuity;
+- architect all 31 modules at system level;
+- define/validate module boundaries, inputs/outputs, events, data ownership and explicit non-ownership;
+- generate and freeze the global dependency graph;
+- classify dependencies as hard, soft/optional, event-driven or governance-only;
+- identify implementation order by dependency / next NECESSARY capability, not module number;
+- define S01 Technology Radar and S01.5 Technology Invention Radar as mandatory deep-discovery steps per selected module;
+- require small vertical slices with continuous tests;
+- require Architecture Reconciliation Checkpoint every 3-5 completed modules or earlier on material change;
+- preserve M27-M31 enterprise gates continuously.
 
-Preflight HEDS approved implementation on the locked branch; correction CR-001
-through CR-003 is now implemented locally. Required hosted gates passed on the
-audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`. No merge until final
-exact-head HEDS `APPROVED`.
+No new deep module runtime implementation begins until UADS2-WO-004 is HEDS APPROVED.
 
 ## Repository follow-up
 
