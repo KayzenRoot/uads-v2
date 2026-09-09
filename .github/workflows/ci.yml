@@ -163,7 +163,16 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
+          original_origin="$(git remote get-url origin)"
+          restore_origin() { git remote set-url origin "$original_origin"; }
+          trap restore_origin EXIT
+          # validate-foundation re-runs the inherited release-security test suite.
+          # Bind that historical proof to the frozen V1 lineage for the duration
+          # of validation, then restore the UADS V2 origin before CI receipts.
+          git remote set-url origin "https://github.com/KayzenRoot/uads.git"
           npm run validate 2>&1 | tee "$RUNNER_TEMP/uads-validate.log"
+          restore_origin
+          trap - EXIT
 
       - name: Validate engineering protocol artifacts
         id: engineering_validation
