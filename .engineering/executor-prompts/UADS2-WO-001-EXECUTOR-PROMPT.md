@@ -1,10 +1,26 @@
 # UADS2-WO-001 — Executor Prompt
 
 ## ROLE
-Act as the bounded executor for Work Order `UADS2-WO-001`. Execute this increment end-to-end. Do not begin any UADS V2 runtime module.
+Act as the bounded executor for Work Order `UADS2-WO-001`. Execute this increment end-to-end. Do not begin any UADS V2 runtime module. The user must not need to perform Git/terminal setup manually when you can perform it safely.
+
+## LOCAL WORKSPACE BOOTSTRAP — MANDATORY FIRST STEP
+The user's intended local UADS V2 working directory is currently EMPTY. Treat this first execution as a clean-machine/empty-workspace bootstrap.
+
+1. Inspect the current working directory before writing anything.
+2. If it is truly empty (ignoring harmless OS metadata), clone `KayzenRoot/uads-v2` directly into the current directory. Do not create an unnecessary nested `uads-v2/uads-v2` path.
+3. If `.git` already exists, do not clone again. Verify the repository identity and remote instead.
+4. If the directory is non-empty and is not clearly the intended UADS V2 repository, STOP rather than deleting, overwriting or relocating unrelated user files.
+5. Verify `origin` points to the canonical `KayzenRoot/uads-v2` repository. If the remote is missing, add it safely. If it points elsewhere, report the mismatch and only correct it when the repository identity is unambiguous and no unrelated history would be lost.
+6. Fetch/prune remote refs non-destructively.
+7. Checkout the existing remote Work Order branch `work/uads2-wo-001-v1-baseline`, creating a local tracking branch only if needed.
+8. Pull/fast-forward to the exact remote head. Do not force reset over user work. If local modifications unexpectedly exist, preserve them and STOP with a precise report rather than discarding them.
+9. Verify branch, `origin`, HEAD, working-tree cleanliness, and reachability of `origin/main` before proceeding.
+10. Do not use force-push, destructive clean/reset, history rewriting, or deletion of unrelated local content.
+
+The local checkout is an execution workspace. GitHub canonical sources and the active checkpoint remain authoritative.
 
 ## SOURCE CHECK / CONTEXT LOCK
-Before changes, reconcile the local repository with `KayzenRoot/uads-v2`, checkout `work/uads2-wo-001-v1-baseline`, fetch the current remote head, and inspect Git status. Read in canonical order:
+After local bootstrap, reconcile the repository with GitHub and read in canonical order:
 1. `docs/v2/11-CHECKPOINT.md`
 2. `docs/v2/10-DECISIONS-LEDGER.md`
 3. `docs/v2/03-SCOPE.md`
@@ -65,6 +81,8 @@ Create/update only bounded evidence artifacts required by the Work Order, includ
 - `.engineering/checkpoints/CHECKPOINT-DELTA-UADS2-WO-001.md`
 
 Add raw evidence under a clearly named bounded `.engineering/evidence/UADS2-WO-001/` path when needed. Do not commit secrets, credentials, private tokens, irrelevant machine data, or large generated/vendor artifacts.
+
+If the owner-approved canonical dashboard reference image is available to the executor as an input/local file during this execution, it may be added unchanged under a clearly documented `docs/v2/ui/reference/dashboard/` path with a checksum and README identifying it as the canonical visual reference. Do not regenerate, reinterpret or alter the image. Absence of the binary image does not block this baseline Work Order.
 
 ## REQUIRED METRICS
 Calculate from raw evidence, not estimates:
