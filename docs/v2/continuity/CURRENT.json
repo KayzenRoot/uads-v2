@@ -3,18 +3,18 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_004_GLOBAL_MODULE_ARCHITECTURE_ACTIVE",
+  "programState": "UADS2_WO_004_GLOBAL_MODULE_ARCHITECTURE_READY_FOR_HEDS",
   "completedWorkOrder": "UADS2-WO-003",
   "completedPullRequest": 22,
   "approvedHead": "553ec1e66a84444d9944b45220ecdfe2160ced6b",
   "mergeCommit": "e54f70fd40bdc9b58c9145036b920f59879f6d63",
-  "lastRecordedHead": "d3f80ed352c8424853882bbf9041c386a93bd603",
+  "lastRecordedHead": "d09c0c692e3bc07519aa39b1d12358f96ef0bac2",
   "activeWorkOrder": "UADS2-WO-004",
-  "activePullRequest": null,
+  "activePullRequest": 25,
   "activeBranch": "work/uads2-wo-004-global-module-architecture",
   "activeModule": "GLOBAL M01-M31 SYSTEM ARCHITECTURE",
-  "activeSession": "Promote issue #23, freeze ownership/contracts/dependency graph before deep discovery",
-  "nextNecessaryAction": "Open PR for UADS2-WO-004, run exact-head HEDS, and only after APPROVED/MERGED begin M03 deep discovery S00/S01/S01.5.",
+  "activeSession": "Global ownership/contracts/dependency graph frozen; exact-head HEDS pending on PR #25",
+  "nextNecessaryAction": "Run exact-head HEDS on PR #25. If APPROVED, merge/promote issue #23 as ADR-UADS2-011, then begin M03 deep discovery S00/S01/S01.5.",
   "knownBlockers": [
     "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
   ],
@@ -25,7 +25,15 @@
     "Issue #23 owner-approved Global Architecture -> Deep Module Discovery -> Vertical Implementation -> Integration Freeze model"
   ],
   "moduleInventoryCount": 31,
-  "moduleInventoryState": "GLOBAL_SYSTEM_ARCHITECTURE_HEDS_PENDING",
+  "moduleInventoryState": "GLOBAL_SYSTEM_ARCHITECTURE_READY_FOR_HEDS",
+  "dependencyGraphValidation": {
+    "nodeCount": 31,
+    "hardEdgeCount": 60,
+    "cycles": 0,
+    "missingRefs": 0,
+    "manifestMismatch": 0,
+    "selectedNext": "M03"
+  },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
     "SOLO",
