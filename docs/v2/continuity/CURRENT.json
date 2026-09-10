@@ -3,29 +3,35 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_010_PR38_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
-  "completedWorkOrder": "UADS2-WO-009",
-  "completedPullRequest": 35,
-  "lastRecordedHead": "5136f4c940b68ec07538b7654e68edf2a6b7af9e",
-  "activeWorkOrder": "UADS2-WO-010",
-  "activePullRequest": 38,
-  "activeBranch": "work/uads2-wo-010-m03-cross-platform-telemetry-hardening",
+  "programState": "UADS2_WO_010_APPROVED_MERGED_M03_S06_INTEGRATION_NEXT",
+  "completedWorkOrder": "UADS2-WO-010",
+  "completedPullRequest": 38,
+  "approvedHead": "51884e5716a362ab983bced0d3d8dfef4efb0868",
+  "mergeCommit": "886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721",
+  "hedsReviewId": 5161673161,
+  "lastRecordedHead": "886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721",
+  "activeWorkOrder": null,
+  "activePullRequest": null,
+  "activeBranch": null,
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.5 implemented; exact-head HEDS pending",
-  "nextNecessaryAction": "Wait for fresh exact-head gates on PR #38, then HEDS. If approved, merge/promote and reconcile S06. B6 remains justified performance exception.",
+  "activeSession": "S05.1-S05.5 approved/merged; S06 integration next",
+  "nextNecessaryAction": "Create bounded M03 S06.1 Work Order to migrate host-dispatch capability input to proof-aware compatibility projection without vendor-specific active probes.",
   "knownBlockers": [
-    "Issue #9 admin-only repository configuration"
+    "Issue #9 admin-only repository configuration",
+    "M30 B6 telemetry CPU overhead remains documented performance debt"
   ],
   "m03": {
     "completedSlices": [
       "S05.1",
       "S05.2",
       "S05.3",
-      "S05.4"
+      "S05.4",
+      "S05.5"
     ],
-    "activeSlice": "S05.5",
+    "nextSlice": "S06.1 proof-aware host-dispatch integration",
     "vendorSpecificProbes": "NOT_AUTHORIZED",
-    "localMachineRequired": false
+    "localMachineRequired": false,
+    "s07Frozen": false
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [

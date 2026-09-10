@@ -1,6 +1,6 @@
 # M03 — Host Capability Detector
 
-Status: DISCOVERY — S00-S04 FROZEN / S05.1-S05.4 APPROVED-MERGED / NEXT SLICE RECONCILIATION
+Status: DISCOVERY — S00-S04 FROZEN / S05.1-S05.5 APPROVED-MERGED / S06 INTEGRATION NEXT
 Class: NECESSARY
 
 Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools, telemetry or other host-dependent behavior.
@@ -32,8 +32,9 @@ Canonical accepted ADR:
 - S05.2: APPROVED / MERGED — stable privacy-safe host subject identity, exact adapter/passive-state digests and passive PCCR evidence bridge. Host presence never becomes positive capability proof.
 - S05.3: APPROVED / MERGED — schema-closed Probe Budget Fence, fixed Node-current production self-test, no-shell/no-PATH execution, minimal environment, byte/time ceilings, executable identity, single-flight and privacy-safe receipts.
 - S05.4: APPROVED / MERGED — backward-compatible PCCR 1.1 active-evidence semantics, TEST_ONLY trust-boundary hardening, composite executable-identity validity binding, conservative active negative proof and forged-receipt rejection.
-- Later S05 slices: vendor-specific experiments remain separately gated and require real source/host evidence before promotion.
-- S06: future integration/hardening.
+- S05.5: APPROVED / MERGED — cross-platform T061-T066 proof, inspectable no-shell/no-PATH PBF policy and B6 telemetry overhead measured as a documented JUSTIFIED_EXCEPTION.
+- Later vendor-specific S05 experiments remain separately gated and require real source/host evidence before promotion.
+- S06: NEXT — migrate HARD consumers incrementally from coarse adapter-declaration snapshots to proof-aware compatibility projections; preserve conservative fallback and no vendor claims.
 - S07: future module freeze.
 
 ## Core invariant

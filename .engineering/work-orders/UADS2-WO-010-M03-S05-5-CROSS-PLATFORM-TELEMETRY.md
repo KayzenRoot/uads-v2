@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-010
 
-Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
+Status: COMPLETED — HEDS APPROVED / MERGED
 Module: M03 — Host Capability Detector
 Slice: S05.5 — Cross-Platform & Telemetry Hardening
 Repository: `KayzenRoot/uads-v2`
@@ -129,3 +129,20 @@ B6:
 
 Capability truth remained unchanged when telemetry failed.
 Final exact-head HEDS still required after this evidence-only commit.
+
+
+## Final HEDS completion record
+
+- Exact reviewed head: `51884e5716a362ab983bced0d3d8dfef4efb0868`
+- HEDS review: `5161673161`
+- HEDS verdict: `APPROVED WITH DOCUMENTED PERFORMANCE EXCEPTION`
+- Merge SHA: `886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721`
+- CI / CodeQL / Dependency Review / Cross-Platform: SUCCESS
+- 56/56 test files PASS
+- 539/539 tests PASS
+- Linux focused T061/T066: PASS
+- Windows focused T062/T065: PASS
+- T063/T064 root-binding portability rules: PASS
+- Exact-head B6 direct overhead: 401.567944%
+- Exact-head B6 validation overhead: 372.111293%
+- B6 verdict: JUSTIFIED_EXCEPTION, NOT PASS

@@ -1,7 +1,7 @@
 {
   "schema": "uads2.wo010.cross-platform-telemetry-evidence",
   "schemaVersion": "1.0.0",
-  "status": "IMPLEMENTATION_HEAD_VERIFIED_FINAL_HEDS_HEAD_PENDING",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED_WITH_PERFORMANCE_EXCEPTION",
   "implementationHead": "5136f4c940b68ec07538b7654e68edf2a6b7af9e",
   "ci": {
     "runId": 34423921430,
@@ -45,6 +45,36 @@
       "enabledMedianWallMsPerOp": 2.0295547500000026,
       "overheadPercent": 421.99730094466935
     },
-    "reason": "Existing M30 evidence.lifecycle performs synchronous durable event persistence, hashing, retention and health projection. S04 explicitly permits a justified exception when <5% is not achieved."
+    "reason": "Existing M30 evidence.lifecycle performs synchronous durable event persistence, hashing, retention and health projection. S04 explicitly permits a justified exception when <5% is not achieved.",
+    "final": {
+      "direct": {
+        "disabledMedianCpuMicrosPerOp": 358.75,
+        "enabledMedianCpuMicrosPerOp": 1799.375,
+        "disabledMedianWallMsPerOp": 0.29289525000000083,
+        "enabledMedianWallMsPerOp": 1.9636694999999946,
+        "overheadPercent": 401.5679442508711
+      },
+      "validation": {
+        "disabledMedianCpuMicrosPerOp": 381.875,
+        "enabledMedianCpuMicrosPerOp": 1802.875,
+        "disabledMedianWallMsPerOp": 0.33561050000000137,
+        "enabledMedianWallMsPerOp": 1.936803249999997,
+        "overheadPercent": 372.1112929623568
+      },
+      "verdict": "JUSTIFIED_EXCEPTION"
+    }
+  },
+  "finalHead": "51884e5716a362ab983bced0d3d8dfef4efb0868",
+  "finalCi": {
+    "runId": 34424460441,
+    "jobId": 102706622305,
+    "testFilesPassed": 56,
+    "testsPassed": 539
+  },
+  "finalCrossPlatform": {
+    "runId": 34424460268,
+    "linuxJobId": 102706621594,
+    "windowsJobId": 102706621420,
+    "status": "SUCCESS"
   }
 }

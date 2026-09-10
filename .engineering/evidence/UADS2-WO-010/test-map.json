@@ -2,7 +2,7 @@
   "schema": "uads2.wo010.test-map",
   "schemaVersion": "1.0.0",
   "implementationHead": "5136f4c940b68ec07538b7654e68edf2a6b7af9e",
-  "status": "PASS_IMPLEMENTATION_HEAD",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "tests": [
     {
       "id": "M03-T061",
@@ -41,5 +41,15 @@
     "failed": 0
   },
   "telemetryTruthIndependence": "PASS",
-  "B6Verdict": "JUSTIFIED_EXCEPTION"
+  "B6Verdict": "JUSTIFIED_EXCEPTION",
+  "finalHead": "51884e5716a362ab983bced0d3d8dfef4efb0868",
+  "finalResult": {
+    "testFilesPassed": 56,
+    "testsPassed": 539,
+    "failed": 0
+  },
+  "finalCrossPlatform": {
+    "linux": "PASS",
+    "windows": "PASS"
+  }
 }

@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-010 / M03 S05.5
 
-Status: IMPLEMENTATION VERIFIED / FINAL EXACT-HEAD HEDS PENDING
+Status: HEDS APPROVED / MERGED
 Issue: #37
 PR: #38
 Base main: `5752d1ff7716027071464308eaec6e0a0aef3892`
@@ -119,3 +119,38 @@ A future bounded optimization should examine amortized/batched operational proje
 ## Final gate
 
 This evidence commit changes PR HEAD. Fresh exact-head CI, CodeQL, Dependency Review and Cross-Platform SUCCESS plus zero unresolved threads are required before HEDS approval.
+
+
+## Final exact-head HEDS evidence
+
+Exact reviewed head: `51884e5716a362ab983bced0d3d8dfef4efb0868`
+HEDS review: `5161673161`
+Merge SHA: `886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721`
+Exact-head CI run: `34424460441`
+Exact-head Foundation job: `102706622305`
+Exact-head Cross-Platform run: `34424460268`
+
+Final:
+- 56/56 test files PASS;
+- 539/539 tests PASS;
+- Foundation SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Linux / Node20 SUCCESS;
+- Windows / Node20 SUCCESS;
+- unresolved review threads = 0;
+- mergeable = true at audit.
+
+Exact-head B6 direct:
+- disabled CPU 358.75 us/op;
+- enabled CPU 1799.375 us/op;
+- overhead 401.567944%;
+- wall 0.292895 ms/op -> 1.963669 ms/op.
+
+Validation:
+- disabled CPU 381.875 us/op;
+- enabled CPU 1802.875 us/op;
+- overhead 372.111293%;
+- wall 0.335611 ms/op -> 1.936803 ms/op.
+
+B6 remains JUSTIFIED_EXCEPTION. No <5% claim is promoted.

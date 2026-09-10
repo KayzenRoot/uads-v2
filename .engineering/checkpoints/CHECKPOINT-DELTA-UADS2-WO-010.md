@@ -1,19 +1,22 @@
 # CHECKPOINT DELTA — UADS2-WO-010
 
-Status: IMPLEMENTED / NOT PROMOTED / HEDS PENDING
+Status: PROMOTED
 Module: M03 S05.5
 Issue: #37
 PR: #38
-Implementation head: `5136f4c940b68ec07538b7654e68edf2a6b7af9e`
+Reviewed head: `51884e5716a362ab983bced0d3d8dfef4efb0868`
+Merge SHA: `886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721`
 
-Candidate promotion:
-- T061-T066 cross-platform evidence;
-- immutable inspectable PBF execution policy;
+## Promoted
+- M03-T061..T066;
+- Linux/Windows focused execution proof;
+- immutable PBF execution policy;
+- case-preserving CLDS portable root identity behavior;
 - B6 truthful JUSTIFIED_EXCEPTION;
-- telemetry failure remains truth-independent.
+- telemetry truth independence.
 
-Not promoted:
-- B6 <5% claim;
-- vendor probes;
-- host-dispatch integration;
-- M03 S07 freeze.
+## Explicit debt
+M30 evidence.lifecycle CPU overhead exceeds the <5% target. No passing claim is made.
+
+## Next
+M03 S06.1 proof-aware host-dispatch integration.
