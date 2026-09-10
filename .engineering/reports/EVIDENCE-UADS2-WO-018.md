@@ -1,6 +1,6 @@
 # EVIDENCE — UADS2-WO-018
 
-Status: CANDIDATE — FINAL HEDS PENDING
+Status: CANDIDATE — FINAL EXACT-HEAD REVALIDATION REQUIRED
 Module: M30 Production Observability & Real-Time Operations
 Session: S03 Failure, Security and Recovery Analysis
 Issue: #59
@@ -31,23 +31,28 @@ These are cross-module requirements discovered during M30 S03 and MUST be reconc
 ## Governance repair dependency
 A source audit before final S03 review found missing WO-015/016 governance artifacts. UADS2-WO-018G / Issue #61 / PR #62 reconstructed those artifacts truthfully as post-merge records. PR #62 received HEDS review `5166442418` and was squash-merged as `6106dcbd67595bac9cd8251b987db3ebdbcb45ce` before S03 final approval.
 
-## Gate evidence
-An earlier S03 candidate head `503076e16bad7894ea772e84ad46eced6f5585d5` passed:
+## Historical candidate gate evidence
+Candidate head `503076e16bad7894ea772e84ad46eced6f5585d5` passed:
 - Dependency Review `34469315756` — SUCCESS
 - CodeQL `34469315767` — SUCCESS
 - Cross-Platform `34469315799` — SUCCESS
 - CI `34469315764` — SUCCESS
 
-These runs are historical candidate evidence only. Because this Evidence Bundle/checkpoint reconciliation changes the PR head, FINAL approval requires all mandatory gates and HEDS on the new exact head.
+## Pre-final evidence reconciliation head
+Head `7ee51d4ef63364a44f51d7864f2c79c8ce41a1d0` passed:
+- Dependency Review `34471147625` — SUCCESS
+- CodeQL `34471147582` — SUCCESS
+- Cross-Platform `34471147633` — SUCCESS
+- CI `34471147620` — SUCCESS
+- HEDS review `5166522646` — APPROVED
 
-## Final gate placeholders
-- Final head: PENDING
-- Dependency Review: PENDING
-- CodeQL: PENDING
-- Cross-Platform: PENDING
-- CI: PENDING
-- HEDS: PENDING
-- Merge SHA: PENDING
+Because this Evidence Bundle was then updated to replace placeholders with those concrete facts, the resulting commit becomes the new final candidate head and MUST itself receive a fresh exact-head gate set and HEDS before merge.
+
+## Final merge evidence
+- Final exact head: determined by this evidence-reconciliation commit
+- Final exact-head gates: REQUIRED
+- Final HEDS: REQUIRED
+- Merge SHA: PENDING UNTIL MERGE
 
 ## S03 stop condition
-Do not freeze or promote to S04 while any unresolved HIGH/CRITICAL path lacks prevention/detection/containment/recovery proof obligations, or while token-spend runaway/routing-economic safeguards lack release-blocking proof requirements.
+Do not freeze or promote to S04 while any unresolved HIGH/CRITICAL path lacks prevention/detection/containment/recovery proof obligations, while token-spend runaway/routing-economic safeguards lack release-blocking proof requirements, or while exact-head gates/HEDS are incomplete.
