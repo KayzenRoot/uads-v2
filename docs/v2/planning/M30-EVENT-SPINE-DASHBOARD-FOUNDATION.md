@@ -1,7 +1,9 @@
 # M30 S00/S02 — Event Spine & Dashboard Operator Foundation
 
-Status: CORRECTION IMPLEMENTED — LOCAL FOCUSED VALIDATION PASS / FINAL HEDS PENDING
-Work Order: UADS2-WO-003
+Status: HISTORICAL FOUNDATION RECORD — SUPERSEDED FOR CURRENT STATUS BY M30 CANONICAL DISCOVERY DOCS
+Original Work Order: UADS2-WO-003
+
+> Historical record note (2026-09-10): this document preserves the bounded WO-003 foundation decisions and evidence context. Its former ending that said final HEDS was pending is no longer a current-status statement. Subsequent M30 discovery increments S00, S01 and S01.5 have been approved and merged. Current status belongs in `docs/v2/modules/M30-PRODUCTION-OBSERVABILITY-REALTIME-OPERATIONS.md` and `docs/v2/11-CHECKPOINT.md`. Historical benchmark values below remain baselines only, never production SLOs.
 
 ## Technology decision for this slice
 
@@ -104,6 +106,8 @@ Future modules emit through a small M30 event API. They must not write dashboard
   handling, bounded SSE lifecycle, and objective dashboard identity/status
   rendering. Missing fields remain `UNAVAILABLE`.
 
-The correction implementation snapshot is `60b3f26f276a8f22fafb73b7d33f60cef16d053f`; hosted exact-head gates passed on
-audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`, while final HEDS
-approval remains pending before merge.
+## Historical implementation evidence
+
+The correction implementation snapshot was `60b3f26f276a8f22fafb73b7d33f60cef16d053f`; hosted exact-head gates passed on audited PR head `1f62e6ae225c7b4e2da0d956e573f5cf95a3b521`.
+
+This section is retained strictly as historical foundation evidence. It does not determine current M30 discovery or production-readiness status.
