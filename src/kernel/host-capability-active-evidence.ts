@@ -52,6 +52,7 @@ export type ActiveEvidenceCurrentContext = {
   runtimeVersion: string | null;
   adapterContractDigest: string;
   configurationDigest: string | null;
+  executableIdentityDigest: string | null;
 };
 
 export type ActiveEvidenceCompileResult = {
@@ -192,6 +193,14 @@ export function listProductionActiveEvidenceContracts():HostCapabilityActiveEvid
   return [...REGISTRY.values()].filter((contract)=>contract.availability==="PRODUCTION");
 }
 
+function activeConfigurationBindingDigest(current:ActiveEvidenceCurrentContext):string {
+  return digest({
+    domain:"uads-m03-active-validity-basis-v1",
+    configurationDigest:current.configurationDigest,
+    executableIdentityDigest:current.executableIdentityDigest,
+  });
+}
+
 function basis(contract:HostCapabilityActiveEvidenceContract,current:ActiveEvidenceCurrentContext):HostCapabilityCurrentBasis {
   return {
     subjectDigest:current.subjectDigest,
@@ -201,9 +210,19 @@ function basis(contract:HostCapabilityActiveEvidenceContract,current:ActiveEvide
       adapterContractDigest:current.adapterContractDigest,
       probeDefinitionDigest:contract.descriptorDigest,
       policyDigest:contract.policyDigest,
-      configurationDigest:current.configurationDigest,
+      configurationDigest:activeConfigurationBindingDigest(current),
     },
   };
+}
+
+export function buildActiveEvidenceCurrentBasis(
+  contractId:string,
+  current:ActiveEvidenceCurrentContext,
+):HostCapabilityCurrentBasis {
+  const contract=getHostCapabilityActiveEvidenceContract(contractId);
+  assertCurrent(current);
+  if(current.adapterId!==contract.adapterId) throw new Error("active contract adapter mismatch");
+  return basis(contract,current);
 }
 
 function reject(contract:HostCapabilityActiveEvidenceContract,current:ActiveEvidenceCurrentContext,reason:string):ActiveEvidenceCompileResult {
@@ -215,6 +234,19 @@ function assertCurrent(current:ActiveEvidenceCurrentContext):void {
   assertSafeId(current.adapterId,"adapterId");
   assertDigest(current.adapterContractDigest,"adapterContractDigest");
   if(current.configurationDigest!==null) assertDigest(current.configurationDigest,"configurationDigest");
+  if(current.executableIdentityDigest!==null) assertDigest(current.executableIdentityDigest,"executableIdentityDigest");
+}
+
+const BLOCKED_REASONS=new Set([
+  "TEST_ONLY_PROBE_BLOCKED",
+  "SIDE_EFFECT_CLASS_BLOCKED",
+  "NETWORK_POLICY_BLOCKED",
+  "PLATFORM_UNSUPPORTED",
+]);
+
+function exactReasons(receipt:HostCapabilityProbeReceipt,allowed:readonly string[]):boolean {
+  return receipt.reasonCodes.length===allowed.length &&
+    allowed.every((reason)=>receipt.reasonCodes.includes(reason));
 }
 
 function coherentReceipt(
@@ -231,7 +263,7 @@ function coherentReceipt(
       receipt.executableIdentityBefore!==null &&
       receipt.executableIdentityAfter!==null &&
       receipt.executableIdentityBefore===receipt.executableIdentityAfter &&
-      receipt.reasonCodes.includes("PROBE_EXECUTION_SUCCEEDED");
+      exactReasons(receipt,["PROBE_EXECUTION_SUCCEEDED"]);
   }
   if(receipt.parsedSummary!==null) return false;
   if(receipt.status==="BLOCKED"){
@@ -240,16 +272,30 @@ function coherentReceipt(
       receipt.exitCode===null &&
       receipt.signal===null &&
       receipt.stdoutBytes===0 &&
-      receipt.stderrBytes===0;
+      receipt.stderrBytes===0 &&
+      receipt.reasonCodes.length>0 &&
+      receipt.reasonCodes.every((reason)=>BLOCKED_REASONS.has(reason));
+  }
+  if(
+    receipt.executableIdentityBefore===null ||
+    receipt.executableIdentityAfter===null ||
+    receipt.executableIdentityBefore!==receipt.executableIdentityAfter
+  ){
+    if(receipt.status!=="IDENTITY_DRIFT") return false;
   }
   if(receipt.status==="IDENTITY_DRIFT"){
     return receipt.executableIdentityBefore!==null &&
       receipt.executableIdentityAfter!==null &&
       receipt.executableIdentityBefore!==receipt.executableIdentityAfter &&
-      receipt.reasonCodes.includes("EXECUTABLE_IDENTITY_DRIFT");
+      exactReasons(receipt,["EXECUTABLE_IDENTITY_DRIFT"]);
   }
-  return receipt.executableIdentityBefore!==null &&
-    receipt.executableIdentityAfter!==null;
+  if(receipt.status==="TIMED_OUT") return exactReasons(receipt,["PROBE_TIMEOUT"]);
+  if(receipt.status==="OUTPUT_LIMIT") return exactReasons(receipt,["PROBE_OUTPUT_LIMIT"]);
+  if(receipt.status==="FAILED"){
+    return exactReasons(receipt,["PROBE_PROCESS_FAILED"]) ||
+      exactReasons(receipt,["PROBE_PARSER_REJECTED"]);
+  }
+  return false;
 }
 
 function stateForReceipt(
@@ -280,7 +326,6 @@ export function compileActiveEvidenceToPccr(input:{
   contractId:string;
   current?:ActiveEvidenceCurrentContext|null;
   receipt?:unknown|null;
-  nodeEnv?:string;
   schemaRoot?:string;
 }):ActiveEvidenceCompileResult {
   const contract=getHostCapabilityActiveEvidenceContract(input.contractId);
@@ -289,7 +334,7 @@ export function compileActiveEvidenceToPccr(input:{
   }
   assertCurrent(input.current);
   const currentBasis=basis(contract,input.current);
-  if(contract.availability==="TEST_ONLY" && (input.nodeEnv??process.env.NODE_ENV)!=="test"){
+  if(contract.availability==="TEST_ONLY" && process.env.NODE_ENV!=="test"){
     return {status:"CONTRACT_BLOCKED",state:"UNKNOWN",proof:null,currentBasis,reasonCodes:["TEST_ONLY_ACTIVE_CONTRACT_BLOCKED"]};
   }
   if(contract.availability!=="TEST_ONLY"){
@@ -314,6 +359,12 @@ export function compileActiveEvidenceToPccr(input:{
   if(receipt.parserId!==contract.parserId) return reject(contract,input.current,"ACTIVE_RECEIPT_PARSER_MISMATCH");
   const descriptor=getHostCapabilityProbeDescriptor(contract.probeId);
   if(!coherentReceipt(receipt,descriptor)) return reject(contract,input.current,"ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
+  if(
+    receipt.executableIdentityAfter!==null &&
+    input.current.executableIdentityDigest!==receipt.executableIdentityAfter
+  ){
+    return reject(contract,input.current,"ACTIVE_EXECUTABLE_IDENTITY_MISMATCH");
+  }
 
   const mapped=stateForReceipt(contract,receipt);
   const observedAt=receipt.finishedAt;
