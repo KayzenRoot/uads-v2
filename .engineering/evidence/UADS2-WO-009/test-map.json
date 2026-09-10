@@ -1,9 +1,10 @@
 {
   "schema": "uads2.wo009.test-map",
-  "schemaVersion": "1.0.0",
-  "implementationHead": "c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55",
-  "sourceRunId": 34416641918,
-  "status": "PASS_IMPLEMENTATION_HEAD",
+  "schemaVersion": "1.1.0",
+  "implementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "sourceRunId": 34420764578,
+  "sourceJobId": 102695468622,
+  "status": "PASS_CORRECTIVE_IMPLEMENTATION_HEAD",
   "focused": [
     {
       "id": "M03-T011",
@@ -42,47 +43,31 @@
       "status": "PASS"
     },
     {
-      "id": "synthetic E3 SUPPORTED TEST_ONLY",
+      "id": "C1-T001/T002/T003 TEST_ONLY caller spoof blocked",
       "status": "PASS"
     },
     {
-      "id": "subject binding",
+      "id": "C1-T004 trusted TEST_ONLY synthetic positive path",
       "status": "PASS"
     },
     {
-      "id": "adapter binding",
+      "id": "C1-T005 production active registry empty",
       "status": "PASS"
     },
     {
-      "id": "capability binding",
+      "id": "C1 status/reason contradiction rejection",
       "status": "PASS"
     },
     {
-      "id": "probe binding",
+      "id": "C1-T010/T011/T012 executable identity validity/drift",
       "status": "PASS"
     },
     {
-      "id": "descriptor binding",
+      "id": "subject/adapter/capability/probe/descriptor/parser binding",
       "status": "PASS"
     },
     {
-      "id": "parser binding",
-      "status": "PASS"
-    },
-    {
-      "id": "lease expiry",
-      "status": "PASS"
-    },
-    {
-      "id": "descriptor/policy/config/runtime drift",
-      "status": "PASS"
-    },
-    {
-      "id": "TEST_ONLY blocked outside test",
-      "status": "PASS"
-    },
-    {
-      "id": "production active registry empty",
+      "id": "lease/descriptor/policy/config/runtime drift",
       "status": "PASS"
     },
     {
@@ -91,9 +76,17 @@
     }
   ],
   "regression": {
-    "testFilesPassed": 55,
-    "testsPassed": 526,
-    "failed": 0,
-    "standardEvals": "PASS"
+    "direct": {
+      "testFilesPassed": 55,
+      "testsPassed": 530,
+      "failed": 0
+    },
+    "foundationRerun": {
+      "testFilesPassed": 55,
+      "testsPassed": 530,
+      "failed": 0
+    },
+    "standardEvals": "PASS",
+    "engineeringValidation": "PASS"
   }
 }

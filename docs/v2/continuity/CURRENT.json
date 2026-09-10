@@ -3,16 +3,19 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_009_PR35_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
+  "programState": "UADS2_WO_009_PR35_CORRECTION_C01_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
   "completedWorkOrder": "UADS2-WO-008",
   "completedPullRequest": 33,
   "activeWorkOrder": "UADS2-WO-009",
   "activePullRequest": 35,
   "activeBranch": "work/uads2-wo-009-m03-active-evidence-compiler",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.4 implemented; exact-head HEDS pending",
-  "lastRecordedHead": "c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55",
-  "nextNecessaryAction": "Wait for exact-head four gates on PR #35, then HEDS. No vendor-specific active probe or real host claim.",
+  "activeSession": "S05.4 correction C01 implementation verified; evidence frozen; exact-head HEDS pending",
+  "rejectedHedsHead": "5932f942a84d19ca20c07ed71a92ae344b93a151",
+  "correctiveImplementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "lastRecordedHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "lastRecordedHeadSemantics": "CORRECTIVE_IMPLEMENTATION_HEAD; evidence commit SHA intentionally cannot self-reference",
+  "nextNecessaryAction": "Run fresh exact-head hosted gates on the evidence commit, then HEDS re-audit. Do not merge, start a vendor-specific probe, or open the next Work Order before APPROVED.",
   "knownBlockers": [
     "Issue #9 admin-only repository configuration"
   ],
@@ -23,6 +26,7 @@
       "S05.3"
     ],
     "activeSlice": "S05.4",
+    "correction": "C01_IMPLEMENTATION_VERIFIED",
     "vendorSpecificProbes": "NOT_AUTHORIZED",
     "localMachineRequired": false
   }

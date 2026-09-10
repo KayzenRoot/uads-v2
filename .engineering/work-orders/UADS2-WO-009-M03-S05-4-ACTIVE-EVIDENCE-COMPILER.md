@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-009
 
-Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
+Status: CORRECTION C01 IMPLEMENTED / IMPLEMENTATION HEAD VERIFIED — EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Slice: S05.4 — Active Evidence Contract & Generic PCCR Compiler
 Repository: `KayzenRoot/uads-v2`
@@ -106,7 +106,7 @@ Active basis must bind:
 - current adapterContractDigest;
 - exact probe descriptorDigest as probeDefinitionDigest;
 - exact active contract policyDigest;
-- current configurationDigest.
+- composite active configuration binding digest over current configurationDigest + current executableIdentityDigest.
 
 Finite lease required.
 
@@ -168,5 +168,22 @@ STOP if:
 
 
 ## Implementation snapshot
-Head: `c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55`
-55/55 test files and 526/526 tests PASS. B1 p95 0.377957 ms. B4 all zero. Fresh exact-head HEDS required after evidence commit.
+Original implementation head: `c94bf0ba8c32f9f893ec1d1817c6739e8d3b3c55`.
+HEDS rejected head: `5932f942a84d19ca20c07ed71a92ae344b93a151`.
+Corrective implementation head: `023b867ee2f817dcc2331cb2ddd3c512c99b1bd9`.
+
+Correction C01 closes:
+- caller-controlled TEST_ONLY environment override;
+- missing executable-identity drift participation in active proof validity;
+- incomplete non-success receipt status/reason coherence;
+- stale implementation evidence.
+
+Corrective implementation proof:
+- 55/55 test files PASS twice;
+- 530/530 tests PASS twice;
+- CI / CodeQL / Dependency Review / Linux / Windows SUCCESS;
+- B1 primary p95 0.190151 ms <= 10 ms;
+- B1 validation p95 0.250155 ms <= 10 ms;
+- B4 all safety counters zero.
+
+Fresh exact-head HEDS remains mandatory after the evidence commit. No vendor-specific probe or merge is authorized yet.
