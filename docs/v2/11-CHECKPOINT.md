@@ -1,61 +1,72 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-013 APPROVED / MERGED; M03 S07 FROZEN; NEXT MODULE SELECTION = M30
+Status: M30 S00/S01/S01.5 FROZEN; UADS2-WO-014G GOVERNANCE REPAIR ACTIVE; M30 S02 QUEUED
 Date: 2026-09-10
 
-Completed Work Order: UADS2-WO-013
-Completed PR: #48
-Approved head: `5ff41c01d22ca10444c7f26a223e00d0d642d85c`
-Merge SHA: `5f2b16387e01f77e13a35d45529e1fab2f0d40c4`
-HEDS review: `5164875910`
+## Completed M30 discovery increments
 
-## M03 S07 freeze result
+### UADS2-WO-014 — M30 S00
+- PR: #50
+- Candidate head: `c8137718c94d0f42d306a59638523e3bd1e48916`
+- Merge SHA: `23c8615849bf43b8bf72069bc55f2eab2f606033`
+- HEDS review: `5164995659` recorded APPROVED as COMMENT because self-approval is prohibited.
+- Result: S00 FROZEN.
+- Technical outcome: anti-fabrication/live-data truthfulness, explicit CURRENT/STALE/DEGRADED/UNAVAILABLE semantics, source/freshness requirements, foundation reconciliation, measurable correctness/freshness/loss/cardinality/usefulness objectives and visible Issue #39/B6 performance debt.
 
-M03 Host Capability Detector is now FROZEN.
+### UADS2-WO-015 — M30 S01 Technology Radar
+- PR: #52
+- Approved head: `2d126052ff69d8dfa5a63edb3fd89290d23ae53b`
+- Merge SHA: `4d32aa116ae9fa49e557c46d1e4abc815317f6e1`
+- HEDS review: `5165145243`
+- Result: S01 FROZEN.
+- Technology posture: OpenTelemetry/OTLP-compatible semantics and Prometheus/OpenMetrics-compatible metric semantics; UADS event spine + SSE local-first; optional evidence-gated scale-out; reject mandatory heavy vendor stack and synchronous hot-path observability.
 
-Freeze guarantees:
-- only current valid SUPPORTED PCCR proof may enable TRUE;
-- valid NPC UNSUPPORTED may project FALSE;
-- UNKNOWN/BLOCKED/STALE remain fail-closed UNKNOWN;
-- CEL and CLDS remain mandatory validity controls;
-- Probe Budget Fence remains schema-closed, bounded, no-shell, no-PATH and privacy-safe;
-- future production consumers M01/M04/M06/M23 MUST use `readHostCapabilityProjection()`;
-- adapter declaration values and `runtimeSnapshotFromHostDetection()` are not production enabling truth;
-- M30 telemetry is non-authoritative for M03 proof truth;
-- GLOBAL-FIRST / ZERO-PROJECT-FOOTPRINT remains mandatory.
+### UADS2-WO-016 — M30 S01.5 Proprietary Invention Radar
+- PR: #54
+- Approved head: `3f7bdf34a386668a8ab1e3134f4c42b250f2a9b3`
+- Merge SHA: `8cfe046bc14458914642de8f02e137e2a728cacf`
+- HEDS review: `5165578943`
+- Result: S01.5 FROZEN.
+- Promoted to S02: OTCL, TCL, AOBC including CBF behavior, TPSC, PSCF and LOCP.
+- Experimental architecture hooks: LDCB, COG and AAE.
+- Product direction: dashboard becomes the Living Operations Organism, the primary UADS operational control plane with maximum practical visibility and governed control while authoritative module ownership remains intact.
 
-Exact-head approval evidence:
-- CI SUCCESS;
-- CodeQL SUCCESS;
-- Dependency Review SUCCESS;
-- UADS Cross-Platform Compatibility SUCCESS;
-- HEDS APPROVED;
-- no unresolved HIGH/CRITICAL M03 finding;
-- no production bypass found.
+## Active governance correction — UADS2-WO-014G
 
-## Deferred / accepted debt
+Issue: #56.
 
-- Vendor-specific Cursor/Codex active probes and positive capability claims remain deferred until real host/source evidence exists.
-- B6 telemetry overhead remains a truthful JUSTIFIED_EXCEPTION and M30-owned performance debt tracked by Issue #39.
-- Issue #9 repository administration/governance debt remains independent from M03 correctness.
+A source audit after WO-016 found that WO-014 had been technically approved and merged without three governed-flow artifacts being present on `main`:
+- `.engineering/context-locks/UADS2-WO-014.md`
+- `.engineering/plans/UADS2-WO-014-TEST-PLAN.md`
+- `.engineering/reports/EVIDENCE-UADS2-WO-014.md`
 
-## Dependency graph effect
+This checkpoint itself was also stale and still pointed to WO-013.
 
-M03 freeze makes direct successors M04 Model Capability Registry and M23 Capability Negotiation Layer graph-eligible.
+WO-014G reconstructs those artifacts after merge with explicit post-merge labels. It does not rewrite chronology and does not alter approved M30 S00 technical decisions.
 
-Root-eligible modules also include M07, M14, M17, M19, M25, M29 and M30.
+## M30 S02
 
-## Next NECESSARY module selection
+Issue #55 / UADS2-WO-017 is open and queued.
 
-Selected next deep-discovery target: M30 Production Observability & Real-Time Operations.
+Architecture goals already identified:
+- truthful source ingestion and freshness;
+- OTCL truth-confidence state;
+- TCL continuity/gap evidence;
+- AOBC resource/cardinality budget governance;
+- TPSC source-vs-projection boundary;
+- PSCF privacy-safe correlation;
+- LOCP governed state-and-command control plane;
+- bounded projection/query and realtime delivery;
+- optional evidence-gated LDCB scale bridge;
+- COG/AAE experimental hooks.
 
-Rationale:
-- M30 is a root module with no HARD predecessor;
-- it has high fan-out into M01, M10, M11, M18, M24, M27, M28 and M31-related operating constraints;
-- a foundation slice already exists, so full S00-S07 reconciliation avoids architecture drift;
-- Issue #39 B6 debt is explicitly owned by M30;
-- prioritizing M30 improves dashboard/real-time visibility while preserving the canonical dependency graph.
+Material S02 authoring must resume only after WO-014G passes its own exact-head gates, HEDS and merge.
 
-Next governed action: open M30 deep-discovery Work Order and begin S00 problem/metrics source check before any new runtime implementation.
+## Persistent debt / independent findings
 
-Architecture Reconciliation remains scheduled after 4 completed module freezes, or earlier on material boundary/ADR/regression change.
+- Issue #39: M30-owned telemetry overhead / M03 B6 justified exception.
+- Issue #9: repository administration governance debt; `main` branch protection/ruleset remains an independent concern.
+
+## Next governed action
+
+Complete UADS2-WO-014G exact-head validation, HEDS and merge. Then resume UADS2-WO-017 / M30 S02 Architecture without reopening frozen S00/S01/S01.5 decisions.
