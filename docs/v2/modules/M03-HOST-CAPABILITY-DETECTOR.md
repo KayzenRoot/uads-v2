@@ -1,6 +1,6 @@
 # M03 — Host Capability Detector
 
-Status: DISCOVERY — S00-S04 FROZEN / S05.1-S05.5 APPROVED-MERGED / S06 INTEGRATION NEXT
+Status: DISCOVERY — S00-S04 FROZEN / S05.1-S05.5 APPROVED-MERGED / S06.1 APPROVED-MERGED / S06.2 IMPLEMENTED-CANDIDATE / S07 NEXT AFTER HEDS
 Class: NECESSARY
 
 Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools, telemetry or other host-dependent behavior.
@@ -33,9 +33,20 @@ Canonical accepted ADR:
 - S05.3: APPROVED / MERGED — schema-closed Probe Budget Fence, fixed Node-current production self-test, no-shell/no-PATH execution, minimal environment, byte/time ceilings, executable identity, single-flight and privacy-safe receipts.
 - S05.4: APPROVED / MERGED — backward-compatible PCCR 1.1 active-evidence semantics, TEST_ONLY trust-boundary hardening, composite executable-identity validity binding, conservative active negative proof and forged-receipt rejection.
 - S05.5: APPROVED / MERGED — cross-platform T061-T066 proof, inspectable no-shell/no-PATH PBF policy and B6 telemetry overhead measured as a documented JUSTIFIED_EXCEPTION.
+- S06.1: APPROVED / MERGED — host-dispatch migrated from declaration-derived capability truth to proof-aware compatibility projection with conservative fallback.
+- S06.2: IMPLEMENTED CANDIDATE — canonical future consumer boundary `readHostCapabilityProjection()` introduced for M01/M04/M06/M23; proof internals remain hidden behind the facade.
 - Later vendor-specific S05 experiments remain separately gated and require real source/host evidence before promotion.
-- S06: NEXT — migrate HARD consumers incrementally from coarse adapter-declaration snapshots to proof-aware compatibility projections; preserve conservative fallback and no vendor claims.
-- S07: future module freeze.
+- S07: next only after S06.2 exact-head gates and HEDS approval.
+
+## Canonical consumer boundary
+
+Future production consumers M01, M04, M06 and M23 MUST consume M03 capability truth through:
+
+`readHostCapabilityProjection()` from `src/adapters/host-capability-consumer.ts`.
+
+They MUST NOT use adapter-declared capability values or `runtimeSnapshotFromHostDetection()` as enabling truth. The consumer contract is deliberately compatibility-shaped (`true | false | unknown`) so proof storage, passive facts and future active/stored proof resolution can evolve behind the facade without coupling downstream modules to M03 internals.
+
+The current consumer read path is non-persisting by default and preserves GLOBAL-FIRST / ZERO-PROJECT-FOOTPRINT semantics.
 
 ## Core invariant
 
