@@ -2,15 +2,15 @@
   "name": "uads",
   "version": "0.12.1",
   "description": "UADS - Universal Autonomous Development Studio by NexLabs. Global-first autonomous software engineering orchestration framework.",
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "author": "NexLabs",
-  "homepage": "https://github.com/KayzenRoot/uads",
+  "homepage": "https://github.com/KayzenRoot/uads-v2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KayzenRoot/uads.git"
+    "url": "git+https://github.com/KayzenRoot/uads-v2.git"
   },
   "bugs": {
-    "url": "https://github.com/KayzenRoot/uads/issues"
+    "url": "https://github.com/KayzenRoot/uads-v2/issues"
   },
   "keywords": [
     "uads",
