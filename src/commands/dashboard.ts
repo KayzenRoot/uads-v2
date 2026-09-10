@@ -90,15 +90,16 @@ function defaultStreamState(): CockpitStreamState {
 /**
  * Continuity evidence derived from bounded reader output only.
  *
- * The reader already bounds its scan/retention window, so saturation never
- * upgrades to contiguous: rejected or unusable records stay counted and any
- * unaccounted range remains visible as an explicit gap.
+ * The bounded reader reports rejected records and scan-window saturation as
+ * distinct evidence: rejected records stay GAP_KNOWN, while a saturated scan
+ * surfaces as GAP_UNKNOWN instead of silently collapsing into a known gap or
+ * a contiguous state.
  */
 function deriveContinuityEvidence(read: OperationalEventRead): OperationalContinuityEvidence {
   return {
     observedEventCount: read.health.validEventCount,
-    rejectedRecordCount: read.health.invalidEventCount,
-    scanSaturated: false,
+    rejectedRecordCount: read.health.rejectedEventCount,
+    scanSaturated: read.health.scanSaturated,
     replayActive: false,
     baselineEstablished: read.health.validEventCount > 0 || read.health.lastEventAt !== null,
   };

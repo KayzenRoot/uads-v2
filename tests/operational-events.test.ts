@@ -120,6 +120,8 @@ describe("M30 operational event spine", () => {
     expect(read.events.map((event) => event.eventId)).toEqual([valid.eventId]);
     expect(read.health.status).toBe("DEGRADED");
     expect(read.health.invalidEventCount).toBe(3);
+    expect(read.health.rejectedEventCount).toBe(3);
+    expect(read.health.scanSaturated).toBe(false);
     expect(read.health.reasonCodes).toEqual(expect.arrayContaining(["UNSUPPORTED_EVENT_VERSION", "EVENT_HASH_MISMATCH", "INVALID_EVENT_RECORD"]));
   });
 

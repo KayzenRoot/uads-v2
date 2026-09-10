@@ -55,7 +55,16 @@ export type OperationalEventInput = Omit<
 export type OperationalHealth = {
   status: OperationalState;
   validEventCount: number;
+  /**
+   * Legacy aggregate: rejected/corrupt record count plus a +1 sentinel when the
+   * bounded scan window saturated. Kept for backward compatibility; semantic
+   * decisions must use rejectedEventCount and scanSaturated instead.
+   */
   invalidEventCount: number;
+  /** Actual rejected/corrupt/unsupported records observed in the bounded scan. */
+  rejectedEventCount: number;
+  /** True when the bounded scan window was fully consumed; older records may exist unread. */
+  scanSaturated: boolean;
   lastEventAt: string | null;
   reasonCodes: string[];
   updatedAt: string;

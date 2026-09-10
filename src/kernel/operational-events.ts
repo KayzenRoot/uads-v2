@@ -249,6 +249,8 @@ function invalidHealth(reasonCodes: string[], validEventCount = 0, invalidEventC
     status: "UNAVAILABLE",
     validEventCount,
     invalidEventCount,
+    rejectedEventCount: invalidEventCount,
+    scanSaturated: false,
     lastEventAt: null,
     reasonCodes: [...new Set(reasonCodes)],
     updatedAt: new Date().toISOString(),
@@ -306,12 +308,16 @@ export function readOperationalEvents(
   }
   events.sort((left, right) => right.recordedAt.localeCompare(left.recordedAt) || right.eventId.localeCompare(left.eventId));
   const selected = events.slice(0, limit);
-  const invalidCount = reasons.length + (files.length >= MAX_OPERATIONAL_EVENT_SCAN ? 1 : 0);
+  const scanSaturated = files.length >= MAX_OPERATIONAL_EVENT_SCAN;
+  const rejectedCount = reasons.length;
+  const invalidCount = rejectedCount + (scanSaturated ? 1 : 0);
   const status: OperationalState = invalidCount > 0 ? "DEGRADED" : events.length > 0 ? "HEALTHY" : "UNAVAILABLE";
   const health: OperationalHealth = {
     status,
     validEventCount: events.length,
     invalidEventCount: invalidCount,
+    rejectedEventCount: rejectedCount,
+    scanSaturated,
     lastEventAt: events[0]?.recordedAt ?? null,
     reasonCodes: [...new Set(reasons.length > 0 ? reasons : events.length > 0 ? [] : ["NO_OPERATIONAL_EVENTS"])],
     updatedAt: new Date().toISOString(),

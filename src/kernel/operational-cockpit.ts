@@ -280,7 +280,7 @@ export function buildLivingCockpitProjection(input: LivingCockpitInput): LivingC
     observedAt: input.health.lastEventAt,
     evaluatedAt: generatedAt,
     freshnessLeaseMs,
-    integrityValid: input.health.invalidEventCount === 0,
+    integrityValid: input.health.rejectedEventCount === 0,
   });
   const freshness = createOperationalStateEnvelope({
     sourceId: EVENTS_SOURCE_ID,

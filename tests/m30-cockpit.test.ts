@@ -3,13 +3,25 @@ import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { createDashboardServer, MAX_SSE_CLIENTS } from "../src/commands/dashboard.js";
+import {
+  buildCockpitSnapshot,
+  buildDashboardSnapshot,
+  createDashboardServer,
+  MAX_SSE_CLIENTS,
+} from "../src/commands/dashboard.js";
 import { ensureWorkspace } from "../src/lib/workspace.js";
 import {
   buildLivingCockpitProjection,
   type LivingCockpitProjection,
 } from "../src/kernel/operational-cockpit.js";
-import { persistOperationalEvent } from "../src/kernel/operational-events.js";
+import { CONTINUITY_REASON_CODES } from "../src/kernel/operational-continuity.js";
+import {
+  createOperationalEvent,
+  MAX_OPERATIONAL_EVENT_LIMIT,
+  MAX_OPERATIONAL_EVENT_SCAN,
+  persistOperationalEvent,
+  readOperationalEvents,
+} from "../src/kernel/operational-events.js";
 import type { OperationalEventInput, OperationalHealth } from "../src/kernel/operational-event-types.js";
 
 const FAKE_GITHUB_TOKEN = `ghp_${"a1b2c3d4e5".repeat(4)}`;
@@ -122,6 +134,8 @@ function unavailableHealth(): OperationalHealth {
     status: "UNAVAILABLE",
     validEventCount: 0,
     invalidEventCount: 0,
+    rejectedEventCount: 0,
+    scanSaturated: false,
     lastEventAt: null,
     reasonCodes: ["NO_OPERATIONAL_EVENTS"],
     updatedAt: "2026-09-10T12:00:00.000Z",
@@ -139,8 +153,8 @@ function projectOnce(
     observedEvents: events,
     continuityEvidence: {
       observedEventCount: health.validEventCount,
-      rejectedRecordCount: health.invalidEventCount,
-      scanSaturated: false,
+      rejectedRecordCount: health.rejectedEventCount,
+      scanSaturated: health.scanSaturated,
       replayActive: false,
       baselineEstablished: health.validEventCount > 0 || health.lastEventAt !== null,
     },
@@ -311,6 +325,8 @@ describe("UADS2-WO-020 T7 storage pressure and degraded evidence (PF-004)", () =
       status: "DEGRADED",
       validEventCount: 2,
       invalidEventCount: 1,
+      rejectedEventCount: 1,
+      scanSaturated: false,
       lastEventAt: "2026-09-10T11:59:00.000Z",
       reasonCodes: ["EVENT_HASH_MISMATCH"],
       updatedAt: "2026-09-10T12:00:00.000Z",
@@ -530,4 +546,61 @@ describe("UADS2-WO-020 T8 cockpit privacy and economic truth (ES-020, OP-009)", 
       await dashboard.stop();
     }
   });
+});
+
+describe("UADS2-WO-020 T2 TCL continuity saturation (OP-002)", () => {
+  it(
+    "projects GAP_UNKNOWN when the real bounded scan saturates and never fabricates rejected records",
+    () => {
+      const home = temporaryHome();
+      const projectId = buildDashboardSnapshot(process.cwd(), home).projectId;
+      const paths = ensureWorkspace(projectId, home);
+      fs.mkdirSync(paths.observabilityEvents, { recursive: true });
+      const fileCount = MAX_OPERATIONAL_EVENT_SCAN + 100;
+      for (let index = 0; index < fileCount; index += 1) {
+        const event = createOperationalEvent({
+          ...eventInput(projectId, {
+            correlationId: `saturation-${index}`,
+            recordedAt: new Date(Date.now() - (fileCount - index)).toISOString(),
+          }),
+          eventId: `00000000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+        });
+        fs.writeFileSync(
+          path.join(paths.observabilityEvents, `${event.eventId}.json`),
+          `${JSON.stringify(event, null, 2)}\n`,
+          "utf8",
+        );
+      }
+
+      const read = readOperationalEvents(paths, { limit: MAX_OPERATIONAL_EVENT_LIMIT });
+      expect(read.health.scanSaturated).toBe(true);
+      expect(read.health.rejectedEventCount).toBe(0);
+      expect(read.health.invalidEventCount).toBe(1);
+      expect(read.health.status).toBe("DEGRADED");
+      expect(read.health.validEventCount).toBe(MAX_OPERATIONAL_EVENT_SCAN);
+      expect(read.events.length).toBe(MAX_OPERATIONAL_EVENT_LIMIT);
+
+      const cockpit = buildCockpitSnapshot(process.cwd(), home);
+      expect(cockpit.continuity.state).toBe("GAP_UNKNOWN");
+      expect(cockpit.continuity.reasonCode).toBe(CONTINUITY_REASON_CODES.unknownRange);
+      expect(cockpit.continuity.state).not.toBe("GAP_KNOWN");
+      expect(cockpit.continuity.state).not.toBe("CONTIGUOUS");
+      expect(cockpit.continuity.knownGapCount).toBe(0);
+      expect(cockpit.freshness.truthState).toBe("CURRENT");
+      expect(cockpit.freshness.reasonCode).toBe("FRESHNESS_LEASE_VALID");
+      expect(cockpit.globalHealth.status).not.toBe("CURRENT");
+      expect(cockpit.globalHealth.reasonCodes).toContain(CONTINUITY_REASON_CODES.unknownRange);
+
+      const corruptPath = path.join(paths.observabilityEvents, "0-corrupt.json");
+      fs.writeFileSync(corruptPath, "{not-json", "utf8");
+      const mixed = buildCockpitSnapshot(process.cwd(), home);
+      expect(mixed.continuity.state).toBe("GAP_UNKNOWN");
+      expect(mixed.continuity.reasonCode).toBe(CONTINUITY_REASON_CODES.unknownRange);
+      expect(mixed.continuity.knownGapCount).toBe(1);
+      expect(mixed.freshness.truthState).toBe("DEGRADED");
+      expect(mixed.freshness.reasonCode).toBe("INTEGRITY_DEFECT");
+      expect(mixed.globalHealth.status).not.toBe("CURRENT");
+    },
+    120_000,
+  );
 });
