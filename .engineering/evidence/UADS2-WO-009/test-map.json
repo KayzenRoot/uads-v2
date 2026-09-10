@@ -1,0 +1,92 @@
+{
+  "schema": "uads2.wo009.test-map",
+  "schemaVersion": "1.1.0",
+  "implementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "sourceRunId": 34420764578,
+  "sourceJobId": 102695468622,
+  "status": "PASS_CORRECTIVE_IMPLEMENTATION_HEAD",
+  "focused": [
+    {
+      "id": "M03-T011",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T012",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T013",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T014",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T015",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T016",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T017",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T051",
+      "status": "PASS"
+    },
+    {
+      "id": "M03-T052",
+      "status": "PASS"
+    },
+    {
+      "id": "C1-T001/T002/T003 TEST_ONLY caller spoof blocked",
+      "status": "PASS"
+    },
+    {
+      "id": "C1-T004 trusted TEST_ONLY synthetic positive path",
+      "status": "PASS"
+    },
+    {
+      "id": "C1-T005 production active registry empty",
+      "status": "PASS"
+    },
+    {
+      "id": "C1 status/reason contradiction rejection",
+      "status": "PASS"
+    },
+    {
+      "id": "C1-T010/T011/T012 executable identity validity/drift",
+      "status": "PASS"
+    },
+    {
+      "id": "subject/adapter/capability/probe/descriptor/parser binding",
+      "status": "PASS"
+    },
+    {
+      "id": "lease/descriptor/policy/config/runtime drift",
+      "status": "PASS"
+    },
+    {
+      "id": "privacy-safe compiler",
+      "status": "PASS"
+    }
+  ],
+  "regression": {
+    "direct": {
+      "testFilesPassed": 55,
+      "testsPassed": 530,
+      "failed": 0
+    },
+    "foundationRerun": {
+      "testFilesPassed": 55,
+      "testsPassed": 530,
+      "failed": 0
+    },
+    "standardEvals": "PASS",
+    "engineeringValidation": "PASS"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "uads2.wo009.benchmark-evidence",
+  "schemaVersion": "1.1.0",
+  "status": "CORRECTIVE_IMPLEMENTATION_HEAD_VERIFIED_FINAL_HEDS_HEAD_PENDING",
+  "implementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "sourceRunId": 34420764578,
+  "sourceJobId": 102695468622,
+  "environment": "GitHub Actions Linux / Node 20 CI",
+  "samples": [
+    {
+      "phase": "DIRECT_TEST",
+      "B1": {
+        "samples": 1000,
+        "p50Ms": 0.1388719999999921,
+        "p95Ms": 0.1901510000000144,
+        "targetP95Ms": 10,
+        "pass": true
+      },
+      "B4": {
+        "falsePositiveFromAbsence": 0,
+        "absenceUnsupported": 0,
+        "unrecognizedUnsupported": 0,
+        "forgedAccepted": 0,
+        "pass": true
+      }
+    },
+    {
+      "phase": "FOUNDATION_VALIDATION_RERUN",
+      "B1": {
+        "samples": 1000,
+        "p50Ms": 0.16088999999999487,
+        "p95Ms": 0.2501550000000634,
+        "targetP95Ms": 10,
+        "pass": true
+      },
+      "B4": {
+        "falsePositiveFromAbsence": 0,
+        "absenceUnsupported": 0,
+        "unrecognizedUnsupported": 0,
+        "forgedAccepted": 0,
+        "pass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.local/schemas/host-capability-active-evidence-contract.schema.json",
+  "title": "UADS Host Capability Active Evidence Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema","schemaVersion","contractId","availability","adapterId","capabilityId",
+    "probeId","descriptorDigest","parserId","resultMode","supportedSummaries",
+    "unsupportedSummaries","evidenceClass","validityClass","leaseMs","policyDigest","contractDigest"
+  ],
+  "properties": {
+    "schema": { "const": "uads.host-capability-active-evidence-contract" },
+    "schemaVersion": { "const": "1.0.0" },
+    "contractId": { "type": "string","minLength": 1,"maxLength": 128,"pattern": "^[A-Za-z0-9._:-]+$" },
+    "availability": { "enum": ["PRODUCTION","TEST_ONLY"] },
+    "adapterId": { "type": "string","minLength": 1,"maxLength": 128,"pattern": "^[A-Za-z0-9._:-]+$" },
+    "capabilityId": { "enum": ["modelSelection","toolCalling","structuredOutput","promptCache","explicitCache","persistentContext","subagents","parallelAgents","usageTelemetry","visionInput"] },
+    "probeId": { "type": "string","minLength": 1,"maxLength": 128,"pattern": "^[A-Za-z0-9._:-]+$" },
+    "descriptorDigest": { "type": "string","pattern": "^[a-f0-9]{64}$" },
+    "parserId": { "enum": ["node-version-v1","exit-code-v1","echo-safe-v1"] },
+    "resultMode": { "enum": ["EXACT_ACTIVE_RESULT","COMPLETE_ENUMERATION"] },
+    "supportedSummaries": { "type": "array","maxItems": 16,"uniqueItems": true,"items": { "type": "string","minLength": 1,"maxLength": 64,"pattern": "^[A-Z0-9._:-]+$" } },
+    "unsupportedSummaries": { "type": "array","maxItems": 16,"uniqueItems": true,"items": { "type": "string","minLength": 1,"maxLength": 64,"pattern": "^[A-Z0-9._:-]+$" } },
+    "evidenceClass": { "const": "E3" },
+    "validityClass": { "const": "LEASED" },
+    "leaseMs": { "type": "integer","minimum": 1000,"maximum": 86400000 },
+    "policyDigest": { "type": "string","pattern": "^[a-f0-9]{64}$" },
+    "contractDigest": { "type": "string","pattern": "^[a-f0-9]{64}$" }
+  }
+}

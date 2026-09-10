@@ -3,20 +3,21 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_008_APPROVED_MERGED_M03_NEXT_SLICE_RECONCILIATION",
+  "programState": "UADS2_WO_009_PR35_CORRECTION_C01_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
   "completedWorkOrder": "UADS2-WO-008",
   "completedPullRequest": 33,
-  "approvedHead": "3c95b6b340168d619669ddc1f392872f3252e6f1",
-  "mergeCommit": "f870d46a39d9bbf0adb8ac9e5dd73b9848be276f",
-  "lastRecordedHead": "f870d46a39d9bbf0adb8ac9e5dd73b9848be276f",
-  "activeWorkOrder": null,
-  "activePullRequest": null,
-  "activeBranch": null,
+  "activeWorkOrder": "UADS2-WO-009",
+  "activePullRequest": 35,
+  "activeBranch": "work/uads2-wo-009-m03-active-evidence-compiler",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.3 approved/merged; reconcile frozen design before next slice",
-  "nextNecessaryAction": "Re-read M03 S01-S04 and ADR-UADS2-012. Plan next bounded slice. Do not claim vendor capability without real host evidence.",
+  "activeSession": "S05.4 correction C01 implementation verified; evidence frozen; exact-head HEDS pending",
+  "rejectedHedsHead": "5932f942a84d19ca20c07ed71a92ae344b93a151",
+  "correctiveImplementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "lastRecordedHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
+  "lastRecordedHeadSemantics": "CORRECTIVE_IMPLEMENTATION_HEAD; evidence commit SHA intentionally cannot self-reference",
+  "nextNecessaryAction": "Run fresh exact-head hosted gates on the evidence commit, then HEDS re-audit. Do not merge, start a vendor-specific probe, or open the next Work Order before APPROVED.",
   "knownBlockers": [
-    "Repository branch-protection administration remains pending under issue #9 and requires an admin-capable executor"
+    "Issue #9 admin-only repository configuration"
   ],
   "m03": {
     "completedSlices": [
@@ -24,13 +25,9 @@
       "S05.2",
       "S05.3"
     ],
-    "vendorSpecificProbes": "NOT_YET_AUTHORIZED",
-    "localEvidenceForVendorProbes": "REQUIRED_BEFORE_PROMOTION",
-    "s07Frozen": false
-  },
-  "reviewModel": "HEDS_CANONICAL",
-  "operatingModes": [
-    "SOLO",
-    "HIVE_CONNECTED"
-  ]
+    "activeSlice": "S05.4",
+    "correction": "C01_IMPLEMENTATION_VERIFIED",
+    "vendorSpecificProbes": "NOT_AUTHORIZED",
+    "localMachineRequired": false
+  }
 }
