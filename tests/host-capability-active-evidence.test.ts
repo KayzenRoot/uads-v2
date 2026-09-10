@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildActiveEvidenceCurrentBasis,
   compileActiveEvidenceToPccr,
   getHostCapabilityActiveEvidenceContract,
   listProductionActiveEvidenceContracts,
@@ -27,6 +28,7 @@ const current=(overrides:Partial<ActiveEvidenceCurrentContext>={}):ActiveEvidenc
   runtimeVersion:null,
   adapterContractDigest:ADAPTER_DIGEST,
   configurationDigest:CONFIG_DIGEST,
+  executableIdentityDigest:null,
   ...overrides,
 });
 
@@ -40,6 +42,16 @@ function resignReceipt(input:HostCapabilityProbeReceipt,patch:Partial<HostCapabi
   return {...unsigned,receiptDigest:computeHostCapabilityProbeReceiptDigest(unsigned)};
 }
 
+function currentForReceipt(
+  input:HostCapabilityProbeReceipt,
+  overrides:Partial<ActiveEvidenceCurrentContext>={},
+):ActiveEvidenceCurrentContext{
+  return current({
+    executableIdentityDigest:input.executableIdentityAfter,
+    ...overrides,
+  });
+}
+
 describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("production active contract registry is intentionally empty",()=>{
     expect(listProductionActiveEvidenceContracts()).toEqual([]);
@@ -47,7 +59,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
 
   it("M03-T011 no receipt remains UNKNOWN, never UNSUPPORTED",()=>{
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-unsupported.v1",current:current(),receipt:null,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-unsupported.v1",current:current(),receipt:null,schemaRoot:ROOT,
     });
     expect(result.status).toBe("NO_EVIDENCE");
     expect(result.state).toBe("UNKNOWN");
@@ -56,7 +68,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
 
   it("M03-T012 missing host/current context cannot create UNSUPPORTED",()=>{
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:null,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:null,schemaRoot:ROOT,
     });
     expect(result.status).toBe("NO_EVIDENCE");
     expect(result.state).toBe("UNKNOWN");
@@ -68,7 +80,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("M03-T013 blocked probe remains BLOCKED and non-enabling",async()=>{
     const r=await receipt("test.active-blocked.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-blocked.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-blocked.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(r.status).toBe("BLOCKED");
     expect(result.state).toBe("BLOCKED");
@@ -78,7 +90,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("M03-T014 timeout remains UNKNOWN",async()=>{
     const r=await receipt("test.active-timeout.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-timeout.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-timeout.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(r.status).toBe("TIMED_OUT");
     expect(result.state).toBe("UNKNOWN");
@@ -88,7 +100,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("M03-T015 unrecognized successful summary remains UNKNOWN",async()=>{
     const r=await receipt("test.active-unrecognized.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-unrecognized.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-unrecognized.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(r.status).toBe("SUCCEEDED");
     expect(r.parsedSummary).toBe("MAYBE");
@@ -99,7 +111,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("M03-T016 complete enumeration exclusion creates only exact E3 NPC UNSUPPORTED",async()=>{
     const r=await receipt("test.enumeration-excluded.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.enumeration.structured-excluded.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.enumeration.structured-excluded.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(result.state).toBe("UNSUPPORTED");
     expect(result.proof?.schemaVersion).toBe("1.1.0");
@@ -110,7 +122,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("M03-T017 recognized exact unsupported result creates active NPC UNSUPPORTED",async()=>{
     const r=await receipt("test.active-unsupported.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-unsupported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-unsupported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(result.state).toBe("UNSUPPORTED");
     expect(result.proof?.negativeProofKind).toBe("active-probe-recognized-unsupported");
@@ -119,7 +131,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("synthetic recognized supported result creates E3 SUPPORTED only under TEST_ONLY contract",async()=>{
     const r=await receipt("test.active-supported.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(result.status).toBe("COMPILED");
     expect(result.state).toBe("SUPPORTED");
@@ -128,20 +140,36 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     expect(result.proof?.validityClass).toBe("LEASED");
   });
 
-  it("TEST_ONLY contract is blocked outside test mode",async()=>{
-    const r=await receipt("test.active-supported.v1");
-    const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:r,nodeEnv:"production",schemaRoot:ROOT,
-    });
-    expect(result.status).toBe("CONTRACT_BLOCKED");
-    expect(result.state).toBe("UNKNOWN");
-    expect(result.proof).toBeNull();
+  it("C1-T001/T002/T003 caller test-mode spoof cannot bypass trusted TEST_ONLY gate",async()=>{
+    const cases=[
+      {contractId:"test.active.tool-supported.v1",receipt:await receipt("test.active-supported.v1")},
+      {contractId:"test.active.tool-unsupported.v1",receipt:await receipt("test.active-unsupported.v1")},
+      {contractId:"test.enumeration.structured-excluded.v1",receipt:await receipt("test.enumeration-excluded.v1")},
+    ];
+    const previous=process.env.NODE_ENV;
+    process.env.NODE_ENV="production";
+    try{
+      for(const entry of cases){
+        const result=compileActiveEvidenceToPccr({
+          contractId:entry.contractId,
+          current:currentForReceipt(entry.receipt),
+          receipt:entry.receipt,
+          schemaRoot:ROOT,
+          nodeEnv:"test",
+        } as never);
+        expect(result.status).toBe("CONTRACT_BLOCKED");
+        expect(result.state).toBe("UNKNOWN");
+        expect(result.proof).toBeNull();
+      }
+    }finally{
+      process.env.NODE_ENV=previous;
+    }
   });
 
   it("wrong subject binding fails closed",async()=>{
     const r=await receipt("test.active-supported.v1","5".repeat(64));
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     expect(result.status).toBe("REJECTED");
     expect(result.state).toBe("UNKNOWN");
@@ -150,7 +178,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("wrong adapter binding fails closed",async()=>{
     const r=await receipt("test.active-supported.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current({adapterId:"cursor"}),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r,{adapterId:"cursor"}),receipt:r,schemaRoot:ROOT,
     });
     expect(result.status).toBe("REJECTED");
   });
@@ -165,7 +193,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     ];
     for(const forged of variants){
       const result=compileActiveEvidenceToPccr({
-        contractId:"test.active.tool-supported.v1",current:current(),receipt:forged,nodeEnv:"test",schemaRoot:ROOT,
+        contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:forged,schemaRoot:ROOT,
       });
       expect(result.status).toBe("REJECTED");
       expect(result.proof).toBeNull();
@@ -182,16 +210,49 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
       parsedSummary:null,
     });
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-timeout.v1",current:current(),receipt:forged,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-timeout.v1",current:currentForReceipt(timed),receipt:forged,schemaRoot:ROOT,
     });
     expect(result.status).toBe("REJECTED");
     expect(result.reasonCodes).toContain("ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
   });
 
+  it("C1 receipt status/reason contradictions fail closed",async()=>{
+    const r=await receipt("test.active-supported.v1");
+    const forgedCases:HostCapabilityProbeReceipt[]=[
+      resignReceipt(r,{status:"TIMED_OUT",reasonCodes:["PROBE_OUTPUT_LIMIT"],parsedSummary:null}),
+      resignReceipt(r,{status:"OUTPUT_LIMIT",reasonCodes:["PROBE_TIMEOUT"],parsedSummary:null}),
+      resignReceipt(r,{status:"FAILED",reasonCodes:["PROBE_EXECUTION_SUCCEEDED"],parsedSummary:null,exitCode:1}),
+      resignReceipt(r,{status:"IDENTITY_DRIFT",reasonCodes:["PROBE_TIMEOUT"],parsedSummary:null}),
+      resignReceipt(r,{
+        status:"BLOCKED",
+        reasonCodes:["PROBE_TIMEOUT"],
+        parsedSummary:null,
+        executableIdentityBefore:null,
+        executableIdentityAfter:null,
+        exitCode:null,
+        signal:null,
+        stdoutBytes:0,
+        stderrBytes:0,
+      }),
+    ];
+    for(const forged of forgedCases){
+      const result=compileActiveEvidenceToPccr({
+        contractId:"test.active.tool-supported.v1",
+        current:currentForReceipt(r),
+        receipt:forged,
+        schemaRoot:ROOT,
+      });
+      expect(result.status).toBe("REJECTED");
+      expect(result.state).toBe("UNKNOWN");
+      expect(result.proof).toBeNull();
+      expect(result.reasonCodes).toContain("ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
+    }
+  });
+
   it("M03-T052 historical PCCR 1.0 remains valid and cannot carry 1.1 negative kind",async()=>{
     const r=await receipt("test.active-unsupported.v1");
     const compiled=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-unsupported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-unsupported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     }).proof!;
     const historical={
       ...compiled,
@@ -237,7 +298,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     const r=await receipt("test.active-supported.v1");
     const forged=resignReceipt(r,{stdoutBytes:1024});
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:forged,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:forged,schemaRoot:ROOT,
     });
     expect(result.status).toBe("REJECTED");
     expect(result.reasonCodes).toContain("ACTIVE_RECEIPT_SEMANTIC_INCONSISTENCY");
@@ -246,7 +307,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
   it("lease expiry and descriptor/policy/config/runtime drift become STALE",async()=>{
     const r=await receipt("test.active-supported.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     const proof=result.proof!;
     expect(evaluateHostCapabilityProof(proof,result.currentBasis,{now:proof.observedAt,schemaRoot:ROOT}).effectiveState).toBe("SUPPORTED");
@@ -264,10 +325,40 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     }
   });
 
+  it("C1-T010/T011/T012 executable identity drift alone makes active proof STALE",async()=>{
+    const contractId="test.active.tool-supported.v1";
+    const r=await receipt("test.active-supported.v1");
+    const initial=currentForReceipt(r);
+    const result=compileActiveEvidenceToPccr({
+      contractId,current:initial,receipt:r,schemaRoot:ROOT,
+    });
+    const proof=result.proof!;
+    expect(evaluateHostCapabilityProof(
+      proof,
+      buildActiveEvidenceCurrentBasis(contractId,initial),
+      {now:proof.observedAt,schemaRoot:ROOT},
+    ).effectiveState).toBe("SUPPORTED");
+
+    const drifted=current({
+      ...initial,
+      executableIdentityDigest:"f".repeat(64),
+    });
+    const driftedBasis=buildActiveEvidenceCurrentBasis(contractId,drifted);
+    expect(driftedBasis.validityBasis.configurationDigest)
+      .not.toBe(result.currentBasis!.validityBasis.configurationDigest);
+    const evaluated=evaluateHostCapabilityProof(
+      proof,
+      driftedBasis,
+      {now:proof.observedAt,schemaRoot:ROOT},
+    );
+    expect(evaluated.effectiveState).toBe("STALE");
+    expect(evaluated.effectiveState).not.toBe("UNSUPPORTED");
+  });
+
   it("compiler needs only privacy-safe receipt identity, never raw output/path/env",async()=>{
     const r=await receipt("test.active-supported.v1");
     const result=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
     });
     const durable=JSON.stringify(result.proof);
     expect(durable).not.toContain(process.execPath);
@@ -280,7 +371,7 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     for(let i=0;i<1000;i+=1){
       const started=performance.now();
       const result=compileActiveEvidenceToPccr({
-        contractId:"test.active.tool-supported.v1",current:current(),receipt:r,nodeEnv:"test",schemaRoot:ROOT,
+        contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:r,schemaRoot:ROOT,
       });
       durations.push(performance.now()-started);
       expect(result.state).toBe("SUPPORTED");
@@ -289,15 +380,15 @@ describe("UADS2-WO-009 M03 active evidence compiler",{timeout:120000},()=>{
     const percentile=(n:number)=>sorted[Math.max(0,Math.ceil(sorted.length*n/100)-1)]??0;
 
     const absence=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-unsupported.v1",current:current(),receipt:null,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-unsupported.v1",current:current(),receipt:null,schemaRoot:ROOT,
     });
     const unknownR=await receipt("test.active-unrecognized.v1");
     const unknown=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-unrecognized.v1",current:current(),receipt:unknownR,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-unrecognized.v1",current:currentForReceipt(unknownR),receipt:unknownR,schemaRoot:ROOT,
     });
     const forged=resignReceipt(r,{descriptorDigest:"a".repeat(64)});
     const forgedResult=compileActiveEvidenceToPccr({
-      contractId:"test.active.tool-supported.v1",current:current(),receipt:forged,nodeEnv:"test",schemaRoot:ROOT,
+      contractId:"test.active.tool-supported.v1",current:currentForReceipt(r),receipt:forged,schemaRoot:ROOT,
     });
     const metrics={
       schema:"uads2.wo009.active-evidence-benchmark",
