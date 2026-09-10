@@ -2,9 +2,11 @@
 
 **Universal Autonomous Development Studio V2** by **NexLabs**.
 
-[![CI](https://github.com/KayzenRoot/uads-v2/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads-v2/actions/workflows/ci.yml) [![CodeQL](https://github.com/KayzenRoot/uads-v2/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads-v2/actions/workflows/codeql.yml) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![CI](https://github.com/KayzenRoot/uads-v2/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads-v2/actions/workflows/ci.yml) [![CodeQL](https://github.com/KayzenRoot/uads-v2/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/KayzenRoot/uads-v2/actions/workflows/codeql.yml) [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
 > **Status:** V2 bootstrap and architecture/discovery program. Runtime V2 capabilities are not considered implemented until their governed Work Orders are merged with evidence.
+
+> **Licensing:** UADS V2 is proprietary, source-visible software. Public visibility, if enabled, is for transparency, auditability, security review and development workflow. It does **not** make the project open source. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
 UADS V2 is a controlled continuation of UADS V1, preserving the frozen V1 baseline while evolving orchestration, review, context, model/effort routing, fault resolution, cost governance and optional Hive V2 interoperability.
 
@@ -35,7 +37,7 @@ Start with [`docs/v2/README.md`](docs/v2/README.md). Source authority is:
 7. [`docs/v2/13-REVIEW-PROTOCOL.md`](docs/v2/13-REVIEW-PROTOCOL.md)
 8. active Work Order / Context Lock / Evidence Bundle / PR.
 
-Inherited V1 documentation remains authoritative wherever the V2 overlay has not explicitly superseded it.
+Inherited V1 documentation remains authoritative wherever the V2 overlay has not explicitly superseded it. Historical references to Apache-2.0 in inherited or frozen material do not override the current UADS V2 license for newly governed V2 content.
 
 ## 26-module V2 program
 
@@ -98,7 +100,7 @@ Frozen source baseline:
 - inherited version: `0.12.1`
 - tracked files: `489`
 
-The UADS V1 repository remains untouched and independently usable.
+The UADS V1 repository remains untouched and independently usable. Prior copies of V1 or other historical material may remain governed by licenses that applied when those copies were distributed.
 
 ## Current development entry points
 
@@ -115,6 +117,6 @@ The UADS V1 repository remains untouched and independently usable.
 
 ## License
 
-Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
+**NexLabs UADS V2 Source-Visible Proprietary License v1.0.** See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
-Copyright 2026 NexLabs.
+Copyright 2026 NexLabs. All rights reserved.
