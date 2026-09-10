@@ -11,11 +11,14 @@ import {
 } from "../src/commands/dashboard.js";
 import { ensureWorkspace } from "../src/lib/workspace.js";
 import {
+  MAX_COCKPIT_REASON_CODES,
   buildLivingCockpitProjection,
   type LivingCockpitProjection,
 } from "../src/kernel/operational-cockpit.js";
 import { CONTINUITY_REASON_CODES } from "../src/kernel/operational-continuity.js";
 import {
+  OPERATIONAL_STORAGE_REASON_CODES,
+  armOperationalStorageFaultForTests,
   createOperationalEvent,
   MAX_OPERATIONAL_EVENT_LIMIT,
   MAX_OPERATIONAL_EVENT_SCAN,
@@ -401,6 +404,70 @@ describe("UADS2-WO-020 T7 storage pressure and degraded evidence (PF-004)", () =
       expect(snapshot.cockpit.globalHealth.status).toBe("STALE");
       expect(snapshot.cockpit.globalHealth.status).not.toBe("CURRENT");
       expect(snapshot.cockpit.globalHealth.reasonCodes).toContain("FRESHNESS_LEASE_EXPIRED");
+    } finally {
+      await dashboard.stop();
+    }
+  });
+
+  it("degrades the operator cockpit on a real write-denied storage failure and recovers truthfully", async () => {
+    const home = temporaryHome();
+    const dashboard = createDashboardServer({ cwd: process.cwd(), uadsHome: home, host: "127.0.0.1", port: 0 });
+    const address = await dashboard.start();
+    try {
+      const snapshotBefore = JSON.parse((await get(address.port, "/api/snapshot")).body) as { projectId: string };
+      const paths = ensureWorkspace(snapshotBefore.projectId, home);
+      persistOperationalEvent(paths, eventInput(snapshotBefore.projectId, { correlationId: "storage-baseline" }));
+
+      const healthy = JSON.parse((await get(address.port, "/api/snapshot")).body) as { cockpit: LivingCockpitProjection };
+      expect(healthy.cockpit.globalHealth.status).toBe("CURRENT");
+
+      const release = armOperationalStorageFaultForTests(paths.observabilityEvents, {
+        faultClass: "WRITE_DENIED",
+        code: "EACCES",
+        point: "event-file",
+      });
+      try {
+        let failure: NodeJS.ErrnoException | null = null;
+        try {
+          persistOperationalEvent(paths, eventInput(snapshotBefore.projectId, { correlationId: "storage-denied" }));
+        } catch (error) {
+          failure = error as NodeJS.ErrnoException;
+        }
+        expect(failure?.code).toBe("EACCES");
+
+        const degraded = JSON.parse((await get(address.port, "/api/snapshot")).body) as {
+          health: { status: string; reasonCodes: string[] };
+          cockpit: LivingCockpitProjection;
+        };
+        expect(degraded.health.status).toBe("DEGRADED");
+        expect(degraded.health.reasonCodes).toEqual(
+          expect.arrayContaining([
+            OPERATIONAL_STORAGE_REASON_CODES.writeUnavailable,
+            OPERATIONAL_STORAGE_REASON_CODES.writeDenied,
+          ]),
+        );
+        expect(degraded.cockpit.globalHealth.status).toBe("DEGRADED");
+        expect(degraded.cockpit.globalHealth.status).not.toBe("CURRENT");
+        expect(degraded.cockpit.globalHealth.reasonCodes).toContain(OPERATIONAL_STORAGE_REASON_CODES.writeUnavailable);
+        expect(degraded.cockpit.globalHealth.reasonCodes.length).toBeLessThanOrEqual(MAX_COCKPIT_REASON_CODES);
+        const storageSource = degraded.cockpit.globalHealth.sources.find((source) => source.sourceId === "m30.observability-storage");
+        expect(storageSource?.truthState).toBe("DEGRADED");
+        expect(storageSource?.reasonCode).toBeTruthy();
+      } finally {
+        release();
+      }
+
+      const recovered = persistOperationalEvent(paths, eventInput(snapshotBefore.projectId, { correlationId: "storage-recovered" }));
+      const after = JSON.parse((await get(address.port, "/api/snapshot")).body) as {
+        health: { status: string; reasonCodes: string[] };
+        latestActivity: { eventId: string } | null;
+        cockpit: LivingCockpitProjection;
+      };
+      expect(after.health.status).toBe("HEALTHY");
+      expect(after.health.reasonCodes).toEqual([]);
+      expect(after.latestActivity?.eventId).toBe(recovered.eventId);
+      expect(after.cockpit.globalHealth.status).toBe("CURRENT");
+      expect(fs.existsSync(path.join(paths.observability, "storage-pressure.json"))).toBe(false);
     } finally {
       await dashboard.stop();
     }
