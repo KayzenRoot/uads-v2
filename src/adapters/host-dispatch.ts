@@ -35,14 +35,14 @@ import {
   readCurrentSpecialistSelectionPlan,
 } from "../kernel/specialist-persist.js";
 import { loadSpecialistRegistry } from "../kernel/specialist-registry.js";
-import type { ModelExecutionPlan } from "../kernel/model-types.js";
+import type { ModelExecutionPlan, RuntimeCapabilitySnapshot } from "../kernel/model-types.js";
 import { readCurrentExecutionRun } from "../kernel/execution-persist.js";
 import type { ActiveApprovalGatedAction, Checkpoint, ContextPlan, RoutingDecision, WorkOrder } from "../kernel/types.js";
 import {
   detectHostAdapter,
   resolveHostTarget,
-  runtimeSnapshotFromHostDetection,
 } from "./host-adapter-detect.js";
+import { buildPassiveHostCapabilityBridge } from "./host-capability-passive.js";
 import {
   getHostAdapterDefinition,
 } from "./host-adapter-registry.js";
@@ -76,7 +76,7 @@ export type HostDispatchCurrentArtifacts = {
   modelRuntimeIdentityDigest: string;
   modelRegistryDigest: string;
   modelPolicyDigest: string;
-  hostRuntime: ReturnType<typeof runtimeSnapshotFromHostDetection>;
+  hostRuntime: RuntimeCapabilitySnapshot;
   adapterDetection: ReturnType<typeof detectHostAdapter>;
   hostTargetRootDigest: string;
   currentIndexDigest: string;
@@ -354,9 +354,26 @@ export function readCurrentHostDispatchArtifacts(
     throw new HostDispatchError("current Model Execution Plan content is tampered or semantically divergent");
   }
 
+  const proofAwareBridge = buildPassiveHostCapabilityBridge({
+    adapterId: input.adapterId,
+    detectionInput: { hostHome: input.hostHome },
+    persist: false,
+    schemaRoot: input.schemaRoot,
+  });
+  if (proofAwareBridge.detection.status !== "SUPPORTED") {
+    throw new HostDispatchError(
+      `host capability projection became non-current during preparation: ${proofAwareBridge.detection.status}`,
+    );
+  }
+  if (
+    proofAwareBridge.subject.adapterId !== input.adapterId ||
+    proofAwareBridge.subject.targetRootDigest !== hostTarget.targetRootDigest
+  ) {
+    throw new HostDispatchError("host capability projection root/adapter identity mismatch");
+  }
   const hostRuntime = persistRuntimeCapabilitySnapshot(
     ctx.paths,
-    runtimeSnapshotFromHostDetection(detection),
+    proofAwareBridge.projectedRuntime,
     input.schemaRoot,
   );
   const currentExecution = readCurrentExecutionRun(ctx.paths, input.schemaRoot);
