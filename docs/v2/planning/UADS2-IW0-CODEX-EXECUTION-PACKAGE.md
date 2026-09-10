@@ -4,6 +4,8 @@ Status: CANDIDATE / PRE-DISPATCH
 Work Order family: UADS2-WO-020 / M30 S05.1
 Prepared under: UADS2-WO-024
 Runtime execution: NOT STARTED
+Source baseline: `docs/v2/planning/UADS2-IW0-SOURCE-BASELINE.md`
+Planning base main: `b21cce7150c991dba347e28bb8e3752be9e2e941`
 
 ## Executor mission
 Implement and prove the first M30 S05.1 vertical slice: authoritative operational truth -> OTCL freshness/truth evaluation -> TCL continuity -> TPSC projection -> bounded AOBC/CBF handling -> PSCF-safe correlation -> read-only Living Cockpit projection over the existing local-first HTTP/SSE foundation.
@@ -16,8 +18,15 @@ The executor implements. It does not redesign ownership or architecture.
 - WO-023 Technology Acquisition Radar frozen.
 - Interface Freeze IF-001, IF-006, IF-007 applicable.
 - Existing M30 event spine/dashboard foundation is reusable but not treated as full S05.1 completion.
+- Source baseline is reconciled against current main at dispatch time.
 
-At actual dispatch, bind this package to exact current main SHA and current source blob identities.
+## Frozen critical source identities at planning base
+- `src/kernel/operational-events.ts` -> `c68b5a960c7774b877867ae2aa32505bd3bbff48`
+- `src/kernel/operational-event-types.ts` -> `77ba2574d8c6b1a0d08ffce9459a09571beec972`
+- `src/commands/dashboard.ts` -> `172b21d89bbc3421e449935ad24f5df9a32f6600`
+- focused tests and schemas are bound by the planning base commit and must be re-read/reconciled before implementation.
+
+If any critical identity has moved on main, do not blindly use this package. Produce a source-baseline delta and revalidate affected contracts first.
 
 ## Primary allowed source boundary
 Expected existing files:
@@ -178,4 +187,4 @@ Do not declare complete until:
 7. no unrelated architecture redesign or dependency expansion occurred.
 
 ## Dispatch rule
-This file is a PRE-DISPATCH package. Before sending to Codex, create a dedicated implementation WO/context lock/test plan and bind exact main SHA/source identities. Until then, continue GitHub-only preparation.
+This file is a PRE-DISPATCH package. Before sending to Codex, create a dedicated implementation WO/context lock/test plan and bind exact current main/source identities. Until then, continue GitHub-only preparation.
