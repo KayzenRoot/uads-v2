@@ -1,6 +1,6 @@
 # EVIDENCE — UADS2-WO-020
 
-Status: COMPLETE_CANDIDATE — Review-01 correction applied (P1 continuity truth: scan saturation kept distinct from rejected records); exact-head gates and HEDS remain PENDING on the final head
+Status: COMPLETE_CANDIDATE — Review-01 correction applied (P1 continuity truth: scan saturation kept distinct from rejected records) and Review-02 Correction Delta applied (T7/PF-004: deterministic write-denied/read-only and ENOSPC-equivalent storage faults exercised through the real persistence path with truthful throw, visible operator degradation and proven recovery); exact-head gates and HEDS remain PENDING on the final head
 Module: M30 Production Observability & Real-Time Operations
 Session: S05.1 Truth Kernel & Living Cockpit Vertical Slice
 Issue: #65
@@ -9,12 +9,15 @@ Risk: HIGH
 
 ## Exact identities
 - Base main SHA: `e5ed58ed541c415c06fe42498f622a1aeada0f4a` (verified as merge-base with `origin/main`)
-- Implementation head SHA: `f43aa04f705c018e2c969e7a9ce26bdd6a0f2646` (Review-01 correction)
+- Implementation head SHA: `39787af6f3fbc9e672164f14f6728765e6795f74` (Correction Delta Review-02: T7/PF-004 storage-failure proof)
   - `29bb00e` feat(UADS2-WO-020): implement M30 S05.1 truth kernel and living cockpit
   - `cc8998d` test(UADS2-WO-020): add truth kernel and cockpit runtime proofs
   - `4a101cc` chore(UADS2-WO-020): observe cockpit projection latency in M30 benchmark
   - `0131b71` docs(UADS2-WO-020): record runtime evidence bundle
   - `f43aa04` fix(UADS2-WO-020): separate scan saturation from rejected records in continuity truth
+  - `26a0631` docs(UADS2-WO-020): record Review-01 correction evidence and refresh M30 benchmark
+  - `b321a79` docs(UADS2-WO-020): add final checkpoint delta
+  - `39787af` fix(UADS2-WO-020): prove storage write denial and capacity exhaustion through the persistence path
 - Node version: `v24.18.0` (npm `11.16.0`)
 - OS/platform: Windows `10.0.26200` x64, PowerShell, host `D:\Projekt Codexx\uads-v2`
 - Executor/host model routing state: `HOST_FIXED` — the host exposes no per-subtask model/effort control to the executor and `uads status` reports `modelRoutingStatus: (none)` / `selectedProfileId: (none)`. GPT-5.6 Luna availability was not proven on this host and is not claimed.
@@ -34,6 +37,17 @@ Method: `git rev-parse e5ed58ed:<path>` versus `git hash-object <path>` (working
 | `tests/dashboard-m30.test.ts` | `048d58bc28cc214a3afcc54a6f43f5dc13bf90ab` | `8f2cbf04f9984447f5a3c6dd70be97ac514ae98b` | INTENTIONAL DELTA (allowed primary source boundary) |
 
 No unexpected source movement outside the allowed Work Order file list. Review-01 required the bounded reader itself to expose scan saturation separately from rejected/corrupt records, so the event kernel and its type contract now carry additive, documented fields (`rejectedEventCount`, `scanSaturated`; legacy `invalidEventCount` retained only as a documented aggregate). Every delta is one of: the reader, its type contract, the cockpit projection consumer, the dashboard continuity derivation, or their tests.
+
+### Correction Delta (Review-02) blob movement
+Only three files moved between the Review-01 head `b321a79` and the implementation head `39787af`; every other blob in this Work Order file list is byte-identical at the implementation head.
+
+| Path | Blob at `b321a79` | Blob at `39787af` | Status |
+| --- | --- | --- | --- |
+| `src/kernel/operational-events.ts` | `657d12682256cb8b0377a165a510578b226584c6` | `d93dee6c4b293ffb3e9f89b7be9a649943628a05` | INTENTIONAL DELTA (test-only storage-failure seam, errno classification and bounded pressure evidence; default production path unchanged) |
+| `tests/operational-events.test.ts` | `fd94ba6095655438d7000564798ba39099f02f1f` | `1b6955449bdc07fa8d7f299b71ff7a25493499e3` | INTENTIONAL DELTA (negative storage-failure proofs and seam guards) |
+| `tests/m30-cockpit.test.ts` | `70f8dcc0376d3b64bfaa52d406968aec81987b17` | `e6ccdf756bbe68705950e45fcc6021392ea96168` | INTENTIONAL DELTA (end-to-end operator degradation and recovery proof) |
+
+No new files, no dependency change and no other source movement in this delta: `src/kernel/operational-event-types.ts` (`e9eb0ce9939b2f005ed1cf3dc2796ace68481be9`), `src/commands/dashboard.ts` (`432283c6b8984d116804dcdc87a247f982913431`) and `tests/dashboard-m30.test.ts` (`8f2cbf04f9984447f5a3c6dd70be97ac514ae98b`) are byte-identical to `b321a79`.
 
 New-file blobs at `4a101cc`:
 
@@ -75,7 +89,7 @@ Labels: PASS / FAIL / BLOCKED / NOT_APPLICABLE. References are test names in `te
 - PF-001: PASS — optional P3 then P2 detail sheds before P1/P0 truth/health/audit and shedding emits visible evidence (TK "degrades optional detail before protected truth/health/audit classes").
 - PF-002: PASS — adversarial attribute cardinality bounded with visible dropped-series evidence (TK "bounds adversarial cardinality with visible dropped-series evidence").
 - PF-003: PASS — per-client backpressure firewall (1 MiB buffer bound, slow-client drops), client ceiling enforced with 503 `sse-client-limit`, cleanup back to 0, resume/gap truth (TK "exposes a bounded per-client backpressure firewall"; CK "keeps client work bounded and exposes truthful stream state", "replays the bounded window and resumes explicitly from a cursor", "reports an explicit gap instead of silently skipping when the cursor left the window").
-- PF-004: PASS (slice scope) — bounded retention enforced with visible health, over-cap cleanup exact (`withinCap`, `oldestRemoved`, `newestRetained` all true) and corrupt storage degrades without corrupting domain workload; a real ENOSPC/read-only-volume injection was not performed in this slice (see limitations).
+- PF-004: PASS — bounded retention enforced with visible health, over-cap cleanup exact (`withinCap`, `oldestRemoved`, `newestRetained` all true), corrupt storage degrades without corrupting the domain workload, and both mandatory storage-failure classes are proven through the real persistence path with the deterministic, platform-independent injected-errno seam: write-denied/read-only (`EACCES` and `EROFS` at the event-file open, `EACCES` at directory creation) and capacity-exhausted (`ENOSPC` at the fsync commit point). Each failure throws the original errno, stores no event, leaves bounded `WRITE_UNAVAILABLE` pressure evidence (`STORAGE_WRITE_DENIED` / `STORAGE_CAPACITY_EXHAUSTED`), degrades the operator surfaces and recovers after fault removal (OE "fails truthfully when the store denies writes (EACCES/EROFS) and never fabricates or corrupts a record", "fails truthfully when the store is capacity exhausted (ENOSPC) and leaves no partial record behind"; CK "degrades the operator cockpit on a real write-denied storage failure and recovers truthfully").
 - ES-020: PASS (slice scope) — cockpit renders fresh/stale/gapped/absent accounting truthfully and never displays UNKNOWN as CURRENT/zero; economic truth is projected only from owning-module evidence with lineage, otherwise UNKNOWN/UNAVAILABLE with `value: null` (CK "renders absence as UNKNOWN/UNAVAILABLE instead of zero or success", "displays zero only with authoritative owner evidence"). Concrete remaining/reserved/consumed budget fields depend on M07/M24 owner payloads not wired in this read-only slice.
 - T1 OTCL freshness: PASS — TK tests above; plus CK "never renders stale evidence as CURRENT" (stale event cannot render CURRENT even while raw `health.status` is HEALTHY).
 - T2 TCL continuity (Review-01 corrected): PASS — TK continuity suite; CK cursor-resume/gap suite plus the end-to-end saturation proof through the real bounded reader + dashboard/cockpit path ("projects GAP_UNKNOWN when the real bounded scan saturates and never fabricates rejected records").
@@ -83,9 +97,9 @@ Labels: PASS / FAIL / BLOCKED / NOT_APPLICABLE. References are test names in `te
 - T4 AOBC/CBF boundedness: PASS — PF-001/PF-002 plus bounded evidence refs/correlation ids in the projection.
 - T5 PSCF privacy: PASS — OP-009 suite plus same-origin-only shell proof (see Security/privacy).
 - T6 SSE realtime/reconnect: PASS — loopback-only enforced, bounded clients, explicit cursor resume/gap, no fabricated continuity (CK suite).
-- T7 storage pressure: PASS (slice scope) — retention bound + corrupt-store degradation without workload corruption; real ENOSPC injection not performed (see limitations).
+- T7 storage pressure: PASS — retention bound and corrupt-store degradation without workload corruption, plus both mandatory write-failure classes through the real persistence boundary: `EACCES`/`EROFS` write denial (directory creation and event-file open) and `ENOSPC` capacity exhaustion at the fsync commit point. A failed write is never reported as stored, adjacent state stays byte-identical, no partial/temporary record is left behind, and removing the injected fault restores HEALTHY/CURRENT with the pressure marker cleared (see PF-004, Runtime scenarios, Tests).
 - T8 economic truth/no model refresh: PASS — dashboard render/refresh path performs zero model-bearing calls (CK "keeps the dashboard render path free of model-bearing calls"; DM cockpit assertions).
-- T9 foundation compatibility: PASS — OE suite green (7/7, B-001 semantics unchanged); DM suite green; full suite 569/570 with the single failure proven pre-existing and unrelated (see Tests).
+- T9 foundation compatibility: PASS — OE suite green (11/11 including the new storage-failure proofs, B-001 semantics unchanged); DM/TK/CK suites green; full suite 575/576 with the single failure proven pre-existing and unrelated (see Tests).
 - T10 source-baseline integrity: PASS — baseline table above; no unexpected drift; all deltas are declared Work Order files (Review-01 expanded the intentional set to the bounded reader, its type contract and their tests); no ownership relocation.
 
 ## Tests
@@ -104,13 +118,27 @@ Review-01 correction (`f43aa04f705c018e2c969e7a9ce26bdd6a0f2646`), post-commit r
 Command: `npx vitest run --maxWorkers=1 tests/m30-cockpit.test.ts tests/m30-truth-kernel.test.ts tests/dashboard-m30.test.ts tests/operational-events.test.ts`
 Result: 4 files, 37/37 tests passed (53.36s).
 
-Build: `npm run build` (`tsc -p tsconfig.json`) — exit 0, run before and at the committed head, and re-run after the Review-01 correction (exit 0).
+Review-02 correction (Correction Delta, `39787af6f3fbc9e672164f14f6728765e6795f74`), runs on the exact fixed content (`src/` and `tests/` byte-identical to the committed blobs above, verified with `git hash-object`). Runs were executed directly with `node node_modules/vitest/vitest.mjs` because the `npx` shim is unreliable on this Windows host:
+
+Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/operational-events.test.ts`
+Result: 1 file, 11/11 tests passed (1.81s).
+
+Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/m30-cockpit.test.ts`
+Result: 1 file, 14/14 tests passed (110.73s).
+
+Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/operational-events.test.ts tests/dashboard-m30.test.ts tests/m30-truth-kernel.test.ts`
+Result: 3 files, 28/28 tests passed (9.9s).
+
+Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/m30-cockpit.test.ts tests/m30-truth-kernel.test.ts tests/dashboard-m30.test.ts tests/operational-events.test.ts`
+Result: 4 files, 42/42 tests passed (63.78s).
+
+Build: `npm run build` (`tsc -p tsconfig.json`) — exit 0 at the base and at the committed head; re-run after the Review-02 correction with `node node_modules/typescript/bin/tsc -p tsconfig.json` — exit 0.
 
 ### Full suite
-Command: `npm test` (Review-01 correction)
-Result: 570/571 tests passed. Sole failure: `tests/release-security-proof.test.ts` — "RG14 keeps v0.11.0 outside corrected-release proof semantics and immutable" (same pre-existing failure; unchanged by this correction).
+Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1` (Review-02 correction, full suite; direct entrypoint for the reason above)
+Result: 60 files — 59 passed / 1 failed; 576 tests — 575 passed / 1 failed. Sole failure: `tests/release-security-proof.test.ts` — "RG14 keeps v0.11.0 outside corrected-release proof semantics and immutable" (same pre-existing failure; unchanged by this correction). Duration 1443.51s.
 Pre-existing proof: the same single test file was run in a detached worktree at base `e5ed58ed` → `1 failed | 24 passed`, identical failure. Root cause: `git ls-remote origin refs/tags/v0.11.0` is empty because remote `KayzenRoot/uads-v2` has 0 tags; the historical tag exists only in the predecessor repo (`KayzenRoot/uads` `refs/tags/v0.11.0` → `d5cb361274cb19f70c8bd02dd023b596b8babf13`, verified by `git ls-remote`). Not caused by this Work Order; not fixed here.
-The full suite ran on working-tree content that is byte-identical to committed head `f43aa04f705c018e2c969e7a9ce26bdd6a0f2646` for `src/` and `tests/` (verified via `git hash-object` against the committed blobs above).
+The full suite ran on working-tree content that is byte-identical to committed head `39787af6f3fbc9e672164f14f6728765e6795f74` for `src/` and `tests/` (verified via `git hash-object` against the committed blobs above).
 
 ## Runtime scenarios
 - Stale lease: event recorded 2020 → freshness `STALE` / `FRESHNESS_LEASE_EXPIRED`; `globalHealth` STALE while raw `health.status` remains HEALTHY — stale data cannot render CURRENT and raw health is not laundered.
@@ -120,6 +148,11 @@ The full suite ran on working-tree content that is byte-identical to committed h
 - Bounded clients/cardinality: 2 active clients with `MAX_SSE_CLIENTS` reported; `slowClientDrops` 0 under normal load; `bufferLimitBytes` 1 MiB; 9th client → HTTP 503 `sse-client-limit`; cleanup back to 0.
 - Source/domain protection: dashboard reads are read-only projections; corrupt/failed reads degrade projection only; event writer/reader contract (B-001) unchanged.
 - Saturated bounded scan (Review-01): 1,200 real event files (`MAX_OPERATIONAL_EVENT_SCAN` + 100) → reader `scanSaturated: true`, `rejectedEventCount: 0` (legacy `invalidEventCount: 1` sentinel only), reads bounded to `MAX_OPERATIONAL_EVENT_LIMIT`; cockpit continuity `GAP_UNKNOWN` / `CONTINUITY_RANGE_UNBOUNDED` with `knownGapCount` 0 and `globalHealth` degraded; adding one real corrupt record keeps `GAP_UNKNOWN` while `knownGapCount` becomes 1 and freshness degrades with `INTEGRITY_DEFECT`.
+
+- Write-denied storage (Review-02): an injected `EACCES` at the real event-file open throws the original errno, stores no event, and leaves bounded `observability/storage-pressure.json` evidence (`state: WRITE_UNAVAILABLE`, `failureClass: WRITE_DENIED`); `/api/snapshot` `health.status` and cockpit `globalHealth` become DEGRADED with bounded reason codes (`WRITE_UNAVAILABLE`, `STORAGE_WRITE_DENIED`; source `m30.observability-storage` truth DEGRADED); after the fault is released a new write succeeds, `latestActivity` advances, health returns to HEALTHY/CURRENT and the marker file is removed.
+- Read-only storage (Review-02): injected `EROFS` at the same points follows the identical truthful path (`WRITE_DENIED` class).
+- Capacity exhaustion (Review-02): an injected `ENOSPC` after the temporary file exists and before the fsync commit throws, exposes no event, leaves no partial/temporary record, keeps adjacent files byte-identical and records `WRITE_UNAVAILABLE` + `STORAGE_CAPACITY_EXHAUSTED`; recovery restores HEALTHY.
+- Denied directory creation (Review-02): when the store directory cannot be created and no readable store exists, the reader reports `UNAVAILABLE` with `OBSERVABILITY_STORAGE_UNAVAILABLE` merged with the bounded pressure reasons; a later write recreates the store and returns to HEALTHY.
 
 ## Performance observation
 Environment: Node `v24.18.0`, `win32` `x64`, single Windows developer host, isolated temp UADS home (`isolatedUadsHome: true`), synchronous local sidecar filesystem path. Raw artifact: `.engineering/reports/UADS2-WO-020-BENCHMARK.json`.
@@ -150,23 +183,22 @@ Notes: snapshot latency now includes the cockpit projection. Run-to-run spread o
 - No project-local UADS installation was created; no governance check was bypassed.
 
 ## Repository gates on exact final head
-- CI: PENDING (must run on the final pushed head)
-- CodeQL: PENDING
-- Dependency Review: PENDING
-- Cross-Platform: PENDING
+- Historical (superseded audited head `b321a79b41a441555b657740bfbc2e74901cd514`, green but no longer applicable): CI `34527885418`; CodeQL `34527885361`; Dependency Review `34527885428`; Cross-Platform `34527885363`.
+- The implementation head `39787af6f3fbc9e672164f14f6728765e6795f74` plus this documentation commit form the final head; that exact revision must receive fresh CI, CodeQL, Dependency Review and Cross-Platform before merge.
+- Gate status for the final head: PENDING at commit time — the executor triggers and verifies the exact-head runs after pushing and reports their IDs to the independent reviewer.
 
 ## Remaining debt / known limitations
 - Issue #39 M30 telemetry overhead debt remains open; no production SLO/capacity claim is made from developer-host observations.
-- PF-004/T7: real ENOSPC / read-only volume injection was not performed; corruption, retention and degradation paths were exercised.
 - ES-020: slice-level truth rules are proven; concrete remaining/reserved/consumed budget fields depend on M07/M24 owner payloads not wired in this read-only slice.
 - Full suite contains one pre-existing unrelated failure (RC/G14 tag proof against a repository with 0 tags); not caused by this Work Order.
 - Exact-head CI/CodeQL/Dependency Review/Cross-Platform and independent HEDS must run on the final head before merge.
 
 ## HEDS
-Review ID: PENDING (assigned after independent final audit)
+Review ID: PENDING (new independent exact-head audit required for the final head)
 Verdict: PENDING
+Previous review `5172359560` (head `b321a79`, CORRECTION REQUIRED, T7/PF-004 proof gap) is addressed by this Correction Delta and is not an approval; the new audit must re-verify storage-failure proofs and gates on the exact final head.
 
 ## Final verdict
-Terminal state: `COMPLETE_CANDIDATE` (Review-01 correction applied: scan saturation and rejected/corrupt records are distinct bounded-reader evidence, proven end-to-end through the real reader and dashboard/cockpit path).
+Terminal state: `COMPLETE_CANDIDATE` (Review-01 continuity correction plus Review-02 storage-pressure Correction Delta: write-denied/read-only `EACCES`/`EROFS` and capacity-exhausted `ENOSPC` failures are deterministically exercised through the real `persistOperationalEvent` boundary with truthful throws, bounded operator-visible degradation and proven recovery).
 
-This is not APPROVED: independent ChatGPT review, exact-head repository gates and HEDS remain to be executed on the final head. No CORRECTION_REQUIRED condition was found: no scenario fabricates live state, hides continuity gaps, bypasses source authority, grows telemetry/SSE unboundedly, exposes sensitive raw data, introduces model-bearing dashboard refresh, or weakens M03/M07/M21/M24/M29/M31 authority.
+This is not APPROVED: independent ChatGPT review, exact-head repository gates and HEDS remain to be executed on the final head. No CORRECTION_REQUIRED condition was found: no scenario fabricates live state or persisted success, hides continuity gaps, bypasses source authority, grows telemetry/SSE unboundedly, exposes sensitive raw data, introduces model-bearing dashboard refresh, or weakens M03/M07/M21/M24/M29/M31 authority.
