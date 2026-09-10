@@ -1,6 +1,6 @@
 # UADS V2 — Current Checkpoint
 
-Status: M30 S00/S01/S01.5/S02/S03/S04 FROZEN; M30 S05.1 ACTIVE; AEG/HEDS 2.1 CANDIDATE — FINAL EXACT-HEAD REVALIDATION PENDING
+Status: M30 S00/S01/S01.5/S02/S03/S04 FROZEN; M30 S05.1 ACTIVE; AEG/HEDS 2.1 FROZEN; Graph + Harness Engineering Program CANDIDATE — FINAL EXACT-HEAD REVALIDATION PENDING
 Date: 2026-09-10
 
 ## Completed M30 discovery increments
@@ -49,7 +49,6 @@ Date: 2026-09-10
 - HEDS review: `5166996417`
 - Merge SHA: `786d2ca204fb55b3ec402e27984b6bf778f18d6a`
 - Result: S04 FROZEN.
-- Outcome: 50 stable proof IDs, 15 economic chaos scenarios and 12 CRITICAL economic release floors; performance remains TARGET/OBSERVATION until representative M27/M28 evidence exists.
 
 ## Active M30 implementation
 
@@ -59,29 +58,42 @@ Date: 2026-09-10
 - Status: ACTIVE
 - Objective: first end-to-end runtime slice from authoritative operational truth through OTCL/TCL/TPSC/AOBC/PSCF into read-only realtime cockpit projection over the local-first HTTP/SSE foundation.
 - Dashboard-first rule: new state must be visible truthfully; missing economic/routing sources render UNKNOWN/UNAVAILABLE, never fabricated zero/current values.
+- Compatibility seam: preserve graph-backed projections, Harness Episode/Decision-to-Proof references and Digital Operations Office views without requiring those later capabilities to exist in S05.1.
 
-## Cross-module HEDS evolution
+## Frozen cross-module HEDS evolution
 
 ### UADS2-WO-021 — Adaptive Evidence Gauntlet + HEDS 2.1
-- Issue: #66
-- PR: #67
-- Risk: HIGH with CRITICAL economic-safety subset
+- Issue: #66 — CLOSED
+- PR: #67 — MERGED
+- Final head: `7a701c3579d75aedc68e0c985baad86d0755a92b`
+- Final HEDS review: `5167295672`
+- Merge SHA: `512a7c82fbb71df585246272a4aee083ef06cffb`
+- Result: FROZEN cross-module design.
+- Runtime truth: AEG/HEDS 2.1 contracts are frozen, while runtime enforcement remains proof-gated by owning-module implementation.
+
+## Active cross-module program
+
+### UADS2-WO-022 — Graph + Harness Engineering Program & Digital Operations Office
+- Issue: #68
+- PR: #69
+- Branch: `docs/uads2-wo-022-graph-harness-program`
+- Risk: HIGH cross-cutting architecture.
 - Status: CANDIDATE — final exact-head revalidation required after Evidence Bundle/checkpoint reconciliation.
-- Reviewed candidate head: `8644426c0d16451a09eaf2e58370e786903ffdab`
-- HEDS review on reviewed candidate: `5167201964` — APPROVED.
-- Reviewed candidate gates: Dependency Review `34477473445`, CodeQL `34477473606`, Cross-Platform `34477473495`, CI `34477473470` — all SUCCESS.
-- New contracts: Adaptive Evidence Gauntlet (AEG), Gauntlet Evidence Trail (GET), Critic Selection Contract (CSC), Review Convergence Guard (RCG), Adversarial Proof Bar (APB).
-- Operating modes: OFF, LIGHT, STANDARD, HIGH_ASSURANCE.
-- Key invariants: builder/critic separation, risk-selected critics, bounded rounds/concurrency/tokens/cost/context/time, no critic-to-merge shortcut, delta-first correction, finding persistence, convergence detection, Model Lock integrity, M21 single retry ownership, M07 economic admission, M22 evidence-driven escalation/de-escalation.
-- Runtime truth: this WO freezes design/requirements only; runtime enforcement must be proven by owning-module deep discovery and S05 implementation.
+- Candidate head before evidence reconciliation: `8df06b4eb25bfbfab460797aedfedd793ad81560`.
+- Candidate gates: CI `34480650745`, CodeQL `34480650750`, Dependency Review `34480650808`, Cross-Platform `34480650748` — all SUCCESS.
+- Native graph targets: EGC, GIR, GCS, GPG, GCE, deterministic typed traversal/provenance/diff/cycle/forbidden-edge controls.
+- Native harness targets: Harness Contract, HEP, Behavioral Eval Harness, Trajectory Verification, Harness Regression Suite, TCF, CPL, HDD, DPT, EIC, EEB.
+- Integrated target: HGE Harness-Graph Engine and GAFL Graph-Aware Failure Localization.
+- Living Cockpit extension: Digital Operations Office with LIVE, REPLAY, GRAPH and TABLE modes, strictly projected from authoritative runtime truth.
+- No runtime implementation claim is made by WO-022.
 
 ## Persistent debt / independent findings
 - Issue #39: M30 telemetry overhead / M03 B6 performance debt remains open for runtime optimization and representative benchmarking.
 - Issue #9: repository administration governance debt; branch protection/ruleset remains an independent concern.
 
 ## Next governed action
-1. Re-run CI, CodeQL, Dependency Review and Cross-Platform on the final PR #67 head after Evidence Bundle/checkpoint reconciliation.
+1. Re-run CI, CodeQL, Dependency Review and Cross-Platform on the final PR #69 head after Evidence Bundle/checkpoint reconciliation.
 2. Perform final HEDS on that exact head.
-3. If APPROVED, squash merge PR #67 and close Issue #66.
-4. Treat AEG/HEDS 2.1 as frozen cross-module design, not yet runtime-enforced.
-5. Resume UADS2-WO-020 / M30 S05.1 implementation with the new AEG/HEDS requirements available to future review/runtime slices.
+3. If APPROVED, squash merge PR #69 and close Issue #68.
+4. Freeze Graph + Harness Engineering Program as cross-module architecture, not yet runtime implementation.
+5. Resume UADS2-WO-020 / M30 S05.1 while starting a separate UADS-only Technology Acquisition Radar that excludes Hive-specific RAG/memory/context ownership and UGAS-specific media/marketing domains.
