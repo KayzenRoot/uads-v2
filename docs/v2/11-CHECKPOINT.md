@@ -1,72 +1,61 @@
 # UADS V2 — Current Checkpoint
 
-Status: UADS2-WO-012 APPROVED / MERGED; M03 S07 FREEZE REVIEW NEXT
+Status: UADS2-WO-013 APPROVED / MERGED; M03 S07 FROZEN; NEXT MODULE SELECTION = M30
 Date: 2026-09-10
 
-Completed Work Order: UADS2-WO-012
-Completed PR: #46
-Approved head: `d15c18727a5775768d82049fa0bf7b890e981ad6`
-Merge SHA: `6b1f0049311386af6d5c2bacb94da514def9e4c6`
-HEDS review: `5162743199`
-Evidence: `.engineering/reports/EVIDENCE-UADS2-WO-012.md`
+Completed Work Order: UADS2-WO-013
+Completed PR: #48
+Approved head: `5ff41c01d22ca10444c7f26a223e00d0d642d85c`
+Merge SHA: `5f2b16387e01f77e13a35d45529e1fab2f0d40c4`
+HEDS review: `5164875910`
 
-## M03 S06.2 completion
+## M03 S07 freeze result
 
-Promoted:
-- `readHostCapabilityProjection()` is the canonical production consumer boundary for M03 capability truth;
-- future HARD consumers M01, M04, M06 and M23 must integrate through that proof-aware seam rather than adapter declaration snapshots;
-- adapter-declared TRUE remains UNKNOWN without acceptable enabling proof;
-- generic fixed negative capabilities remain FALSE only under current NPC semantics;
-- consumer reads do not persist proof records by default;
-- consumer reads create no project-local runtime footprint;
-- passive/probe/PCCR internals remain hidden behind the facade so stored/active proof resolution can evolve without breaking consumers;
-- the module-level canonical M03 document now records this boundary explicitly.
+M03 Host Capability Detector is now FROZEN.
 
-Exact-head evidence:
+Freeze guarantees:
+- only current valid SUPPORTED PCCR proof may enable TRUE;
+- valid NPC UNSUPPORTED may project FALSE;
+- UNKNOWN/BLOCKED/STALE remain fail-closed UNKNOWN;
+- CEL and CLDS remain mandatory validity controls;
+- Probe Budget Fence remains schema-closed, bounded, no-shell, no-PATH and privacy-safe;
+- future production consumers M01/M04/M06/M23 MUST use `readHostCapabilityProjection()`;
+- adapter declaration values and `runtimeSnapshotFromHostDetection()` are not production enabling truth;
+- M30 telemetry is non-authoritative for M03 proof truth;
+- GLOBAL-FIRST / ZERO-PROJECT-FOOTPRINT remains mandatory.
+
+Exact-head approval evidence:
 - CI SUCCESS;
 - CodeQL SUCCESS;
 - Dependency Review SUCCESS;
 - UADS Cross-Platform Compatibility SUCCESS;
-- HEDS APPROVED after one documentation correction and full exact-head rerun.
+- HEDS APPROVED;
+- no unresolved HIGH/CRITICAL M03 finding;
+- no production bypass found.
 
-## M03 completed runtime/integration slices
+## Deferred / accepted debt
 
-- S05.1 PCCR core
-- S05.2 subject identity + passive bridge
-- S05.3 Probe Budget Fence + generic executor
-- S05.4 Active Evidence Contract + PCCR 1.1 compiler
-- S05.5 cross-platform + telemetry hardening
-- S06.1 proof-aware host-dispatch integration
-- S06.2 canonical proof-aware consumer boundary
+- Vendor-specific Cursor/Codex active probes and positive capability claims remain deferred until real host/source evidence exists.
+- B6 telemetry overhead remains a truthful JUSTIFIED_EXCEPTION and M30-owned performance debt tracked by Issue #39.
+- Issue #9 repository administration/governance debt remains independent from M03 correctness.
 
-## Freeze-readiness assessment
+## Dependency graph effect
 
-M03 is now eligible for S07 freeze review.
+M03 freeze makes direct successors M04 Model Capability Registry and M23 Capability Negotiation Layer graph-eligible.
 
-Why:
-- core proof semantics, NPC, freshness/drift, integrity, privacy, replay resistance and compatibility projection are implemented;
-- active-probe safety contract exists and is tested before any vendor-specific promotion;
-- cross-platform obligations T061-T066 are closed;
-- current production host-dispatch no longer trusts declaration-derived TRUE;
-- future HARD consumers have a canonical proof-aware integration seam;
-- vendor-specific active probes remain separately gated experiments and are not required to freeze core M03;
-- B6 telemetry overhead remains a documented JUSTIFIED_EXCEPTION and visible M30 performance debt, not a capability-truth correctness blocker.
+Root-eligible modules also include M07, M14, M17, M19, M25, M29 and M30.
 
-## Next NECESSARY increment
+## Next NECESSARY module selection
 
-M03 S07 Freeze Review.
+Selected next deep-discovery target: M30 Production Observability & Real-Time Operations.
 
-The freeze review must:
-1. perform a final repository source audit for production bypasses of the canonical M03 consumer boundary;
-2. reconcile S00-S06 obligations, tests and accepted exceptions;
-3. verify no unresolved HIGH/CRITICAL M03 finding remains;
-4. freeze stable contracts and explicitly mark deferred vendor-specific experiments/debt;
-5. update dependency graph/checkpoint so the next graph-eligible module can begin deep discovery.
+Rationale:
+- M30 is a root module with no HARD predecessor;
+- it has high fan-out into M01, M10, M11, M18, M24, M27, M28 and M31-related operating constraints;
+- a foundation slice already exists, so full S00-S07 reconciliation avoids architecture drift;
+- Issue #39 B6 debt is explicitly owned by M30;
+- prioritizing M30 improves dashboard/real-time visibility while preserving the canonical dependency graph.
 
-Constraints remain:
-- no real Cursor/Codex capability claim without evidence;
-- no declaration-derived TRUE may become enabling truth;
-- preserve fail-closed semantics and GLOBAL-FIRST / ZERO-PROJECT-FOOTPRINT;
-- no scope expansion into downstream module implementation during freeze.
+Next governed action: open M30 deep-discovery Work Order and begin S00 problem/metrics source check before any new runtime implementation.
 
-Issue #9 remains independent repository administration/governance debt.
+Architecture Reconciliation remains scheduled after 4 completed module freezes, or earlier on material boundary/ADR/regression change.
