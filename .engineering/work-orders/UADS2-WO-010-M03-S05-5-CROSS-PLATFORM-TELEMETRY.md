@@ -1,12 +1,13 @@
 # Work Order — UADS2-WO-010
 
-Status: ACTIVE — M03 S05.5 CONTRACT FROZEN
+Status: IMPLEMENTED / EVIDENCE FROZEN — EXACT-HEAD HEDS PENDING
 Module: M03 — Host Capability Detector
 Slice: S05.5 — Cross-Platform & Telemetry Hardening
 Repository: `KayzenRoot/uads-v2`
 Branch: `work/uads2-wo-010-m03-cross-platform-telemetry-hardening`
 Base SHA: `5752d1ff7716027071464308eaec6e0a0aef3892`
 Issue: #37
+PR: #38
 Risk: ELEVATED
 ADR: ADR-UADS2-012 — ACCEPTED
 
@@ -100,3 +101,31 @@ STOP if:
 - telemetry changes proof truth;
 - B6 is reported as PASS when >5%;
 - HIGH/CRITICAL defect remains.
+
+
+## Implementation evidence snapshot
+
+Implementation head: `5136f4c940b68ec07538b7654e68edf2a6b7af9e`
+CI run: `34423921430`
+CI job: `102705001365`
+Cross-platform run: `34423921328`
+
+Hosted implementation-head result:
+- 56/56 test files PASS;
+- 539/539 tests PASS;
+- CI SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Linux/Node20 SUCCESS;
+- Windows/Node20 SUCCESS;
+- focused M03 hardening test ran on both OSes.
+
+B6:
+- primary CPU overhead = 552.847282%;
+- validation CPU overhead = 421.997301%;
+- target <5% is NOT met;
+- verdict = JUSTIFIED_EXCEPTION, exactly as permitted by frozen S04;
+- reason: current M30 evidence.lifecycle performs synchronous durable event persistence, hashing, retention and health projection.
+
+Capability truth remained unchanged when telemetry failed.
+Final exact-head HEDS still required after this evidence-only commit.

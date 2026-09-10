@@ -1,0 +1,45 @@
+{
+  "schema": "uads2.wo010.test-map",
+  "schemaVersion": "1.0.0",
+  "implementationHead": "5136f4c940b68ec07538b7654e68edf2a6b7af9e",
+  "status": "PASS_IMPLEMENTATION_HEAD",
+  "tests": [
+    {
+      "id": "M03-T061",
+      "status": "PASS",
+      "proof": "linux / Node20 focused test; stable node-current pre/post executable identity"
+    },
+    {
+      "id": "M03-T062",
+      "status": "PASS",
+      "proof": "windows / Node20 focused test; stable node-current pre/post executable identity"
+    },
+    {
+      "id": "M03-T063",
+      "status": "PASS",
+      "proof": "case-distinct lexical target roots remain digest-distinct"
+    },
+    {
+      "id": "M03-T064",
+      "status": "PASS",
+      "proof": "lexically equivalent same-root spellings converge; V2 stays case-preserving"
+    },
+    {
+      "id": "M03-T065",
+      "status": "PASS",
+      "proof": "Windows fixed execution policy shell=false, windowsHide=true, pathLookup=false"
+    },
+    {
+      "id": "M03-T066",
+      "status": "PASS",
+      "proof": "POSIX fixed execution policy shell=false, pathLookup=false"
+    }
+  ],
+  "regression": {
+    "testFilesPassed": 56,
+    "testsPassed": 539,
+    "failed": 0
+  },
+  "telemetryTruthIndependence": "PASS",
+  "B6Verdict": "JUSTIFIED_EXCEPTION"
+}
