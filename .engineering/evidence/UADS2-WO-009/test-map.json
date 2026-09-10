@@ -4,7 +4,7 @@
   "implementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
   "sourceRunId": 34420764578,
   "sourceJobId": 102695468622,
-  "status": "PASS_CORRECTIVE_IMPLEMENTATION_HEAD",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "focused": [
     {
       "id": "M03-T011",
@@ -88,5 +88,22 @@
     },
     "standardEvals": "PASS",
     "engineeringValidation": "PASS"
+  },
+  "finalHead": "148a3a7699549422a479b1188ce1a9e516bb4b34",
+  "finalSourceRunId": 34421387340,
+  "finalSourceJobId": 102697366734,
+  "finalResult": {
+    "direct": {
+      "testFilesPassed": 55,
+      "testsPassed": 530,
+      "failed": 0
+    },
+    "foundationRerun": {
+      "testFilesPassed": 55,
+      "testsPassed": 530,
+      "failed": 0
+    },
+    "allHostedGates": "SUCCESS",
+    "unresolvedReviewThreads": 0
   }
 }

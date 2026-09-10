@@ -1,6 +1,6 @@
 # CORRECTION DELTA — UADS2-WO-009-C01
 
-Status: IMPLEMENTED / CORRECTIVE IMPLEMENTATION HEAD VERIFIED / FINAL EXACT-HEAD HEDS PENDING
+Status: CLOSED / HEDS APPROVED / MERGED
 Work Order: UADS2-WO-009
 Issue: #34
 PR: #35
@@ -63,6 +63,19 @@ WO009-B1 primary: p50 0.138872 ms / p95 0.190151 ms <= 10 ms.
 WO009-B1 validation: p50 0.160890 ms / p95 0.250155 ms <= 10 ms.
 WO009-B4: falsePositiveFromAbsence=0, absenceUnsupported=0, unrecognizedUnsupported=0, forgedAccepted=0.
 
-## Remaining gate
+## Closure
 
-This evidence commit changes PR HEAD. Fresh exact-head hosted checks and a new HEDS audit are required. Do not merge or start the next Work Order before APPROVED.
+Exact reviewed head: `148a3a7699549422a479b1188ce1a9e516bb4b34`
+HEDS review: `5161388526`
+Merge SHA: `25185cda96f6c9dcf9a3fd32d0e907f82fd28ac4`
+Final CI run: `34421387340`
+Final Foundation job: `102697366734`
+
+- Foundation / CodeQL / Dependency Review / Linux / Windows SUCCESS;
+- 55/55 test files PASS and 530/530 tests PASS twice;
+- exact-head B1 p95 0.326722 ms direct / 0.328023 ms validation <= 10 ms;
+- B4 all safety counters zero;
+- zero unresolved review threads;
+- H-01, H-02, E-01 and M-01 CLOSED.
+
+Correction C01 is objectively closed and promoted through UADS2-WO-009.

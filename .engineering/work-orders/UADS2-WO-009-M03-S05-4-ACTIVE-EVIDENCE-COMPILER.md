@@ -1,6 +1,6 @@
 # Work Order — UADS2-WO-009
 
-Status: CORRECTION C01 IMPLEMENTED / IMPLEMENTATION HEAD VERIFIED — EXACT-HEAD HEDS PENDING
+Status: COMPLETED — HEDS APPROVED / MERGED
 Module: M03 — Host Capability Detector
 Slice: S05.4 — Active Evidence Contract & Generic PCCR Compiler
 Repository: `KayzenRoot/uads-v2`
@@ -187,3 +187,22 @@ Corrective implementation proof:
 - B4 all safety counters zero.
 
 Fresh exact-head HEDS remains mandatory after the evidence commit. No vendor-specific probe or merge is authorized yet.
+
+
+## Final HEDS completion record
+
+- Exact reviewed head: `148a3a7699549422a479b1188ce1a9e516bb4b34`
+- Corrective implementation head: `023b867ee2f817dcc2331cb2ddd3c512c99b1bd9`
+- HEDS review: `5161388526`
+- HEDS verdict: `APPROVED`
+- Merge SHA: `25185cda96f6c9dcf9a3fd32d0e907f82fd28ac4`
+- Foundation / CodeQL / Dependency Review / Linux / Windows: SUCCESS
+- 55/55 test files PASS
+- 530/530 tests PASS
+- Exact-head B1 p95: 0.326722 ms direct / 0.328023 ms validation <= 10 ms
+- B4 all safety counters: 0
+- TEST_ONLY caller spoof regression: PASS
+- executable-only identity drift -> STALE: PASS
+- contradictory terminal receipt semantics fail closed: PASS
+- no production/vendor capability claim promoted
+- M03 remains not S07-frozen

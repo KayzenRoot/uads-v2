@@ -1,6 +1,6 @@
 # Evidence Bundle — UADS2-WO-009 / M03 S05.4
 
-Status: CORRECTION C01 IMPLEMENTATION VERIFIED / FINAL EXACT-HEAD HEDS PENDING
+Status: HEDS APPROVED / MERGED
 Issue: #34
 PR: #35
 Base main: `fbdd1927af7ea250fadac7db0725144dd4873b91`
@@ -79,5 +79,33 @@ Foundation validation rerun:
 - no future capability IDs;
 - M03 not S07-frozen.
 
-## Final gate
-This evidence commit changes the PR head. Fresh exact-head CI / CodeQL / Dependency Review / Cross-Platform SUCCESS and zero unresolved review threads are mandatory before HEDS APPROVED.
+## Final exact-head HEDS evidence
+
+Exact reviewed head: `148a3a7699549422a479b1188ce1a9e516bb4b34`
+HEDS review: `5161388526`
+Merge SHA: `25185cda96f6c9dcf9a3fd32d0e907f82fd28ac4`
+Exact-head CI run: `34421387340`
+Exact-head Foundation job: `102697366734`
+
+Final:
+- 55/55 test files PASS;
+- 530/530 tests PASS;
+- full test suite PASS again inside foundation validation;
+- Foundation SUCCESS;
+- CodeQL SUCCESS;
+- Dependency Review SUCCESS;
+- Linux / Node 20 SUCCESS;
+- Windows / Node 20 SUCCESS;
+- all standard evals / foundation / engineering validation SUCCESS;
+- npm audit / packaging smoke SUCCESS;
+- unresolved review threads = 0;
+- PR mergeable_state = clean at audit.
+
+Exact-head benchmark:
+- direct B1 p50 0.230617 ms / p95 0.326722 ms <= 10 ms;
+- validation B1 p50 0.222866 ms / p95 0.328023 ms <= 10 ms;
+- B4 all safety counters zero.
+
+The evidence-only head changed no runtime file from corrective implementation head `023b867ee2f817dcc2331cb2ddd3c512c99b1bd9`.
+
+HEDS verdict: APPROVED. PR #35 merged successfully.

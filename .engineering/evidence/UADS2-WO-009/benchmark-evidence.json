@@ -1,7 +1,7 @@
 {
   "schema": "uads2.wo009.benchmark-evidence",
   "schemaVersion": "1.1.0",
-  "status": "CORRECTIVE_IMPLEMENTATION_HEAD_VERIFIED_FINAL_HEDS_HEAD_PENDING",
+  "status": "FINAL_EXACT_HEAD_HEDS_APPROVED",
   "implementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
   "sourceRunId": 34420764578,
   "sourceJobId": 102695468622,
@@ -30,6 +30,45 @@
         "samples": 1000,
         "p50Ms": 0.16088999999999487,
         "p95Ms": 0.2501550000000634,
+        "targetP95Ms": 10,
+        "pass": true
+      },
+      "B4": {
+        "falsePositiveFromAbsence": 0,
+        "absenceUnsupported": 0,
+        "unrecognizedUnsupported": 0,
+        "forgedAccepted": 0,
+        "pass": true
+      }
+    }
+  ],
+  "finalHead": "148a3a7699549422a479b1188ce1a9e516bb4b34",
+  "finalSourceRunId": 34421387340,
+  "finalSourceJobId": 102697366734,
+  "finalSamples": [
+    {
+      "phase": "EXACT_HEAD_DIRECT_TEST",
+      "B1": {
+        "samples": 1000,
+        "p50Ms": 0.23061699999993834,
+        "p95Ms": 0.32672200000001794,
+        "targetP95Ms": 10,
+        "pass": true
+      },
+      "B4": {
+        "falsePositiveFromAbsence": 0,
+        "absenceUnsupported": 0,
+        "unrecognizedUnsupported": 0,
+        "forgedAccepted": 0,
+        "pass": true
+      }
+    },
+    {
+      "phase": "EXACT_HEAD_FOUNDATION_VALIDATION_RERUN",
+      "B1": {
+        "samples": 1000,
+        "p50Ms": 0.2228660000000673,
+        "p95Ms": 0.32802300000003015,
         "targetP95Ms": 10,
         "pass": true
       },
