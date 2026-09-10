@@ -9,25 +9,25 @@
   },
   "method": "synchronous local sidecar writes and bounded reads measured with performance.now()",
   "sampleCount": 24,
-  "writeThroughputEventsPerSecond": 22.31,
+  "writeThroughputEventsPerSecond": 25.54,
   "writeLatency": {
-    "p50Ms": 41.193,
-    "p95Ms": 56.801,
+    "p50Ms": 37.12,
+    "p95Ms": 55.88,
     "samples": 24
   },
   "boundedReadLatency": {
-    "p50Ms": 38.203,
-    "p95Ms": 59.144,
+    "p50Ms": 38.791,
+    "p95Ms": 70.886,
     "samples": 24
   },
   "dashboardSnapshotLatency": {
-    "p50Ms": 2210.889,
-    "p95Ms": 2878.288,
+    "p50Ms": 1863.44,
+    "p95Ms": 2228.559,
     "samples": 24
   },
   "cockpitProjectionLatency": {
-    "p50Ms": 651.696,
-    "p95Ms": 868.134,
+    "p50Ms": 597.518,
+    "p95Ms": 843.147,
     "samples": 24,
     "classification": "OBSERVATION"
   },
