@@ -61,5 +61,26 @@ Translate the M30 S03 threat/failure model into concrete S04 proof obligations. 
 - AAE cannot hide unresolved HIGH/CRITICAL or uncertain states;
 - drill-down/raw evidence remains available.
 
+### P9 Critical token-spend safety
+- prove every model-bearing dispatch has a finite hard Economic Safety Envelope;
+- prove parent-child budget conservation under concurrent delegation;
+- prove agent depth, descendants, per-agent children and concurrency ceilings cannot be bypassed;
+- prove recursive/duplicate semantic delegation trips a circuit breaker before hard-budget breach;
+- prove retry ownership is single and cross-layer retries cannot multiply calls;
+- prove deterministic/policy/context/budget failures are not automatically retried;
+- prove progress-free model/tool loops terminate within bounded call/token limits;
+- prove duplicate expensive-call handling uses dedup/reconciliation without blind replay;
+- prove context accumulation and RAG retrieval obey token/source/top-K growth ceilings;
+- prove model fallback cannot silently escalate to a materially more expensive profile outside policy/budget;
+- prove multi-model broadcast requires explicit ensemble authorization and a separate bounded budget;
+- prove UNKNOWN token/cost accounting cannot create new spend capacity;
+- prove restart/recovery does not reset consumed budget or duplicate outstanding reservation;
+- prove token/cost/model-call/agent-spawn velocity anomaly triggers WARN/THROTTLED/HARD_STOP deterministically;
+- prove HARD_STOP blocks new model-bearing dispatch locally without requiring an LLM call;
+- prove project/WO/execution/agent/provider kill switches are governed, auditable and bounded;
+- prove dashboard does not label remaining token/cost budget CURRENT when accounting continuity is stale/gapped.
+
+CRITICAL gate: a release cannot be approved while any token-spend safety proof above is unresolved or failing.
+
 ## S04 gate rule
-S04 cannot begin with unresolved HIGH/CRITICAL S03 findings lacking a specific prevention/detection/containment/recovery proof obligation.
+S04 cannot begin with unresolved HIGH/CRITICAL S03 findings lacking a specific prevention/detection/containment/recovery proof obligation. Token-spend runaway is classified as CRITICAL economic safety and is release-blocking by default.
