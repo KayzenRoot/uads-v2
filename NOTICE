@@ -1,7 +1,16 @@
-UADS - Universal Autonomous Development Studio
-Copyright 2026 NexLabs
+UADS - Universal Autonomous Development Studio V2
+Copyright 2026 NexLabs. All rights reserved.
 
-This product includes software developed at NexLabs.
+UADS V2 is proprietary, source-visible software developed by NexLabs.
+Public repository visibility, if enabled, is provided for transparency, auditability,
+security review, interoperability review, and development workflow. It does not make
+UADS V2 open source and does not grant permission to copy, modify, redistribute,
+commercialize, sublicense, host, or create derivative products except as expressly
+permitted by the LICENSE file or by a separate written agreement from NexLabs.
 
-UADS is an open-source autonomous software engineering orchestration framework.
-See README.md and docs/ for Architecture Freeze v0.2.
+Historical UADS/V1 materials or prior releases may contain references to Apache-2.0.
+Those references describe the licensing of the applicable historical material and do
+not override the current UADS V2 LICENSE for content governed by that license.
+
+Third-party dependencies and separately identified materials remain under their own
+licenses and notices.
