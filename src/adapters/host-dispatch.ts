@@ -41,7 +41,6 @@ import type { ActiveApprovalGatedAction, Checkpoint, ContextPlan, RoutingDecisio
 import {
   detectHostAdapter,
   resolveHostTarget,
-  runtimeSnapshotFromHostDetection,
 } from "./host-adapter-detect.js";
 import {
   getHostAdapterDefinition,
@@ -50,6 +49,7 @@ import {
   getHostAdapterStatusSummary,
   inspectHostAdapterOwnership,
 } from "./host-adapter-install.js";
+import { buildPassiveHostCapabilityBridge } from "./host-capability-passive.js";
 import type {
   HostAdapterId,
   HostAdapterInstallInput,
@@ -76,7 +76,7 @@ export type HostDispatchCurrentArtifacts = {
   modelRuntimeIdentityDigest: string;
   modelRegistryDigest: string;
   modelPolicyDigest: string;
-  hostRuntime: ReturnType<typeof runtimeSnapshotFromHostDetection>;
+  hostRuntime: ReturnType<typeof buildPassiveHostCapabilityBridge>["projectedRuntime"];
   adapterDetection: ReturnType<typeof detectHostAdapter>;
   hostTargetRootDigest: string;
   currentIndexDigest: string;
@@ -354,9 +354,15 @@ export function readCurrentHostDispatchArtifacts(
     throw new HostDispatchError("current Model Execution Plan content is tampered or semantically divergent");
   }
 
+  const hostCapabilityBridge = buildPassiveHostCapabilityBridge({
+    adapterId: input.adapterId,
+    detectionInput: { hostHome: input.hostHome },
+    persist: false,
+    schemaRoot: input.schemaRoot,
+  });
   const hostRuntime = persistRuntimeCapabilitySnapshot(
     ctx.paths,
-    runtimeSnapshotFromHostDetection(detection),
+    hostCapabilityBridge.projectedRuntime,
     input.schemaRoot,
   );
   const currentExecution = readCurrentExecutionRun(ctx.paths, input.schemaRoot);
