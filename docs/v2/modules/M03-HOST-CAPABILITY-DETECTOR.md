@@ -1,6 +1,6 @@
 # M03 — Host Capability Detector
 
-Status: S07 FREEZE CANDIDATE — UADS2-WO-013 EXACT-HEAD GATES + HEDS PENDING
+Status: S07 FROZEN — UADS2-WO-013 APPROVED / MERGED
 Class: NECESSARY
 
 Mission: prove what the current host can actually do before UADS enables subagents, background execution, model controls, tools, telemetry or other host-dependent behavior.
@@ -35,11 +35,9 @@ Canonical accepted ADR:
 - S05.5: APPROVED / MERGED — cross-platform T061-T066 proof, inspectable no-shell/no-PATH PBF policy and B6 telemetry overhead measured as JUSTIFIED_EXCEPTION.
 - S06.1: APPROVED / MERGED — host-dispatch migrated from declaration-derived capability truth to proof-aware compatibility projection with conservative fallback.
 - S06.2: APPROVED / MERGED — canonical future consumer boundary `readHostCapabilityProjection()` introduced for M01/M04/M06/M23; proof internals remain hidden behind the facade.
-- S07: FREEZE CANDIDATE — source audit and contract reconciliation complete; exact-head gates and HEDS still required before final FROZEN promotion.
+- S07: FROZEN — final source audit, contract reconciliation, exact-head CI/security/cross-platform gates and HEDS APPROVED under UADS2-WO-013.
 
-## Frozen contract candidate
-
-The following contract is proposed for S07 freeze:
+## Frozen contract
 
 1. Only a current valid `SUPPORTED` PCCR proof may project to enabled `true`.
 2. Valid NPC `UNSUPPORTED` may project to `false`; absence, timeout, permission denial or unrecognized output may not.
@@ -79,5 +77,3 @@ M01, M04, M06 and M23.
 - M29 operational security: COVERED.
 - M30 observability: COVERED WITH ACCEPTED PERFORMANCE DEBT (#39).
 - M31 safe release: COVERED.
-
-Final status becomes `S07 FROZEN` only after UADS2-WO-013 exact-head mandatory gates and HEDS are APPROVED.
