@@ -1,5 +1,5 @@
 # M30 — Production Observability & Real-Time Operations
-Status: DISCOVERY — S00 FROZEN / S01 TECHNOLOGY RADAR CANDIDATE | Class: NECESSARY
+Status: DISCOVERY — S00 FROZEN / S01 FROZEN / S01.5 PROPRIETARY INVENTION RADAR CANDIDATE | Class: NECESSARY
 
 Mission: provide the event-backed operational nervous system and canonical UADS V2 dashboard/operator surface required by ADR-UADS2-009.
 
@@ -16,10 +16,11 @@ Mandatory tests: correlation continuity, event identity/hash stability, missing 
 ## Discovery sessions
 
 - S00: FROZEN — problem framing, objective operator outcomes, measurable correctness/freshness/latency/durability/loss/cardinality/usefulness metrics, foundation reconciliation and anti-fabrication rules.
-- S01: CANDIDATE — `docs/v2/modules/m30/M30-S01-TECHNOLOGY-RADAR.md`; exact-head gates + HEDS required before promotion.
-- S01.5: NEXT after S01 approval — proprietary invention radar. Candidate gaps from S01 are not yet canonized inventions.
+- S01: FROZEN — `docs/v2/modules/m30/M30-S01-TECHNOLOGY-RADAR.md`; standards-compatible observability posture, local-first default and evidence-gated enterprise scale path.
+- S01.5: CANDIDATE — `docs/v2/modules/m30/M30-S01.5-PROPRIETARY-INVENTION-RADAR.md`; proprietary mechanisms shortlisted for architecture, pending exact-head gates + HEDS.
+- S02: NEXT only after S01.5 approval — component placement, state machines, APIs and bounded architecture seams.
 
-## Current technology posture candidate
+## Frozen S01 technology posture
 
 - ADOPT standards-compatible OpenTelemetry semantic/OTLP boundary without mandatory runtime dependency.
 - ADOPT Prometheus/OpenMetrics-compatible metric semantics; exporter remains optional/experimental.
@@ -27,4 +28,19 @@ Mandatory tests: correlation continuity, event identity/hash stability, missing 
 - EXPERIMENT with trace-derived metrics, native histograms, pluggable OTLP/Prometheus export and evidence-gated distributed ingest.
 - REJECT mandatory Grafana/Kafka/SaaS stacks, unbounded cardinality and synchronous heavy telemetry on critical paths.
 
-All technology selections remain governed discovery decisions until S01 is exact-head approved and merged.
+## S01.5 proprietary shortlist candidate
+
+PROMOTE to S02 architecture if exact-head approved:
+- OTCL — Operational Truth Confidence Layer.
+- TCL — Telemetry Continuity Ledger.
+- AOBC — Adaptive Observability Budget Controller, including the CBF cardinality firewall function.
+- TPSC — Truth/Projection Separation Contract.
+- PSCF — Privacy-Safe Correlation Fabric.
+- LOCP — Living Operations Control Plane.
+
+EXPERIMENT architecture hooks:
+- LDCB — Local-to-Distributed Continuity Bridge.
+- COG — Causal Operations Graph.
+- AAE — Adaptive Attention Engine.
+
+No S01.5 concept is claimed implemented before later architecture, proof and implementation increments.
