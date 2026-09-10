@@ -3,20 +3,16 @@
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
   "date": "2026-09-09",
-  "programState": "UADS2_WO_009_APPROVED_MERGED_M03_NEXT_SLICE_RECONCILIATION",
+  "programState": "UADS2_WO_010_PR38_EVIDENCE_FROZEN_EXACT_HEAD_HEDS_PENDING",
   "completedWorkOrder": "UADS2-WO-009",
   "completedPullRequest": 35,
-  "approvedHead": "148a3a7699549422a479b1188ce1a9e516bb4b34",
-  "correctiveImplementationHead": "023b867ee2f817dcc2331cb2ddd3c512c99b1bd9",
-  "mergeCommit": "25185cda96f6c9dcf9a3fd32d0e907f82fd28ac4",
-  "hedsReviewId": 5161388526,
-  "lastRecordedHead": "25185cda96f6c9dcf9a3fd32d0e907f82fd28ac4",
-  "activeWorkOrder": null,
-  "activePullRequest": null,
-  "activeBranch": null,
+  "lastRecordedHead": "5136f4c940b68ec07538b7654e68edf2a6b7af9e",
+  "activeWorkOrder": "UADS2-WO-010",
+  "activePullRequest": 38,
+  "activeBranch": "work/uads2-wo-010-m03-cross-platform-telemetry-hardening",
   "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.1-S05.4 approved/merged; reconcile remaining M03 design obligations before next slice",
-  "nextNecessaryAction": "Reconcile frozen M03 S01-S04 against completed S05.1-S05.4, surface next technology/invention candidates in chat, and plan only the next bounded necessary slice. Vendor-specific capability truth still requires real host evidence.",
+  "activeSession": "S05.5 implemented; exact-head HEDS pending",
+  "nextNecessaryAction": "Wait for fresh exact-head gates on PR #38, then HEDS. If approved, merge/promote and reconcile S06. B6 remains justified performance exception.",
   "knownBlockers": [
     "Issue #9 admin-only repository configuration"
   ],
@@ -27,10 +23,9 @@
       "S05.3",
       "S05.4"
     ],
-    "vendorSpecificProbes": "NOT_YET_AUTHORIZED",
-    "localEvidenceForVendorProbes": "REQUIRED_BEFORE_PROMOTION",
-    "s06Frozen": false,
-    "s07Frozen": false
+    "activeSlice": "S05.5",
+    "vendorSpecificProbes": "NOT_AUTHORIZED",
+    "localMachineRequired": false
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
