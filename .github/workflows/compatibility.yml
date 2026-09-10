@@ -69,6 +69,10 @@ jobs:
         id: adapter_eval
         run: npm run eval:adapters
 
+      - name: M03 cross-platform hardening
+        id: m03_cross_platform
+        run: npm exec -- vitest run tests/host-capability-cross-platform.test.ts --reporter=verbose
+
       - name: Isolated global installation smoke
         id: isolated_install
         run: node scripts/github/compatibility-smoke.mjs --platform ${{ matrix.platform }} --report "${{ runner.temp }}/uads-compatibility-smoke.json"
@@ -78,7 +82,7 @@ jobs:
         env:
           UADS_COMPATIBILITY_STATUS: ${{ job.status }}
           UADS_COMPATIBILITY_CHECKS: >-
-            {"npm-ci":"${{ steps.npm_ci.outcome }}","typecheck-build":"${{ steps.typecheck_build.outcome }}","adapter-eval":"${{ steps.adapter_eval.outcome }}"}
+            {"npm-ci":"${{ steps.npm_ci.outcome }}","typecheck-build":"${{ steps.typecheck_build.outcome }}","adapter-eval":"${{ steps.adapter_eval.outcome }}","m03-cross-platform":"${{ steps.m03_cross_platform.outcome }}"}
         run: >-
           node scripts/github/generate-compatibility-evidence.mjs
           --platform "${{ matrix.platform }}"

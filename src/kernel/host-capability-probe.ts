@@ -14,6 +14,13 @@ export const HOST_CAPABILITY_PROBE_DESCRIPTOR_VERSION = "1.0.0" as const;
 export const HOST_CAPABILITY_PROBE_RECEIPT_SCHEMA = "uads.host-capability-probe-receipt" as const;
 export const HOST_CAPABILITY_PROBE_RECEIPT_VERSION = "1.0.0" as const;
 
+export const HOST_CAPABILITY_PROBE_EXECUTION_POLICY = Object.freeze({
+  executableRule: "node-current" as const,
+  shell: false as const,
+  windowsHide: true as const,
+  pathLookup: false as const,
+});
+
 export type ProbeAvailability = "PRODUCTION" | "TEST_ONLY";
 export type ProbeSideEffectClass =
   | "READ_ONLY_LOCAL"
@@ -682,8 +689,8 @@ async function executeRegisteredProbe(
       process.execPath,
       descriptor.fixedArgs,
       {
-        shell:false,
-        windowsHide:true,
+        shell: HOST_CAPABILITY_PROBE_EXECUTION_POLICY.shell,
+        windowsHide: HOST_CAPABILITY_PROBE_EXECUTION_POLICY.windowsHide,
         env:hardMinimalEnvironment(descriptor),
         signal:controller.signal,
         maxBuffer:Math.min(descriptor.maxStdoutBytes, descriptor.maxStderrBytes),
