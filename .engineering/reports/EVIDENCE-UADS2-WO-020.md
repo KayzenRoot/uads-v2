@@ -1,6 +1,6 @@
 # EVIDENCE — UADS2-WO-020
 
-Status: COMPLETE_CANDIDATE — Review-01 correction applied (P1 continuity truth: scan saturation kept distinct from rejected records) and Review-02 Correction Delta applied (T7/PF-004: deterministic write-denied/read-only and ENOSPC-equivalent storage faults exercised through the real persistence path with truthful throw, visible operator degradation and proven recovery); exact-head gates and HEDS remain PENDING on the final head
+Status: COMPLETE_CANDIDATE — Review-01 correction applied (P1 continuity truth: scan saturation kept distinct from rejected records), Review-02 Correction Delta applied (T7/PF-004: deterministic write-denied/read-only and ENOSPC-equivalent storage faults exercised through the real persistence path with truthful throw, visible operator degradation and proven recovery) and Review-03 Correction Delta applied (evidence exactness: seam-vs-production distinction stated truthfully; benchmark Run D recorded on the Review-02 implementation content; no runtime source change); exact-head gates and HEDS remain PENDING on the final head
 Module: M30 Production Observability & Real-Time Operations
 Session: S05.1 Truth Kernel & Living Cockpit Vertical Slice
 Issue: #65
@@ -25,6 +25,8 @@ Risk: HIGH
 
 This bundle document is committed after the implementation head above. The resulting final head is a new revision and MUST receive fresh exact-head CI, CodeQL, Dependency Review, Cross-Platform and HEDS before merge.
 
+Review-03 correction identity: evidence-only revision — no runtime/source change. `src/` and `tests/` stay byte-identical to the Review-02 implementation head `39787af6f3fbc9e672164f14f6728765e6795f74` (`src/kernel/operational-events.ts` blob `d93dee6c4b293ffb3e9f89b7be9a649943628a05`, `tests/operational-events.test.ts` blob `1b6955449bdc07fa8d7f299b71ff7a25493499e3`, `tests/m30-cockpit.test.ts` blob `e6ccdf756bbe68705950e45fcc6021392ea96168`); this revision corrects the evidence wording and adds benchmark Run D on that same implementation content, and its final head must receive the same fresh exact-head gates and HEDS.
+
 ## Source baseline verification
 Method: `git rev-parse e5ed58ed:<path>` versus `git hash-object <path>` (working tree clean; committed head content byte-identical to tested content).
 
@@ -43,7 +45,7 @@ Only three files moved between the Review-01 head `b321a79` and the implementati
 
 | Path | Blob at `b321a79` | Blob at `39787af` | Status |
 | --- | --- | --- | --- |
-| `src/kernel/operational-events.ts` | `657d12682256cb8b0377a165a510578b226584c6` | `d93dee6c4b293ffb3e9f89b7be9a649943628a05` | INTENTIONAL DELTA (test-only storage-failure seam, errno classification and bounded pressure evidence; default production path unchanged) |
+| `src/kernel/operational-events.ts` | `657d12682256cb8b0377a165a510578b226584c6` | `d93dee6c4b293ffb3e9f89b7be9a649943628a05` | INTENTIONAL DELTA (test-only storage-failure seam, errno classification and bounded pressure evidence; successful persistence performs bounded storage-pressure bookkeeping and classified failures attempt bounded WRITE_UNAVAILABLE marker persistence — see Review-03 correction below) |
 | `tests/operational-events.test.ts` | `fd94ba6095655438d7000564798ba39099f02f1f` | `1b6955449bdc07fa8d7f299b71ff7a25493499e3` | INTENTIONAL DELTA (negative storage-failure proofs and seam guards) |
 | `tests/m30-cockpit.test.ts` | `70f8dcc0376d3b64bfaa52d406968aec81987b17` | `e6ccdf756bbe68705950e45fcc6021392ea96168` | INTENTIONAL DELTA (end-to-end operator degradation and recovery proof) |
 
@@ -61,6 +63,18 @@ New-file blobs at `4a101cc`:
 | `tests/m30-cockpit.test.ts` | `70f8dcc0376d3b64bfaa52d406968aec81987b17` |
 | `tests/m30-truth-kernel.test.ts` | `0052731350760a5d2988f85178474181ba79e708` |
 | `scripts/benchmark/m30-event-dashboard.mjs` | `35163f1f5ff36fd50a3d8db5d2097369a8a903d2` |
+
+### Correction Delta (Review-03) evidence exactness
+
+Review-03 required replacing any statement equivalent to "no additional filesystem work / production behavior unchanged" with the truthful seam-vs-production distinction. The corrected statement, which now governs this bundle and the checkpoint delta, is:
+
+> The test-only fault-injection seam performs no injected fault work when unarmed. Review-02 nevertheless introduces bounded production pressure bookkeeping: successful persistence checks/clears the storage-pressure marker, and classified storage failures attempt to persist bounded WRITE_UNAVAILABLE evidence.
+
+Exact behavior at the Review-02 implementation head (`src/kernel/operational-events.ts` blob `d93dee6c4b293ffb3e9f89b7be9a649943628a05`):
+- `injectedStorageFault()` returns immediately while no fault is armed — the seam itself performs no filesystem work and injects nothing when unarmed.
+- `persistOperationalEvent()` calls `clearOperationalStoragePressure()` after every successful immutable event write: one bounded existence check for `observability/storage-pressure.json` and, only when present, its removal. This production bookkeeping runs whether or not any fault is armed.
+- Classified write failures (`EACCES`/`EROFS`/`ENOSPC` classes) call `recordOperationalStoragePressure()`: a bounded best-effort marker write that never masks the original thrown errno; the read side merges the marker and can only preserve or raise degradation, never clear it (`readOperationalStoragePressure()` / `applyStoragePressure()`).
+- No runtime/source change was made for Review-03: all `src/` and `tests/` blobs in this revision are byte-identical to the Review-02 implementation head, so the Review-02 focused/full/build evidence remains valid for implementation content and benchmark Run D is tied to that same content.
 
 ## Changed files
 - `src/kernel/operational-truth.ts` (new) — OTCL: `OperationalStateEnvelope` (source identity/owner, observedAt/evaluatedAt, freshness lease, truth class, truth state, continuity, reason codes, lineage/evidence refs) and deterministic `evaluateOperationalTruth` with fixed precedence: integrity defect > absence > invalid timestamp/lease > clock skew > lease expiry > CURRENT.
@@ -157,16 +171,18 @@ The full suite ran on working-tree content that is byte-identical to committed h
 ## Performance observation
 Environment: Node `v24.18.0`, `win32` `x64`, single Windows developer host, isolated temp UADS home (`isolatedUadsHome: true`), synchronous local sidecar filesystem path. Raw artifact: `.engineering/reports/UADS2-WO-020-BENCHMARK.json`.
 
-| Metric | Baseline (pre-change, prior session) | Run A (this session, pre-commit) | Run B (post-commit, raw artifact) | Run C (Review-01 post-correction, raw artifact) |
-| --- | --- | --- | --- | --- |
-| Write throughput | 26.71 ev/s | 14.76 ev/s | 22.31 ev/s | 25.54 ev/s |
-| Write latency p50 / p95 | — / — | 45.178 / 252.095 ms | 41.193 / 56.801 ms | 37.12 / 55.88 ms |
-| Bounded read p50 / p95 | 33.05 / — ms | 32.971 / 41.412 ms | 38.203 / 59.144 ms | 38.791 / 70.886 ms |
-| Dashboard snapshot p50 / p95 | 1658.572 / 2133.109 ms | 1725.178 / 2117.369 ms | 2210.889 / 2878.288 ms | 1863.440 / 2228.559 ms |
-| Cockpit projection p50 / p95 | (not measured) | 550.016 / 722.818 ms | 651.696 / 868.134 ms | 597.518 / 843.147 ms |
-| Retention probe | — | HEALTHY, withinCap true, oldestRemoved true, newestRetained true | HEALTHY, withinCap true, oldestRemoved true, newestRetained true | HEALTHY, withinCap true, oldestRemoved true, newestRetained true |
+Run D identity: executed `2026-09-10 22:17:06 -03:00` against `dist/` compiled from the Review-02 implementation content (`node node_modules/typescript/bin/tsc -p tsconfig.json`, exit 0 at `2026-09-10 22:15:33 -03:00`; `src/kernel/operational-events.ts` blob `d93dee6c4b293ffb3e9f89b7be9a649943628a05` unchanged), benchmark script blob `35163f1f5ff36fd50a3d8db5d2097369a8a903d2`, isolated temp UADS home (`isolatedUadsHome: true`), no project-local state written. The raw artifact now holds exactly the Run D numbers below (JSON and this table agree exactly).
 
-Notes: snapshot latency now includes the cockpit projection. Run-to-run spread on this single host is large (for example write throughput 14.76 vs 22.31 ev/s and snapshot p50 1725 vs 2211 ms across runs), so no SLO, regression or capacity claim is made from these numbers; they are developer-host OBSERVATIONs only; Run C is the post-correction re-execution required after the reader contract evolved. Issue #39 M30 telemetry overhead debt remains OPEN and is not closed or hidden by this benchmark (also recorded in the benchmark limitations).
+| Metric | Baseline (pre-change, prior session) | Run A (this session, pre-commit) | Run B (post-commit, raw artifact) | Run C (Review-01 post-correction, raw artifact) | Run D (Review-03, Review-02 implementation content, raw artifact) |
+| --- | --- | --- | --- | --- | --- |
+| Write throughput | 26.71 ev/s | 14.76 ev/s | 22.31 ev/s | 25.54 ev/s | 19.84 ev/s |
+| Write latency p50 / p95 | — / — | 45.178 / 252.095 ms | 41.193 / 56.801 ms | 37.12 / 55.88 ms | 47.164 / 68.052 ms |
+| Bounded read p50 / p95 | 33.05 / — ms | 32.971 / 41.412 ms | 38.203 / 59.144 ms | 38.791 / 70.886 ms | 43.951 / 71.48 ms |
+| Dashboard snapshot p50 / p95 | 1658.572 / 2133.109 ms | 1725.178 / 2117.369 ms | 2210.889 / 2878.288 ms | 1863.440 / 2228.559 ms | 2247.391 / 3147.507 ms |
+| Cockpit projection p50 / p95 | (not measured) | 550.016 / 722.818 ms | 651.696 / 868.134 ms | 597.518 / 843.147 ms | 846.006 / 1091.547 ms |
+| Retention probe | — | HEALTHY, withinCap true, oldestRemoved true, newestRetained true | HEALTHY, withinCap true, oldestRemoved true, newestRetained true | HEALTHY, withinCap true, oldestRemoved true, newestRetained true | HEALTHY, withinCap true, oldestRemoved true, newestRetained true |
+
+Notes: snapshot latency now includes the cockpit projection. Run-to-run spread on this single host is large (for example write throughput 14.76–26.71 ev/s and snapshot p50 1658.572–2247.391 ms across the series), so no SLO, regression or capacity claim is made from these numbers; they are developer-host OBSERVATIONs only; Run C was the post-correction re-execution required after the reader contract evolved, and Run D is the fresh post-Review-02 re-execution required after the successful-persistence path gained bounded storage-pressure bookkeeping. Run D write throughput (19.84 ev/s) sits inside the documented series spread and its snapshot p50 (2247.391 ms) is ~1.7% above the previous series maximum (2210.889 ms, Run B); the cockpit/snapshot readings are the highest of the series, but a single noisy-host sample cannot establish a deterministic regression, so no runtime code change is made from this observation (Review-03 §5.C) and the sample alone does not distinguish host variance from implementation overhead. Issue #39 M30 telemetry overhead debt remains OPEN and is not closed or hidden by this benchmark (also recorded in the benchmark limitations).
 
 ## Security/privacy
 - Raw secret leakage: no `ghp_...` token or host username appears in `/`, `/api/snapshot`, `/api/cockpit` or `/api/events` responses (CK privacy test).
@@ -184,7 +200,8 @@ Notes: snapshot latency now includes the cockpit projection. Run-to-run spread o
 
 ## Repository gates on exact final head
 - Historical (superseded audited head `b321a79b41a441555b657740bfbc2e74901cd514`, green but no longer applicable): CI `34527885418`; CodeQL `34527885361`; Dependency Review `34527885428`; Cross-Platform `34527885363`.
-- The implementation head `39787af6f3fbc9e672164f14f6728765e6795f74` plus this documentation commit form the final head; that exact revision must receive fresh CI, CodeQL, Dependency Review and Cross-Platform before merge.
+- Historical (Review-02 documentation head `350bd6e1ec3742bc626e350b960895a600e15cef`, green but superseded by this evidence revision): CI `34540190093`; CodeQL `34540190060`; Dependency Review `34540190132`; Cross-Platform `34540190042`.
+- This Review-03 evidence revision plus its own commit forms the final head; that exact revision must receive fresh CI, CodeQL, Dependency Review and Cross-Platform before merge.
 - Gate status for the final head: PENDING at commit time — the executor triggers and verifies the exact-head runs after pushing and reports their IDs to the independent reviewer.
 
 ## Remaining debt / known limitations
@@ -196,9 +213,9 @@ Notes: snapshot latency now includes the cockpit projection. Run-to-run spread o
 ## HEDS
 Review ID: PENDING (new independent exact-head audit required for the final head)
 Verdict: PENDING
-Previous review `5172359560` (head `b321a79`, CORRECTION REQUIRED, T7/PF-004 proof gap) is addressed by this Correction Delta and is not an approval; the new audit must re-verify storage-failure proofs and gates on the exact final head.
+Previous reviews `5172359560` (head `b321a79`, CORRECTION REQUIRED, T7/PF-004 proof gap) and `5173972896` (head `350bd6e`, CORRECTION REQUIRED, evidence exactness: zero-overhead wording not exact and benchmark not tied to the final implementation content) are addressed by the corresponding correction deltas and are not approvals; the new audit must re-verify the corrected evidence, the Review-02 storage-failure proofs, benchmark Run D and the exact-head gates.
 
 ## Final verdict
-Terminal state: `COMPLETE_CANDIDATE` (Review-01 continuity correction plus Review-02 storage-pressure Correction Delta: write-denied/read-only `EACCES`/`EROFS` and capacity-exhausted `ENOSPC` failures are deterministically exercised through the real `persistOperationalEvent` boundary with truthful throws, bounded operator-visible degradation and proven recovery).
+Terminal state: `COMPLETE_CANDIDATE` (Review-01 continuity correction; Review-02 storage-pressure Correction Delta: write-denied/read-only `EACCES`/`EROFS` and capacity-exhausted `ENOSPC` failures are deterministically exercised through the real `persistOperationalEvent` boundary with truthful throws, bounded operator-visible degradation and proven recovery; Review-03 evidence-exactness Correction Delta: the seam-vs-production distinction is stated truthfully and benchmark Run D is tied to the same implementation content).
 
-This is not APPROVED: independent ChatGPT review, exact-head repository gates and HEDS remain to be executed on the final head. No CORRECTION_REQUIRED condition was found: no scenario fabricates live state or persisted success, hides continuity gaps, bypasses source authority, grows telemetry/SSE unboundedly, exposes sensitive raw data, introduces model-bearing dashboard refresh, or weakens M03/M07/M21/M24/M29/M31 authority.
+This is not APPROVED: independent ChatGPT review, exact-head repository gates and HEDS remain to be executed on the final head. No CORRECTION_REQUIRED condition was found: the evidence no longer claims zero additional filesystem work or unchanged production behavior, and no scenario fabricates live state or persisted success, hides continuity gaps, bypasses source authority, grows telemetry/SSE unboundedly, exposes sensitive raw data, introduces model-bearing dashboard refresh, or weakens M03/M07/M21/M24/M29/M31 authority.
