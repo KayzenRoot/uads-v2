@@ -137,7 +137,7 @@ function bindFailure(input: {
   root: string;
   text: string;
 }) {
-  const dispatched = runDispatch({ cwd: input.repo, uadsHome: input.home, session: "imp-1" });
+  const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: input.repo, uadsHome: input.home, session: "imp-1" });
   write(input.repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("broken");\n`);
   const verified = runVerify({ cwd: input.repo, uadsHome: input.home });
   const record = recordFailure({
@@ -456,14 +456,14 @@ function main(): number {
       }
 
       if (item.id === "FL14") {
-        const dispatchedB = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        const dispatchedB = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("b");\n`);
         runVerify({ cwd: repo, uadsHome: home });
         const doneB = completeCorrectiveExecution(repo, home, planned);
         assert(doneB.run.status === "completed", "FL14 execution B did not complete");
         gitCommit(repo, "complete B");
         const plannedA = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
-        const dispatchedA = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        const dispatchedA = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("a");\n`);
         const verifiedA = runVerify({ cwd: repo, uadsHome: home });
         const boundA = recordFailure({
@@ -530,7 +530,7 @@ function main(): number {
       }
 
       if (item.id === "FL16") {
-        const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         let mismatchRejected = false;
         try {
           resolveFailureExecutionBinding({
@@ -577,7 +577,7 @@ function main(): number {
       }
 
       if (item.id === "FL17") {
-        const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("d1");\n`);
         const verifiedD1 = runVerify({ cwd: repo, uadsHome: home });
         const digestD1 = verifiedD1.run.currentChangeDigest;

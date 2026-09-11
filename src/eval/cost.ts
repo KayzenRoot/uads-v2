@@ -133,7 +133,7 @@ function recordGate(repo: string, home: string, gate: string, extra = ""): void 
 function prepared(repo: string, home: string) {
   seedRepo(repo);
   const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
-  runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+  runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
   write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("red");\n`);
   runVerify({ cwd: repo, uadsHome: home });
   recordGate(repo, home, "unit-test");
@@ -307,7 +307,7 @@ function main(): number {
         });
         let blocked = false;
         try {
-          runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+          runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         } catch (error) {
           blocked = error instanceof ExecutionBlockedError || /hard token budget/i.test(String(error));
         }
@@ -326,7 +326,7 @@ function main(): number {
           checkpoint: planned.checkpoint,
           contextPlan: planned.contextPlan,
         });
-        runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         const ledger = readCostLedger(getUadsPaths(planned.workOrder.projectId, home), planned.workOrder.projectId);
         assert(ledger?.budgetStatus === "soft-warning", `CC11 expected soft-warning, got ${ledger?.budgetStatus}`);
         const explain = JSON.parse(runCostExplainCommand({ cwd: repo, uadsHome: home, json: true })) as { outcome: string };
@@ -344,7 +344,7 @@ function main(): number {
       } else if (item.id === "CC13") {
         seedRepo(repo);
         const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
-        runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("red");\n`);
         runVerify({ cwd: repo, uadsHome: home });
         recordGate(repo, home, "unit-test", ` token=${TOKEN} `);

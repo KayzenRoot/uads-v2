@@ -11,8 +11,10 @@ import { getUadsPaths } from "../lib/workspace.js";
 import { isReviewGate } from "../kernel/gates.js";
 import { resolveProjectContext } from "../kernel/project-context.js";
 import { createModelProfileRegistry, normalizeModelProfile, persistModelProfileRegistry } from "../kernel/model-registry.js";
-import { computeRuntimeIdentityDigest, persistRuntimeCapabilitySnapshot } from "../kernel/model-runtime.js";
-import { MODEL_ROUTING_SCHEMA_VERSION, type RuntimeCapabilitySnapshot } from "../kernel/model-types.js";
+import { MODEL_ROUTING_SCHEMA_VERSION } from "../kernel/model-types.js";
+import { buildPassiveHostCapabilityBridge } from "../adapters/host-capability-passive.js";
+import { compileHostCapabilityProof, persistHostCapabilityProof } from "../kernel/host-capability-proof.js";
+import { sha256Hex } from "../lib/hash.js";
 import { readCurrentSpecialistSelectionPlan } from "../kernel/specialist-persist.js";
 import {
   hostDispatchBundleStatus,
@@ -103,7 +105,17 @@ function seedRepo(repo: string): void {
   gitCommit(repo, "baseline");
 }
 
-function configureProvenModelRuntime(paths: ReturnType<typeof getUadsPaths>): void {
+const NORMATIVE_PROVEN_CAPABILITIES = [
+  "modelSelection",
+  "toolCalling",
+  "structuredOutput",
+  "promptCache",
+  "explicitCache",
+  "persistentContext",
+  "usageTelemetry",
+] as const;
+
+function configureProvenModelRuntime(paths: ReturnType<typeof getUadsPaths>, schemaRoot: string): string {
   const profile = normalizeModelProfile({
     schema: "uads.model-profile",
     schemaVersion: MODEL_ROUTING_SCHEMA_VERSION,
@@ -133,28 +145,38 @@ function configureProvenModelRuntime(paths: ReturnType<typeof getUadsPaths>): vo
     adapterVersion: MODEL_ROUTING_SCHEMA_VERSION,
   });
   persistModelProfileRegistry(paths, createModelProfileRegistry([profile]));
-  const base: Omit<RuntimeCapabilitySnapshot, "identityDigest"> = {
-    schema: "uads.runtime-capability-snapshot",
-    schemaVersion: MODEL_ROUTING_SCHEMA_VERSION,
-    runtimeId: "generic-runtime",
-    adapterId: "normative-fixture",
-    adapterVersion: MODEL_ROUTING_SCHEMA_VERSION,
-    runtimeVersion: process.versions.node,
-    capabilities: {
-      modelSelection: true,
-      toolCalling: true,
-      structuredOutput: true,
-      promptCache: true,
-      explicitCache: true,
-      persistentContext: true,
-      subagents: false,
-      parallelAgents: false,
-      usageTelemetry: true,
-      visionInput: false,
-    },
-    provenance: { source: "test-fixture", confidence: "proven" },
-  };
-  persistRuntimeCapabilitySnapshot(paths, { ...base, identityDigest: computeRuntimeIdentityDigest(base) });
+  const hostHome = fs.mkdtempSync(path.join(os.tmpdir(), "uads-fi-norm-host-"));
+  fs.mkdirSync(path.join(hostHome, ".agents"), { recursive: true });
+  const bridge = buildPassiveHostCapabilityBridge({
+    adapterId: "generic-agent-skills",
+    detectionInput: { hostHome },
+    persist: false,
+    schemaRoot,
+  });
+  for (const capabilityId of NORMATIVE_PROVEN_CAPABILITIES) {
+    const basis = bridge.currentBasis[capabilityId];
+    const proof = compileHostCapabilityProof(
+      {
+        capabilityId,
+        state: "SUPPORTED",
+        evidenceClass: "E2",
+        subjectDigest: bridge.subject.subjectDigest,
+        adapterId: "generic-agent-skills",
+        runtimeVersion: basis.runtimeVersion,
+        probeId: "fixture.wo026.proof.v1",
+        validityBasis: { ...basis.validityBasis },
+        observedAt: new Date().toISOString(),
+        validUntil: null,
+        validityClass: "IDENTITY_BOUND",
+        evidenceDigest: sha256Hex(`uads2-wo026-normative-fi-${capabilityId}-v1`),
+        negativeProofKind: null,
+        reasonCodes: ["WO026_EVAL_PCCR_FIXTURE"],
+      },
+      schemaRoot,
+    );
+    persistHostCapabilityProof(paths, proof, { schemaRoot });
+  }
+  return hostHome;
 }
 
 function intake(options: {
@@ -181,22 +203,29 @@ function intake(options: {
   };
 }
 
-function fixture(input = {}): { repo: string; home: string; root: string; planned: Planned } {
+function fixture(input = {}): { repo: string; home: string; root: string; planned: Planned; hostHome: string | null } {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-fi-norm-")).replace(/\\/g, "/");
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-fi-norm-home-")).replace(/\\/g, "/");
   const root = path.resolve(path.join(path.dirname(fileURLToPath(import.meta.url)), "../.."));
   seedRepo(repo);
   const context = resolveProjectContext(repo, home);
   const requested = input as NonNullable<Parameters<typeof intake>[0]>;
+  let hostHome: string | null = null;
   if (requested.domainSignals?.includes("architecture") || requested.destructiveSignals?.length || requested.riskSignals?.length) {
-    configureProvenModelRuntime(context.paths);
+    hostHome = configureProvenModelRuntime(context.paths, root);
   }
   const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake(requested) });
-  return { repo, home, root, planned };
+  return { repo, home, root, planned, hostHome };
 }
 
 function dispatchAndVerify(fixtureValue: ReturnType<typeof fixture>, relative = "src/ui/Button.tsx"): ReturnType<typeof runVerify> {
-  runDispatch({ cwd: fixtureValue.repo, uadsHome: fixtureValue.home, session: "implementer-fi" });
+  runDispatch({
+    cwd: fixtureValue.repo,
+    uadsHome: fixtureValue.home,
+    session: "implementer-fi",
+    adapterId: "generic-agent-skills",
+    ...(fixtureValue.hostHome ? { hostHome: fixtureValue.hostHome } : {}),
+  });
   write(fixtureValue.repo, relative, "export const Button = () => 'changed';\n");
   return runVerify({ cwd: fixtureValue.repo, uadsHome: fixtureValue.home });
 }
@@ -298,14 +327,20 @@ function runNormativeFI4(): void {
 
 function runNormativeFI5(): void {
   const f = fixture({ objective: "Change the authenticated API boundary.", domainSignals: ["api", "security", "backend"], riskSignals: ["authentication"], affectedAreas: ["src/ui"], inScope: ["src/ui"], outOfScope: ["src/auth", "src/backend", "src/db", "outside.txt"] });
-  runDispatch({ cwd: f.repo, uadsHome: f.home, session: "implementer-fi" });
+  runDispatch({
+    cwd: f.repo,
+    uadsHome: f.home,
+    session: "implementer-fi",
+    adapterId: "generic-agent-skills",
+    ...(f.hostHome ? { hostHome: f.hostHome } : {}),
+  });
   write(f.repo, "src/auth/foreign.ts", "export const foreign = true;\n");
   expectBlocked(() => runVerify({ cwd: f.repo, uadsHome: f.home }), "FI5 verify", "scope");
 }
 
 function runNormativeFI6(): void {
   const f = fixture();
-  runDispatch({ cwd: f.repo, uadsHome: f.home, session: "implementer-fi" });
+  runDispatch({ adapterId: "generic-agent-skills", cwd: f.repo, uadsHome: f.home, session: "implementer-fi" });
   fs.unlinkSync(path.join(f.repo, "outside.txt"));
   expectBlocked(() => runVerify({ cwd: f.repo, uadsHome: f.home }), "FI6 verify", "scope");
 }

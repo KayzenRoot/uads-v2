@@ -8,7 +8,7 @@ describe("execution correction loop", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);

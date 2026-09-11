@@ -211,7 +211,7 @@ function main(): number {
       }
 
       if (item.id === "CCI7") {
-        runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+        runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
         let blocked = false;
         try {
           analyzeImpact({

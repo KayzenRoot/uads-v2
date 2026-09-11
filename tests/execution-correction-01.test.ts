@@ -39,7 +39,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "blob.bin"), Buffer.alloc(32, 7));
     const first = runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -54,7 +54,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     const spaced = path.join(repo, "src", "primary button.css");
     fs.writeFileSync(spaced, "button { color: orange; }\n");
     const unicodeName = "coração.css";
@@ -85,12 +85,12 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    expect(() => runDispatch({ cwd: repo, uadsHome: home })).toThrow(/implementer session/i);
-    const first = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home })).toThrow(/implementer session/i);
+    const first = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     expect(first.run.implementerSessionId).toBe("imp-1");
-    const again = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const again = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     expect(again.run.executionRunId).toBe(first.run.executionRunId);
-    expect(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-2" })).toThrow(/rebind|mismatch/i);
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-2" })).toThrow(/rebind|mismatch/i);
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -134,7 +134,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     expect(() =>
@@ -159,7 +159,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "proof.txt"), "architecture ok\n");
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
@@ -243,7 +243,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     const gate = firstCommandGate(planned.workOrder.qualityGates);
@@ -304,7 +304,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -355,7 +355,7 @@ describe("Prompt 003 Correction 01", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     const payload = Buffer.from([0, 1, 2, 255, 254, 253, 10, 13]);
     fs.writeFileSync(path.join(repo, "src", "raw.bin"), payload);
     runVerify({ cwd: repo, uadsHome: home });

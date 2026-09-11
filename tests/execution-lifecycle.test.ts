@@ -11,7 +11,7 @@ describe("execution lifecycle guards", { timeout: 120_000 }, () => {
   it("rejects dispatch without a plan and verify before dispatch", () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
-    expect(() => runDispatch({ cwd: repo, uadsHome: home })).toThrow(/planned Work Order/i);
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home })).toThrow(/planned Work Order/i);
     expect(() => runVerify({ cwd: repo, uadsHome: home })).toThrow(/dispatch has not succeeded|no active execution run/i);
   });
 
@@ -21,7 +21,7 @@ describe("execution lifecycle guards", { timeout: 120_000 }, () => {
     planFrontend(repo, home);
     const dirty = path.join(repo, "src", "keep-me.css");
     fs.writeFileSync(dirty, "keep\n");
-    expect(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(ExecutionBlockedError);
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(ExecutionBlockedError);
     expect(fs.readFileSync(dirty, "utf8")).toBe("keep\n");
     expect(fs.existsSync(dirty)).toBe(true);
   });
@@ -30,7 +30,7 @@ describe("execution lifecycle guards", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     expect(() => runFinalize({ cwd: repo, uadsHome: home })).toThrow(/pending gate|independent review|finalize refused/i);
