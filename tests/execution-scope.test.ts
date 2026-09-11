@@ -10,7 +10,7 @@ describe("execution scope guard", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.mkdirSync(path.join(repo, "unrelated"), { recursive: true });
     fs.writeFileSync(path.join(repo, "unrelated", "other.ts"), "export const x = 1;\n");
     expect(() => runVerify({ cwd: repo, uadsHome: home })).toThrow(/scope|sensitive|out-of-scope/i);
@@ -18,7 +18,7 @@ describe("execution scope guard", { timeout: 120_000 }, () => {
     const second = tempDirs();
     seedFrontend(second.repo);
     planFrontend(second.repo, second.home);
-    runDispatch({ cwd: second.repo, uadsHome: second.home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: second.repo, uadsHome: second.home, session: "imp-1" });
     fs.writeFileSync(path.join(second.repo, ".env"), "SECRET=1\n");
     expect(() => runVerify({ cwd: second.repo, uadsHome: second.home })).toThrow(/sensitive|scope/i);
   });

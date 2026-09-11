@@ -10,7 +10,7 @@ describe("execution happy path", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     expect(dispatched.run.phase).toBe("implement");
     implement(repo);
     const verified = runVerify({ cwd: repo, uadsHome: home });

@@ -72,7 +72,6 @@ import { isModelExecutionPlanCurrent, persistModelExecutionPlan, readCurrentMode
 import { MODEL_ROUTING_POLICY_DIGEST } from "./model-router.js";
 import {
   computeRuntimeIdentityDigest,
-  conservativeRuntimeCapabilitySnapshot,
   persistRuntimeCapabilitySnapshot,
 } from "./model-runtime.js";
 import type { ModelExecutionPlan, RuntimeCapabilitySnapshot } from "./model-types.js";
@@ -521,9 +520,11 @@ function resolveDispatchRuntimeCapability(input: {
 }): RuntimeCapabilitySnapshot {
   const requestedAdapter = typeof input.adapterId === "string" ? input.adapterId.trim() : "";
   if (requestedAdapter.length === 0) {
-    // CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED: absent governed adapter identity keeps
-    // conservative all-UNKNOWN host truth and capability-gated routing fail-closed.
-    return conservativeRuntimeCapabilitySnapshot();
+    // CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED: dispatch must not advance without an explicit
+    // governed adapter identity, regardless of registry size, risk class or compatibility state.
+    throw new ExecutionBlockedError("dispatch requires explicit governed adapter identity", [
+      "CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED",
+    ]);
   }
   if (!(HOST_ADAPTER_IDS as readonly string[]).includes(requestedAdapter)) {
     throw new ExecutionBlockedError("dispatch requires a governed host adapter identity", [

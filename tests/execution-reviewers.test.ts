@@ -11,7 +11,7 @@ describe("execution reviewers and context", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -59,7 +59,7 @@ describe("execution reviewers and context", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo);
     fs.mkdirSync(path.join(repo, "tests"), { recursive: true });
     fs.writeFileSync(path.join(repo, "tests", "button.test.ts"), "test('color', () => {});\n");
@@ -72,7 +72,7 @@ describe("execution reviewers and context", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     planFrontend(repo, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     const expanded = runContextExpand({ cwd: repo, uadsHome: home, reason: "need adjacent tests" });
     expect(expanded.run.contextRadius).not.toBe(dispatched.run.contextRadius);
     const order = ["C0", "C1", "C2", "C3", "C4", "C5"];

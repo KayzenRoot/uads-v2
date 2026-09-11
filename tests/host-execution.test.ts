@@ -61,7 +61,7 @@ function fixture(adapterId: AdapterId = "generic-agent-skills", options: Fixture
   });
   const target = hostHome();
   installHostAdapter(adapterId, { hostHome: target, uadsHome: dirs.home, packageRoot: ROOT }, ROOT);
-  const dispatched = runDispatch({ cwd: dirs.repo, uadsHome: dirs.home, session: "implementation-session" });
+  const dispatched = runDispatch({ cwd: dirs.repo, uadsHome: dirs.home, session: "implementation-session", adapterId, hostHome: target });
   const context = resolveProjectContext(dirs.repo, dirs.home);
   return { ...dirs, target, planned, dispatched, context, adapterId };
 }

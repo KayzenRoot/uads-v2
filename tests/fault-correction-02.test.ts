@@ -63,7 +63,7 @@ describe("fault correction 02", { timeout: 180_000 }, () => {
     seed(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
     const paths = getUadsPaths(planned.workOrder.projectId, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("d1");\n`);
     const verifiedD1 = verifyCurrentChange(repo, home);
     const digestD1 = verifiedD1.run.currentChangeDigest;
@@ -103,7 +103,7 @@ describe("fault correction 02", { timeout: 180_000 }, () => {
     seed(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
     const paths = getUadsPaths(planned.workOrder.projectId, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("broken");\n`);
     const failed = verifyCurrentChange(repo, home);
     const record = recordFailure({
@@ -169,7 +169,7 @@ describe("fault correction 02", { timeout: 180_000 }, () => {
     seed(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
     const paths = getUadsPaths(planned.workOrder.projectId, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("broken");\n`);
     const failed = verifyCurrentChange(repo, home);
     const record = recordFailure({

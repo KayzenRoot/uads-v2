@@ -4,14 +4,20 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { runDoctor } from "../src/commands/doctor.js";
 import { runStatus } from "../src/commands/status.js";
+import { tempDirs } from "./helpers.js";
+import { planFrontend, seedFrontend } from "./execution-helpers.js";
 
 const repoRoot = path.resolve(".");
 const cli = path.join(repoRoot, "dist", "cli.js");
 
-function runCli(args: string[]): { status: number | null; stdout: string; stderr: string } {
+function runCli(
+  args: string[],
+  options: { cwd?: string; env?: NodeJS.ProcessEnv } = {},
+): { status: number | null; stdout: string; stderr: string } {
   const result = spawnSync(process.execPath, [cli, ...args], {
-    cwd: repoRoot,
+    cwd: options.cwd ?? repoRoot,
     encoding: "utf8",
+    env: options.env ?? process.env,
   });
   return {
     status: result.status,
@@ -57,5 +63,23 @@ describe("CLI smoke", () => {
     const status = runCli(["status"]);
     expect(status.status).toBe(0);
     expect(status.stdout).toContain("UADS status");
+  });
+
+  it("fails visibly when dispatch is requested without an explicit adapter identity", () => {
+    if (!fs.existsSync(cli)) {
+      return;
+    }
+
+    const { repo, home } = tempDirs();
+    seedFrontend(repo);
+    planFrontend(repo, home);
+
+    const blocked = runCli(["dispatch", "--session", "imp-1"], {
+      cwd: repo,
+      env: { ...process.env, UADS_HOME: home },
+    });
+
+    expect(blocked.status).toBe(1);
+    expect(blocked.stderr).toContain("explicit governed adapter identity");
   });
 });

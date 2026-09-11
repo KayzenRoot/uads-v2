@@ -57,7 +57,7 @@ function recordUnit(repo: string, home: string): void {
 function ready(repo: string, home: string) {
   seedGraph(repo);
   const planned = planFrontend(repo, home);
-  runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+  runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
   implement(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("red");\n`);
   runVerify({ cwd: repo, uadsHome: home });
   recordUnit(repo, home);
@@ -225,7 +225,7 @@ describe("evidence cache and cost governor", () => {
     const { repo, home } = tempDirs();
     seedGraph(repo);
     const planned = planFrontend(repo, home);
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     implement(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("red");\n`);
     runVerify({ cwd: repo, uadsHome: home });
     const outputPath = path.join(home, "secret-out.txt");
@@ -269,7 +269,7 @@ describe("evidence cache and cost governor", () => {
       checkpoint: planned.checkpoint,
       contextPlan: planned.contextPlan,
     });
-    expect(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(ExecutionBlockedError);
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(ExecutionBlockedError);
     expect(evaluateTokenBudget(10, 5, 1)).toBe("hard-blocked");
   });
 
@@ -277,7 +277,7 @@ describe("evidence cache and cost governor", () => {
     const { repo, home } = tempDirs();
     seedFrontend(repo);
     const planned = planFrontend(repo, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     const paths = getUadsPaths(planned.workOrder.projectId, home);
     const first = buildImpactAndPack({
       repoRoot: repo,

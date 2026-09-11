@@ -221,7 +221,7 @@ function runScenario(id: string, home: string, repo: string): void {
     if (!["LOW"].includes(planned.workOrder.riskLevel)) {
       throw new Error(`X1 risk ${planned.workOrder.riskLevel}`);
     }
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -235,7 +235,7 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X2") {
     seedFrontend(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates, 1);
@@ -245,7 +245,7 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X3") {
     seedFrontend(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -255,7 +255,7 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X4") {
     seedFrontend(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -279,7 +279,7 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X5") {
     seedFrontend(repo);
     runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.mkdirSync(path.join(repo, "unrelated"), { recursive: true });
     fs.writeFileSync(path.join(repo, "unrelated", "other.ts"), "export const blocked = true;\n");
     expectThrow(() => runVerify({ cwd: repo, uadsHome: home }), "X5 verify");
@@ -289,7 +289,7 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X6") {
     seedFrontend(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     const first = runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);
@@ -348,7 +348,7 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X8") {
     seedFrontend(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     const gate = planned.workOrder.qualityGates.find((id) => id !== "security-review" && id !== "performance-check") ?? "unit-test";
@@ -388,8 +388,8 @@ function runScenario(id: string, home: string, repo: string): void {
   if (id === "X9") {
     seedFrontend(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: frontendIntake() });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
-    expectThrow(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-forged" }), "X9 rebind");
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
+    expectThrow(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-forged" }), "X9 rebind");
     fs.writeFileSync(path.join(repo, "src", "icon.bin"), Buffer.alloc(16, 1));
     const first = runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);

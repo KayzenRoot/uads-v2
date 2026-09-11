@@ -111,7 +111,7 @@ describe("fault correction 01", { timeout: 180_000 }, () => {
     seed(repo);
     const plannedB = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
     const paths = getUadsPaths(plannedB.workOrder.projectId, home);
-    const dispatchedB = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatchedB = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("b-fix");\n`);
     verifyCurrentChange(repo, home);
     const completedB = recordPassingGatesAndFinalize(repo, home, plannedB);
@@ -136,7 +136,7 @@ describe("fault correction 01", { timeout: 180_000 }, () => {
     ).toThrow(/standalone failure cannot claim verified resolution/i);
     gitCommit(repo, "complete B");
     const plannedA = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
-    const dispatchedA = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatchedA = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     expect(dispatchedA.run.executionRunId).not.toBe(dispatchedB.run.executionRunId);
     write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("a-fail");\n`);
     const verifiedA = verifyCurrentChange(repo, home);
@@ -168,7 +168,7 @@ describe("fault correction 01", { timeout: 180_000 }, () => {
     seed(repo);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: intake() });
     const paths = getUadsPaths(planned.workOrder.projectId, home);
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     write(repo, "src/ui/Button.tsx", `import { format } from "../util/format";\nexport const Button = () => format("broken");\n`);
     const failedVerify = verifyCurrentChange(repo, home);
     const record = recordFailure({
@@ -247,7 +247,7 @@ describe("fault correction 01", { timeout: 180_000 }, () => {
     const { repo, home } = tempDirs();
     seed(repo);
     runPlan({ cwd: repo, uadsHome: home, intake: intake() });
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     write(repo, "fail.txt", stack(repo, "src/ui/Button.tsx"));
     expect(() =>
       runFailureRecordCommand({

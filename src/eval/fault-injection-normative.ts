@@ -223,7 +223,8 @@ function dispatchAndVerify(fixtureValue: ReturnType<typeof fixture>, relative = 
     cwd: fixtureValue.repo,
     uadsHome: fixtureValue.home,
     session: "implementer-fi",
-    ...(fixtureValue.hostHome ? { adapterId: "generic-agent-skills", hostHome: fixtureValue.hostHome } : {}),
+    adapterId: "generic-agent-skills",
+    ...(fixtureValue.hostHome ? { hostHome: fixtureValue.hostHome } : {}),
   });
   write(fixtureValue.repo, relative, "export const Button = () => 'changed';\n");
   return runVerify({ cwd: fixtureValue.repo, uadsHome: fixtureValue.home });
@@ -330,7 +331,8 @@ function runNormativeFI5(): void {
     cwd: f.repo,
     uadsHome: f.home,
     session: "implementer-fi",
-    ...(f.hostHome ? { adapterId: "generic-agent-skills", hostHome: f.hostHome } : {}),
+    adapterId: "generic-agent-skills",
+    ...(f.hostHome ? { hostHome: f.hostHome } : {}),
   });
   write(f.repo, "src/auth/foreign.ts", "export const foreign = true;\n");
   expectBlocked(() => runVerify({ cwd: f.repo, uadsHome: f.home }), "FI5 verify", "scope");
@@ -338,7 +340,7 @@ function runNormativeFI5(): void {
 
 function runNormativeFI6(): void {
   const f = fixture();
-  runDispatch({ cwd: f.repo, uadsHome: f.home, session: "implementer-fi" });
+  runDispatch({ adapterId: "generic-agent-skills", cwd: f.repo, uadsHome: f.home, session: "implementer-fi" });
   fs.unlinkSync(path.join(f.repo, "outside.txt"));
   expectBlocked(() => runVerify({ cwd: f.repo, uadsHome: f.home }), "FI6 verify", "scope");
 }

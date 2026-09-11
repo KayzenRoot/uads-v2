@@ -31,7 +31,7 @@ describe("Prompt 009 Correction 01 specialist dispatch", { timeout: 120_000 }, (
     const workOrder = JSON.parse(fs.readFileSync(workOrderPath, "utf8")) as Record<string, unknown>;
     rewriteWorkOrder(ctx, { ...workOrder, objective: "Tampered objective with unchanged specialist binding" });
 
-    expect(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(
       /specialist routing state|stale|mismatch/i,
     );
     const resumed = runResume({ cwd: repo, uadsHome: home });
@@ -46,7 +46,7 @@ describe("Prompt 009 Correction 01 specialist dispatch", { timeout: 120_000 }, (
     const workOrderPath = path.join(ctx.paths.workOrders, `${checkpoint.workOrderId}.json`);
     const workOrder = JSON.parse(fs.readFileSync(workOrderPath, "utf8")) as Record<string, unknown>;
     rewriteWorkOrder(ctx, { ...workOrder, qualityGates: ["build"] });
-    expect(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(
       /specialist routing state|stale|mismatch/i,
     );
 
@@ -54,7 +54,7 @@ describe("Prompt 009 Correction 01 specialist dispatch", { timeout: 120_000 }, (
     const contextPath = path.join(second.ctx.paths.context, "plan.json");
     const contextPlan = JSON.parse(fs.readFileSync(contextPath, "utf8")) as Record<string, unknown>;
     fs.writeFileSync(contextPath, `${JSON.stringify({ ...contextPlan, indexDigest: "0".repeat(64) }, null, 2)}\n`);
-    expect(() => runDispatch({ cwd: second.repo, uadsHome: second.home, session: "imp-1" })).toThrow(
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: second.repo, uadsHome: second.home, session: "imp-1" })).toThrow(
       /specialist routing state|stale|mismatch|Context\/Impact/i,
     );
   });
@@ -65,7 +65,7 @@ describe("Prompt 009 Correction 01 specialist dispatch", { timeout: 120_000 }, (
     const workOrderPath = path.join(first.ctx.paths.workOrders, `${checkpoint.workOrderId}.json`);
     const workOrder = JSON.parse(fs.readFileSync(workOrderPath, "utf8")) as Record<string, unknown>;
     rewriteWorkOrder(first.ctx, { ...workOrder, specialists: ["implementation-agent"] });
-    expect(() => runDispatch({ cwd: first.repo, uadsHome: first.home, session: "imp-1" })).toThrow(
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: first.repo, uadsHome: first.home, session: "imp-1" })).toThrow(
       /specialist routing state|diverge|stale|mismatch/i,
     );
 
@@ -77,7 +77,7 @@ describe("Prompt 009 Correction 01 specialist dispatch", { timeout: 120_000 }, (
       ? secondWorkOrder.specialistAssignments.slice(0, -1)
       : [];
     rewriteWorkOrder(second.ctx, { ...secondWorkOrder, specialistAssignments: assignments });
-    expect(() => runDispatch({ cwd: second.repo, uadsHome: second.home, session: "imp-1" })).toThrow(
+    expect(() => runDispatch({ adapterId: "generic-agent-skills", cwd: second.repo, uadsHome: second.home, session: "imp-1" })).toThrow(
       /specialist routing state|diverge|stale|mismatch/i,
     );
   });

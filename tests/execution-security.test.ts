@@ -22,7 +22,7 @@ describe("execution security", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seed(repo);
     plan({ cwd: repo, uadsHome: home, intake: frontendIntake });
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     expect(() =>
@@ -44,7 +44,7 @@ describe("execution security", { timeout: 120_000 }, () => {
     const { repo, home } = tempDirs();
     seed(repo);
     plan({ cwd: repo, uadsHome: home, intake: frontendIntake });
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const dispatched = runDispatch({ adapterId: "generic-agent-skills", cwd: repo, uadsHome: home, session: "imp-1" });
     expect(dispatched.run.projectId).toBeTruthy();
     fs.writeFileSync(path.join(repo, "src", "button.css"), "button { color: red; }\n");
     runVerify({ cwd: repo, uadsHome: home });

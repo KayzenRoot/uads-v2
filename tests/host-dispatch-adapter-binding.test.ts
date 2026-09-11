@@ -103,6 +103,25 @@ function seedProofs(paths: UadsPaths, host: string, adapterId: AdapterId, capabi
   }
 }
 
+function executionRunArtifacts(paths: UadsPaths): string[] {
+  return fs.existsSync(paths.executionRuns) ? fs.readdirSync(paths.executionRuns).sort() : [];
+}
+
+function runtimeStateArtifacts(paths: UadsPaths): string[] {
+  const root = paths.runtimeCapabilities;
+  if (!fs.existsSync(root)) return [];
+  const out: string[] = [];
+  const walk = (dir: string): void => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else out.push(path.relative(root, full).split(path.sep).join("/"));
+    }
+  };
+  walk(root);
+  return out.sort();
+}
+
 function seedProfileRegistry(paths: UadsPaths): void {
   const profile = normalizeModelProfile({
     schema: "uads.model-profile",
@@ -220,32 +239,45 @@ describe("UADS2-WO-026 dispatch adapter identity binding", { timeout: 120_000 },
     );
   });
 
-  it("P6 keeps absent adapter identity conservative, non-enabling and fail-closed", () => {
+  it("P6 blocks absent adapter identity before routing when profiles and legacy state exist", () => {
     const { repo, home, context } = plannedFixture();
     seedProfileRegistry(context.paths);
     seedLegacyProvenSnapshot(context.paths);
+    const seeded = readRuntimeCapabilitySnapshot(context.paths, "generic-runtime", ROOT);
 
     const blocked = blockedError(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" }));
-    expect(blocked.message).toMatch(/model routing/);
-    expect(blocked.blockers.join(" ")).toContain("NO_ELIGIBLE_MODEL");
+    expect(blocked.message).toMatch(/explicit governed adapter identity/);
+    expect(blocked.blockers).toContain("CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED");
 
     const persisted = readRuntimeCapabilitySnapshot(context.paths, "generic-runtime", ROOT);
-    expect(persisted.adapterId).toBe("host-managed");
-    expect(Object.values(persisted.capabilities)).not.toContain(true);
-    expect(persisted.provenance).toEqual({ source: "adapter", confidence: "unknown" });
+    expect(persisted.identityDigest).toBe(seeded.identityDigest);
+    expect(persisted.adapterId).toBe("legacy-fixture");
     expect(fs.existsSync(path.join(context.paths.runtimeCapabilities, "proofs"))).toBe(false);
+    expect(executionRunArtifacts(context.paths)).toEqual([]);
   });
 
-  it("P6 leaves the unchanged host-managed compatibility path non-enabling when no profiles exist", () => {
+  it("P6 blocks absent adapter identity and persists no runtime state when no profiles exist", () => {
     const { repo, home, context } = plannedFixture();
+    const before = runtimeStateArtifacts(context.paths);
 
-    const dispatched = runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    const blocked = blockedError(() => runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" }));
+    expect(blocked.message).toMatch(/explicit governed adapter identity/);
+    expect(blocked.blockers).toContain("CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED");
 
-    expect(dispatched.run.phase).toBe("implement");
-    const persisted = readRuntimeCapabilitySnapshot(context.paths, "generic-runtime", ROOT);
-    expect(Object.values(persisted.capabilities)).not.toContain(true);
-    expect(persisted.provenance.confidence).toBe("unknown");
-    expect(persisted.adapterId).toBe("host-managed");
+    expect(runtimeStateArtifacts(context.paths)).toEqual(before);
+    expect(executionRunArtifacts(context.paths)).toEqual([]);
+  });
+
+  it("P6 blocks the dispatch command without adapter identity and does not advance", () => {
+    const { repo, home, context } = plannedFixture();
+    const before = runtimeStateArtifacts(context.paths);
+
+    expect(() => runDispatchCommand({ cwd: repo, uadsHome: home, session: "imp-1" })).toThrow(
+      /explicit governed adapter identity/,
+    );
+
+    expect(runtimeStateArtifacts(context.paths)).toEqual(before);
+    expect(executionRunArtifacts(context.paths)).toEqual([]);
   });
 
   it("P7 keeps M05 dispatch on the IF-001 facade only", () => {
