@@ -95,8 +95,9 @@ program
   .description("Create a bounded execution run and packet from the current planned Work Order")
   .option("--json", "JSON output")
   .option("--session <id>", "implementer session id")
-  .action((options: { json?: boolean; session?: string }) => {
-    process.stdout.write(runDispatchCommand({ json: options.json, session: options.session }));
+  .option("--adapter <id>", "explicit host adapter identity (cursor | codex | generic-agent-skills)")
+  .action((options: { json?: boolean; session?: string; adapter?: string }) => {
+    process.stdout.write(runDispatchCommand({ json: options.json, session: options.session, adapter: options.adapter }));
   });
 
 const models = program.command("models").description("Provider-neutral model profiles and deterministic routing");

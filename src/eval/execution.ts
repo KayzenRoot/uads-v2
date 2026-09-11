@@ -5,8 +5,10 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { ExecutionBlockedError, runAssuranceRecord, runAssuranceStart, runDispatch, runEvidenceRecord, runFinalize, runVerify } from "../kernel/execution.js";
 import { createModelProfileRegistry, normalizeModelProfile, persistModelProfileRegistry } from "../kernel/model-registry.js";
-import { computeRuntimeIdentityDigest, persistRuntimeCapabilitySnapshot } from "../kernel/model-runtime.js";
-import { MODEL_ROUTING_SCHEMA_VERSION, type RuntimeCapabilitySnapshot } from "../kernel/model-types.js";
+import { MODEL_ROUTING_SCHEMA_VERSION } from "../kernel/model-types.js";
+import { buildPassiveHostCapabilityBridge } from "../adapters/host-capability-passive.js";
+import { compileHostCapabilityProof, persistHostCapabilityProof } from "../kernel/host-capability-proof.js";
+import { sha256Hex } from "../lib/hash.js";
 import { isReviewGate } from "../kernel/gates.js";
 import { runPlan } from "../kernel/orchestrator.js";
 import { findPackageRoot } from "../lib/version.js";
@@ -87,7 +89,17 @@ function seedDefi(repo: string): void {
   gitCommit(repo, "init");
 }
 
-function seedCriticalRouting(home: string): void {
+const EVAL_PROVEN_CAPABILITIES = [
+  "modelSelection",
+  "toolCalling",
+  "structuredOutput",
+  "promptCache",
+  "explicitCache",
+  "persistentContext",
+  "usageTelemetry",
+] as const;
+
+function seedCriticalRouting(home: string): { hostHome: string } {
   ensureGlobalLayout(home);
   const paths = getUadsPaths("execution-eval-routing", home);
   const profile = normalizeModelProfile({
@@ -119,28 +131,39 @@ function seedCriticalRouting(home: string): void {
     adapterVersion: MODEL_ROUTING_SCHEMA_VERSION,
   });
   persistModelProfileRegistry(paths, createModelProfileRegistry([profile]));
-  const base: Omit<RuntimeCapabilitySnapshot, "identityDigest"> = {
-    schema: "uads.runtime-capability-snapshot",
-    schemaVersion: MODEL_ROUTING_SCHEMA_VERSION,
-    runtimeId: "generic-runtime",
-    adapterId: "execution-eval",
-    adapterVersion: MODEL_ROUTING_SCHEMA_VERSION,
-    runtimeVersion: process.versions.node,
-    capabilities: {
-      modelSelection: true,
-      toolCalling: true,
-      structuredOutput: true,
-      promptCache: true,
-      explicitCache: true,
-      persistentContext: true,
-      subagents: false,
-      parallelAgents: false,
-      usageTelemetry: true,
-      visionInput: false,
-    },
-    provenance: { source: "test-fixture", confidence: "proven" },
-  };
-  persistRuntimeCapabilitySnapshot(paths, { ...base, identityDigest: computeRuntimeIdentityDigest(base) });
+  const schemaRoot = findPackageRoot();
+  const hostHome = fs.mkdtempSync(path.join(os.tmpdir(), "uads-eval-host-"));
+  fs.mkdirSync(path.join(hostHome, ".agents"), { recursive: true });
+  const bridge = buildPassiveHostCapabilityBridge({
+    adapterId: "generic-agent-skills",
+    detectionInput: { hostHome },
+    persist: false,
+    schemaRoot,
+  });
+  for (const capabilityId of EVAL_PROVEN_CAPABILITIES) {
+    const basis = bridge.currentBasis[capabilityId];
+    const proof = compileHostCapabilityProof(
+      {
+        capabilityId,
+        state: "SUPPORTED",
+        evidenceClass: "E2",
+        subjectDigest: bridge.subject.subjectDigest,
+        adapterId: "generic-agent-skills",
+        runtimeVersion: basis.runtimeVersion,
+        probeId: "fixture.wo026.proof.v1",
+        validityBasis: { ...basis.validityBasis },
+        observedAt: new Date().toISOString(),
+        validUntil: null,
+        validityClass: "IDENTITY_BOUND",
+        evidenceDigest: sha256Hex(`uads2-wo026-eval-critical-${capabilityId}-v1`),
+        negativeProofKind: null,
+        reasonCodes: ["WO026_EVAL_PCCR_FIXTURE"],
+      },
+      schemaRoot,
+    );
+    persistHostCapabilityProof(paths, proof, { schemaRoot });
+  }
+  return { hostHome };
 }
 
 function recordGates(repo: string, home: string, gates: string[], exitCode = 0): void {
@@ -297,7 +320,7 @@ function runScenario(id: string, home: string, repo: string): void {
   }
   if (id === "X7") {
     seedDefi(repo);
-    seedCriticalRouting(home);
+    const hostCapability = seedCriticalRouting(home);
     const planned = runPlan({ cwd: repo, uadsHome: home, intake: defiIntake() });
     if (!planned.workOrder.assuranceReviewers.includes("security-reviewer")) {
       throw new Error("X7 missing security reviewer");
@@ -305,7 +328,13 @@ function runScenario(id: string, home: string, repo: string): void {
     if (planned.workOrder.autonomyBoundary.requiresApproval.every((item) => !item.includes("funds") && !item.includes("on-chain"))) {
       throw new Error("X7 missing funds/on-chain approval boundary");
     }
-    runDispatch({ cwd: repo, uadsHome: home, session: "imp-1" });
+    runDispatch({
+      cwd: repo,
+      uadsHome: home,
+      session: "imp-1",
+      adapterId: "generic-agent-skills",
+      hostHome: hostCapability.hostHome,
+    });
     fs.writeFileSync(path.join(repo, "contracts", "vault.ts"), "export function withdraw() { return 1; }\n");
     runVerify({ cwd: repo, uadsHome: home });
     recordGates(repo, home, planned.workOrder.qualityGates);

@@ -70,11 +70,16 @@ import { loadModelProfileRegistry } from "./model-registry.js";
 import { computeWorkOrderRoutingDigest, routeModel } from "./model-router.js";
 import { isModelExecutionPlanCurrent, persistModelExecutionPlan, readCurrentModelExecutionPlan } from "./model-persist.js";
 import { MODEL_ROUTING_POLICY_DIGEST } from "./model-router.js";
-import { readRuntimeCapabilitySnapshot } from "./model-runtime.js";
-import type { ModelExecutionPlan } from "./model-types.js";
+import {
+  computeRuntimeIdentityDigest,
+  conservativeRuntimeCapabilitySnapshot,
+  persistRuntimeCapabilitySnapshot,
+} from "./model-runtime.js";
+import type { ModelExecutionPlan, RuntimeCapabilitySnapshot } from "./model-types.js";
 import type { Checkpoint, ContextPlan, ContextRadius, RepositoryMap, WorkOrder } from "./types.js";
 import { IMPLEMENTER_ROLE, INDEPENDENT_REVIEWER_ROLE } from "./types.js";
-import { HOST_ADAPTER_IDS } from "../adapters/host-adapter-types.js";
+import { HOST_ADAPTER_IDS, type HostAdapterId } from "../adapters/host-adapter-types.js";
+import { readHostCapabilityProjection } from "../adapters/host-capability-consumer.js";
 import { getHostAdapterStatePath } from "../adapters/host-adapter-install.js";
 import {
   ASSURANCE_REASON_CODES,
@@ -450,9 +455,10 @@ function ensureCurrentModelPlan(input: {
   contextPlan: ContextPlan;
   schemaRoot: string;
   changeDigest: string | null;
+  runtime: RuntimeCapabilitySnapshot;
 }): ModelExecutionPlan {
   const registry = loadModelProfileRegistry(input.ctx.paths, input.schemaRoot);
-  const runtime = readRuntimeCapabilitySnapshot(input.ctx.paths, "generic-runtime", input.schemaRoot);
+  const runtime = input.runtime;
   const current = readCurrentModelExecutionPlan(input.ctx.paths, input.schemaRoot);
   const contextPack = input.contextPlan.contextPackId
     ? readCurrentContextPack(input.ctx.paths, input.schemaRoot)
@@ -507,10 +513,48 @@ function writeCheckpoint(paths: UadsPaths, checkpoint: Checkpoint, workOrder: Wo
   }).checkpoint;
 }
 
+function resolveDispatchRuntimeCapability(input: {
+  paths: UadsPaths;
+  adapterId?: string;
+  hostHome?: string;
+  schemaRoot: string;
+}): RuntimeCapabilitySnapshot {
+  const requestedAdapter = typeof input.adapterId === "string" ? input.adapterId.trim() : "";
+  if (requestedAdapter.length === 0) {
+    // CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED: absent governed adapter identity keeps
+    // conservative all-UNKNOWN host truth and capability-gated routing fail-closed.
+    return conservativeRuntimeCapabilitySnapshot();
+  }
+  if (!(HOST_ADAPTER_IDS as readonly string[]).includes(requestedAdapter)) {
+    throw new ExecutionBlockedError("dispatch requires a governed host adapter identity", [
+      `CAPABILITY_TRUTH_ADAPTER_UNKNOWN:${requestedAdapter}`,
+    ]);
+  }
+  const projection = readHostCapabilityProjection({
+    adapterId: requestedAdapter as HostAdapterId,
+    ...(input.hostHome ? { detectionInput: { hostHome: input.hostHome } } : {}),
+    paths: input.paths,
+    schemaRoot: input.schemaRoot,
+  });
+  if (projection.detection.status === "BLOCKED") {
+    throw new ExecutionBlockedError("dispatch adapter identity fails host detection validation", [
+      "CAPABILITY_TRUTH_ADAPTER_BLOCKED",
+      ...projection.detection.reasonCodes,
+    ]);
+  }
+  const unsigned: Omit<RuntimeCapabilitySnapshot, "identityDigest"> = {
+    ...projection.runtime,
+    runtimeId: "generic-runtime",
+  };
+  return { ...unsigned, identityDigest: computeRuntimeIdentityDigest(unsigned) };
+}
+
 export function runDispatch(input: {
   cwd?: string;
   uadsHome?: string;
   session?: string;
+  adapterId?: string;
+  hostHome?: string;
 }): { run: ExecutionRun; packet: ExecutionPacket; workOrder: WorkOrder } {
   const cwd = input.cwd ?? process.cwd();
   const schemaRoot = schemaRootOf();
@@ -598,6 +642,14 @@ export function runDispatch(input: {
     throw new ExecutionBlockedError("dirty worktree blocks dispatch", ["pre-existing dirty worktree at dispatch"]);
   }
 
+  const modelRuntime = resolveDispatchRuntimeCapability({
+    paths: ctx.paths,
+    adapterId: input.adapterId,
+    hostHome: input.hostHome,
+    schemaRoot,
+  });
+  persistRuntimeCapabilitySnapshot(ctx.paths, modelRuntime, schemaRoot);
+
   let modelPlan: ModelExecutionPlan;
   try {
     modelPlan = ensureCurrentModelPlan({
@@ -606,6 +658,7 @@ export function runDispatch(input: {
       contextPlan,
       schemaRoot,
       changeDigest: computeLiveChangeDigest(ctx.repoRoot),
+      runtime: modelRuntime,
     });
   } catch (error) {
     throw new ExecutionBlockedError(
@@ -686,6 +739,7 @@ export function runDispatch(input: {
     contextPlan,
     schemaRoot,
     changeDigest: computeLiveChangeDigest(ctx.repoRoot),
+    runtime: modelRuntime,
   });
 
   const run: ExecutionRun = {

@@ -6,9 +6,15 @@ export function runDispatchCommand(input: {
   uadsHome?: string;
   json?: boolean;
   session?: string;
+  adapter?: string;
 }): string {
   try {
-    const result = runDispatch({ cwd: input.cwd, uadsHome: input.uadsHome, session: input.session });
+    const result = runDispatch({
+      cwd: input.cwd,
+      uadsHome: input.uadsHome,
+      session: input.session,
+      adapterId: input.adapter,
+    });
     if (input.json) {
       return `${JSON.stringify(result.packet, null, 2)}\n`;
     }
