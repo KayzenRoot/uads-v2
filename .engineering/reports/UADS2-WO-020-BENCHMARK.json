@@ -1,0 +1,54 @@
+{
+  "schema": "uads.m30-benchmark",
+  "schemaVersion": "1.0.0",
+  "environment": {
+    "node": "v24.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "isolatedUadsHome": true
+  },
+  "method": "synchronous local sidecar writes and bounded reads measured with performance.now()",
+  "sampleCount": 24,
+  "writeThroughputEventsPerSecond": 19.84,
+  "writeLatency": {
+    "p50Ms": 47.164,
+    "p95Ms": 68.052,
+    "samples": 24
+  },
+  "boundedReadLatency": {
+    "p50Ms": 43.951,
+    "p95Ms": 71.48,
+    "samples": 24
+  },
+  "dashboardSnapshotLatency": {
+    "p50Ms": 2247.391,
+    "p95Ms": 3147.507,
+    "samples": 24
+  },
+  "cockpitProjectionLatency": {
+    "p50Ms": 846.006,
+    "p95Ms": 1091.547,
+    "samples": 24,
+    "classification": "OBSERVATION"
+  },
+  "retentionCap": 1000,
+  "retainedEventCount": 24,
+  "retentionProbe": {
+    "configuredCap": 8,
+    "inputEventCount": 10,
+    "retainedEventCount": 8,
+    "removedEventCount": 2,
+    "withinCap": true,
+    "oldestRemoved": true,
+    "newestRetained": true,
+    "health": "HEALTHY"
+  },
+  "limitations": [
+    "single Windows developer host",
+    "no production SLO inferred",
+    "synchronous filesystem path",
+    "latency sample uses 24 events; retention probe uses an explicit bounded cap of 8 to exercise over-cap cleanup deterministically",
+    "cockpit projection latency is an OBSERVATION over the same bounded local window, never a production SLO",
+    "Issue #39 M30 telemetry overhead debt remains open and is not closed or hidden by this benchmark"
+  ]
+}

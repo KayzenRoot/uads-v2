@@ -4,7 +4,7 @@ import path from "node:path";
 import { performance } from "node:perf_hooks";
 import { computeProjectFingerprint } from "../../dist/lib/fingerprint.js";
 import { readGitSummary } from "../../dist/lib/git.js";
-import { buildDashboardSnapshot } from "../../dist/commands/dashboard.js";
+import { buildCockpitSnapshot, buildDashboardSnapshot } from "../../dist/commands/dashboard.js";
 import { persistOperationalEvent, readOperationalEvents, DEFAULT_OPERATIONAL_EVENT_RETENTION } from "../../dist/kernel/operational-events.js";
 import { ensureWorkspace } from "../../dist/lib/workspace.js";
 
@@ -13,7 +13,7 @@ const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-m30-benchmark-"));
 const git = readGitSummary(process.cwd());
 const projectId = computeProjectFingerprint({ originUrl: git.originUrl, repoRoot: git.repoRoot ?? process.cwd() }).projectId;
 const paths = ensureWorkspace(projectId, home);
-const durations = { writes: [], reads: [], snapshots: [] };
+const durations = { writes: [], reads: [], snapshots: [], cockpits: [] };
 
 function event(index) {
   return {
@@ -46,6 +46,9 @@ for (let index = 0; index < sampleCount; index += 1) {
 for (let index = 0; index < sampleCount; index += 1) {
   measure(durations.snapshots, () => buildDashboardSnapshot(process.cwd(), home));
 }
+for (let index = 0; index < sampleCount; index += 1) {
+  measure(durations.cockpits, () => buildCockpitSnapshot(process.cwd(), home));
+}
 
 function percentile(values, percentileValue) {
   const sorted = [...values].sort((left, right) => left - right);
@@ -77,6 +80,7 @@ const result = {
   writeLatency: summary(durations.writes),
   boundedReadLatency: summary(durations.reads),
   dashboardSnapshotLatency: summary(durations.snapshots),
+  cockpitProjectionLatency: { ...summary(durations.cockpits), classification: "OBSERVATION" },
   retentionCap: DEFAULT_OPERATIONAL_EVENT_RETENTION,
   retainedEventCount: retained,
   retentionProbe: {
@@ -89,7 +93,7 @@ const result = {
     newestRetained: retentionProbeIds.has(retentionProbeEvents.at(-1).eventId),
     health: retentionProbeRead.health.status,
   },
-  limitations: ["single Windows developer host", "no production SLO inferred", "synchronous filesystem path", "latency sample uses 24 events; retention probe uses an explicit bounded cap of 8 to exercise over-cap cleanup deterministically"],
+  limitations: ["single Windows developer host", "no production SLO inferred", "synchronous filesystem path", "latency sample uses 24 events; retention probe uses an explicit bounded cap of 8 to exercise over-cap cleanup deterministically", "cockpit projection latency is an OBSERVATION over the same bounded local window, never a production SLO", "Issue #39 M30 telemetry overhead debt remains open and is not closed or hidden by this benchmark"],
 };
 
 const outputArgument = process.argv.find((argument) => argument.startsWith("--output="));

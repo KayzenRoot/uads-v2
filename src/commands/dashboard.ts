@@ -13,13 +13,30 @@ import {
   readOperationalEvents,
   subscribeOperationalEvents,
 } from "../kernel/operational-events.js";
-import type { OperationalEvent, OperationalHealth } from "../kernel/operational-event-types.js";
+import {
+  DEFAULT_OBSERVABILITY_LIMITS,
+  evaluateStreamBackpressure,
+} from "../kernel/operational-budget.js";
+import {
+  buildLivingCockpitProjection,
+  type CockpitStreamState,
+  type LivingCockpitProjection,
+} from "../kernel/operational-cockpit.js";
+import type { OperationalContinuityEvidence } from "../kernel/operational-continuity.js";
+import { sanitizeCorrelationLabel } from "../kernel/operational-correlation.js";
+import type {
+  OperationalEvent,
+  OperationalEventRead,
+  OperationalHealth,
+} from "../kernel/operational-event-types.js";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const DEFAULT_DASHBOARD_PORT = 8765;
 export const MAX_SSE_CLIENTS = 8;
 const SSE_HEARTBEAT_MS = 15_000;
 const SSE_POLL_MS = 1_000;
+/** Backpressure firewall: a client buffering beyond this bound is dropped as a slow client. */
+const MAX_SSE_CLIENT_BUFFER_BYTES = DEFAULT_OBSERVABILITY_LIMITS.maxSseClientBufferBytes;
 
 type DashboardSnapshot = {
   schema: "uads.dashboard-snapshot";
@@ -32,6 +49,7 @@ type DashboardSnapshot = {
   recentErrors: OperationalEvent[];
   recentDiagnostics: OperationalEvent[];
   b001: ReturnType<typeof computeB001AnalysisMetrics>;
+  cockpit: LivingCockpitProjection;
   uadsStatus: Record<string, unknown>;
 };
 
@@ -56,9 +74,79 @@ function sanitizeDashboardValue<T>(value: T): T {
   return sanitized;
 }
 
-export function buildDashboardSnapshot(cwd = process.cwd(), uadsHome?: string): DashboardSnapshot {
+function defaultStreamState(): CockpitStreamState {
+  return {
+    activeClients: 0,
+    maxClients: MAX_SSE_CLIENTS,
+    bufferLimitBytes: MAX_SSE_CLIENT_BUFFER_BYTES,
+    slowClientDrops: 0,
+    lastDropReasonCode: null,
+    reconnects: 0,
+    replayActive: false,
+    lastResumeState: null,
+  };
+}
+
+/**
+ * Continuity evidence derived from bounded reader output only.
+ *
+ * The bounded reader reports rejected records and scan-window saturation as
+ * distinct evidence: rejected records stay GAP_KNOWN, while a saturated scan
+ * surfaces as GAP_UNKNOWN instead of silently collapsing into a known gap or
+ * a contiguous state.
+ */
+function deriveContinuityEvidence(read: OperationalEventRead): OperationalContinuityEvidence {
+  return {
+    observedEventCount: read.health.validEventCount,
+    rejectedRecordCount: read.health.rejectedEventCount,
+    scanSaturated: read.health.scanSaturated,
+    replayActive: false,
+    baselineEstablished: read.health.validEventCount > 0 || read.health.lastEventAt !== null,
+  };
+}
+
+function buildCockpitProjectionFor(
+  projectId: string,
+  read: OperationalEventRead,
+  generatedAt: string,
+  stream: CockpitStreamState,
+): LivingCockpitProjection {
+  return buildLivingCockpitProjection({
+    projectId,
+    health: read.health,
+    observedEvents: read.events,
+    continuityEvidence: deriveContinuityEvidence(read),
+    generatedAt,
+    activeClients: stream.activeClients,
+    maxClients: stream.maxClients,
+    bufferLimitBytes: stream.bufferLimitBytes,
+    slowClientDrops: stream.slowClientDrops,
+    lastDropReasonCode: stream.lastDropReasonCode,
+    reconnects: stream.reconnects,
+    replayActive: stream.replayActive,
+    lastResumeState: stream.lastResumeState,
+  });
+}
+
+/** Read-only Living Cockpit projection over the current bounded evidence window. */
+export function buildCockpitSnapshot(
+  cwd = process.cwd(),
+  uadsHome?: string,
+  stream: CockpitStreamState = defaultStreamState(),
+): LivingCockpitProjection {
   const { projectId, paths } = projectPaths(cwd, uadsHome);
   const read = readOperationalEvents(paths, { limit: MAX_OPERATIONAL_EVENT_LIMIT });
+  return buildCockpitProjectionFor(projectId, read, new Date().toISOString(), stream);
+}
+
+export function buildDashboardSnapshot(
+  cwd = process.cwd(),
+  uadsHome?: string,
+  stream: CockpitStreamState = defaultStreamState(),
+): DashboardSnapshot {
+  const { projectId, paths } = projectPaths(cwd, uadsHome);
+  const read = readOperationalEvents(paths, { limit: MAX_OPERATIONAL_EVENT_LIMIT });
+  const generatedAt = new Date().toISOString();
   const byType: Record<string, number> = {};
   for (const event of read.events) {
     byType[event.eventType] = (byType[event.eventType] ?? 0) + 1;
@@ -74,7 +162,7 @@ export function buildDashboardSnapshot(cwd = process.cwd(), uadsHome?: string): 
   return sanitizeDashboardValue({
     schema: "uads.dashboard-snapshot",
     schemaVersion: "1.0.0",
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     projectId,
     health: read.health,
     eventCounts: { total: read.health.validEventCount, byType },
@@ -82,6 +170,7 @@ export function buildDashboardSnapshot(cwd = process.cwd(), uadsHome?: string): 
     recentErrors,
     recentDiagnostics,
     b001: computeB001AnalysisMetrics(read.events),
+    cockpit: buildCockpitProjectionFor(projectId, read, generatedAt, stream),
     uadsStatus,
   });
 }
@@ -100,7 +189,7 @@ function applySecurityHeaders(res: http.ServerResponse): void {
   res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
 }
 
-const DASHBOARD_HTML = `<!doctype html>
+const DASHBOARD_BASE_HTML = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UADS Operator</title>
 <style>
@@ -115,6 +204,36 @@ function render(s){document.querySelector('#health').textContent=s.health.status
 fetch('/api/snapshot').then(r=>r.json()).then(render).catch(()=>{});const stream=new EventSource('/api/stream');stream.onopen=()=>document.querySelector('#stream').textContent='CONNECTED';stream.onerror=()=>document.querySelector('#stream').textContent='DEGRADED';stream.addEventListener('operational',()=>fetch('/api/snapshot').then(r=>r.json()).then(render).catch(()=>{}));
 </script></body></html>`;
 
+const COCKPIT_CSS = ".state-CURRENT{color:#5be0a1}.state-STALE{color:#ffd166}.state-UNKNOWN{color:#83a9c1}";
+
+const COCKPIT_SECTION = '<section class="grid" style="margin-top:12px"><div class="panel wide"><div class="label">Truth cockpit</div><div id="cockpit" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel"><div class="label">Freshness</div><div id="freshness" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel"><div class="label">Continuity</div><div id="continuity" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel"><div class="label">Observability pressure</div><div id="pressure" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel"><div class="label">Capability (M03)</div><div id="capability" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel"><div class="label">Economic (M07 / M24)</div><div id="economic" class="list"><div class="muted">UNAVAILABLE</div></div></div><div class="panel wide"><div class="label">Bounded realtime stream</div><div id="stream-facts" class="list"><div class="muted">UNAVAILABLE</div></div></div></section>';
+
+const COCKPIT_SCRIPT = `
+(function(){
+const f=(l,v)=>'<div class="item"><span class="muted">'+esc(l)+'</span><div class="mono">'+esc(v===null||v===undefined||v===''?'UNAVAILABLE':v)+'</div></div>';
+const rows=(list)=>list.map((pair)=>f(pair[0],pair[1])).join('');
+const paint=(c)=>{const g=(c&&c.globalHealth)||{};const fr=(c&&c.freshness)||{};const co=(c&&c.continuity)||{};const pr=(c&&c.pressure)||{};const cap=(c&&c.capability)||{};const ec=(c&&c.economic)||{};const st=(c&&c.stream)||{};
+document.querySelector('#cockpit').innerHTML=rows([['Global truth',g.status],['Reasons',(g.reasonCodes||[]).join(', ')],['Projection class',c&&c.truthClass],['Projection version',c&&c.projectionVersion]])+(g.sources||[]).map((s)=>f(s.sourceId+' ['+s.truthClass+']',s.truthState+' - '+s.reasonCode)).join('');
+document.querySelector('#freshness').innerHTML=rows([['State',fr.truthState],['Lease ms',fr.freshnessLeaseMs],['Observed at',fr.observedAt],['Evaluated at',fr.evaluatedAt],['Age ms',fr.value?fr.value.ageMs:null],['Continuity',fr.continuityState],['Reason',fr.reasonCode]]);
+document.querySelector('#continuity').innerHTML=rows([['State',co.state],['Reason',co.reasonCode],['Known gaps',co.knownGapCount],['Unresolved gap',co.unresolvedGap],['Replay active',co.replayActive]]);
+document.querySelector('#pressure').innerHTML=rows([['State',pr.state],['Utilization',pr.utilization],['Retained',(pr.retainedClasses||[]).join(', ')],['Shed',(pr.shedClasses||[]).join(', ')],['Dropped series',pr.droppedSeries],['Bounded keys',pr.boundedKeys]]);
+document.querySelector('#capability').innerHTML=rows([['State',cap.truthState],['Reason',cap.reasonCode],['Adapters',(cap.adapters||[]).length]]);
+document.querySelector('#economic').innerHTML=rows([['State',ec.truthState],['Reason',ec.reasonCode],['Owner modules',(ec.sourceOwnerModules||[]).join(', ')],['Value',ec.value]]);
+document.querySelector('#stream-facts').innerHTML=rows([['Active clients',st.activeClients],['Max clients',st.maxClients],['Slow client drops',st.slowClientDrops],['Reconnects',st.reconnects],['Resume state',st.lastResumeState],['Replay active',st.replayActive]]);};
+let pending=false;
+const loadCockpit=()=>{if(pending){return;}pending=true;setTimeout(()=>{pending=false;fetch('/api/cockpit').then((r)=>r.json()).then(paint).catch(()=>{});},750);};
+loadCockpit();
+stream.addEventListener('operational',loadCockpit);
+stream.addEventListener('stream.gap',()=>{document.querySelector('#stream').textContent='GAP_KNOWN';loadCockpit();});
+stream.addEventListener('stream.resumed',()=>{document.querySelector('#stream').textContent='RESUMED';loadCockpit();});
+})();
+`;
+
+const DASHBOARD_HTML = DASHBOARD_BASE_HTML
+  .replace("</style>", COCKPIT_CSS + "</style>")
+  .replace("</section></main>", "</section>" + COCKPIT_SECTION + "</main>")
+  .replace("</script>", COCKPIT_SCRIPT + "</script>");
+
 export type DashboardServerOptions = { cwd?: string; uadsHome?: string; host?: string; port?: number };
 
 export class DashboardServer {
@@ -126,6 +245,10 @@ export class DashboardServer {
   private readonly server: http.Server;
   private readonly clients = new Set<http.ServerResponse>();
   private readonly announcedEventIds = new Set<string>();
+  private slowClientDrops = 0;
+  private lastDropReasonCode: string | null = null;
+  private reconnects = 0;
+  private lastResumeState: string | null = null;
   private unsubscribe: (() => void) | null = null;
   private heartbeat: NodeJS.Timeout | null = null;
   private poller: NodeJS.Timeout | null = null;
@@ -161,7 +284,7 @@ export class DashboardServer {
         this.unsubscribe = subscribeOperationalEvents(this.paths, (event) => this.broadcast(event));
         this.heartbeat = setInterval(() => {
           for (const client of this.clients) {
-            client.write(`: heartbeat ${Date.now()}\n\n`);
+            this.safeWrite(client, `: heartbeat ${Date.now()}\n\n`);
           }
         }, SSE_HEARTBEAT_MS);
         this.poller = setInterval(() => this.pollPersistedEvents(), SSE_POLL_MS);
@@ -197,14 +320,55 @@ export class DashboardServer {
     });
   }
 
+  private streamState(): CockpitStreamState {
+    return {
+      activeClients: this.clients.size,
+      maxClients: MAX_SSE_CLIENTS,
+      bufferLimitBytes: MAX_SSE_CLIENT_BUFFER_BYTES,
+      slowClientDrops: this.slowClientDrops,
+      lastDropReasonCode: this.lastDropReasonCode,
+      reconnects: this.reconnects,
+      replayActive: false,
+      lastResumeState: this.lastResumeState,
+    };
+  }
+
+  /**
+   * Bounded SSE write. A client whose socket buffer exceeds the firewall is
+   * dropped and counted instead of accumulating unbounded buffered work.
+   */
+  private safeWrite(client: http.ServerResponse, payload: string): boolean {
+    if (client.destroyed || client.writableEnded) {
+      this.clients.delete(client);
+      return false;
+    }
+    const backpressure = evaluateStreamBackpressure({
+      bufferedBytes: client.writableLength,
+      limitBytes: MAX_SSE_CLIENT_BUFFER_BYTES,
+    });
+    if (backpressure.drop) {
+      this.slowClientDrops += 1;
+      this.lastDropReasonCode = backpressure.reasonCode;
+      this.clients.delete(client);
+      client.destroy();
+      return false;
+    }
+    client.write(payload);
+    return true;
+  }
+
+  private frame(event: OperationalEvent): string {
+    return `id: ${event.eventId}\nevent: operational\ndata: ${JSON.stringify(event)}\n\n`;
+  }
+
   private broadcast(event: OperationalEvent): void {
     if (this.announcedEventIds.has(event.eventId)) {
       return;
     }
     this.announcedEventIds.add(event.eventId);
-    const encoded = JSON.stringify(event);
+    const payload = this.frame(event);
     for (const client of this.clients) {
-      client.write(`event: operational\ndata: ${encoded}\n\n`);
+      this.safeWrite(client, payload);
     }
   }
 
@@ -244,7 +408,11 @@ export class DashboardServer {
       return;
     }
     if (url.pathname === "/api/snapshot") {
-      jsonResponse(res, 200, buildDashboardSnapshot(this.cwd, this.uadsHome));
+      jsonResponse(res, 200, buildDashboardSnapshot(this.cwd, this.uadsHome, this.streamState()));
+      return;
+    }
+    if (url.pathname === "/api/cockpit") {
+      jsonResponse(res, 200, buildCockpitSnapshot(this.cwd, this.uadsHome, this.streamState()));
       return;
     }
     if (url.pathname === "/api/events") {
@@ -273,9 +441,32 @@ export class DashboardServer {
     res.setHeader("X-Accel-Buffering", "no");
     this.clients.add(res);
     res.write("retry: 5000\n\n");
-    const initial = readOperationalEvents(this.paths, { limit: MAX_OPERATIONAL_EVENT_LIMIT }).events.reverse();
-    for (const event of initial) {
-      res.write(`event: operational\ndata: ${JSON.stringify(event)}\n\n`);
+    const url = new URL(req.url ?? "/api/stream", `http://${LOOPBACK_HOST}`);
+    const requestedCursor = req.headers["last-event-id"] ?? url.searchParams.get("cursor");
+    const cursor = typeof requestedCursor === "string" && requestedCursor.length > 0 ? requestedCursor : null;
+    const bounded = readOperationalEvents(this.paths, { limit: MAX_OPERATIONAL_EVENT_LIMIT }).events.reverse();
+    if (!cursor) {
+      this.lastResumeState = "REPLAY_BOUNDED";
+      for (const event of bounded) {
+        this.safeWrite(res, this.frame(event));
+      }
+    } else {
+      const safeCursor = sanitizeCorrelationLabel(cursor, 64).value;
+      this.reconnects += 1;
+      const cursorIndex = bounded.findIndex((event) => event.eventId === cursor);
+      if (cursorIndex >= 0) {
+        this.lastResumeState = "RESUMED_FROM_CURSOR";
+        this.safeWrite(res, `event: stream.resumed\ndata: ${JSON.stringify({ resumeState: "RESUMED_FROM_CURSOR", cursor: safeCursor, delivered: bounded.length - cursorIndex - 1 })}\n\n`);
+        for (const event of bounded.slice(cursorIndex + 1)) {
+          this.safeWrite(res, this.frame(event));
+        }
+      } else {
+        this.lastResumeState = "GAP_KNOWN";
+        this.safeWrite(res, `event: stream.gap\ndata: ${JSON.stringify({ resumeState: "GAP_KNOWN", reason: "CURSOR_OUTSIDE_BOUNDED_WINDOW", cursor: safeCursor, boundedWindow: bounded.length })}\n\n`);
+        for (const event of bounded) {
+          this.safeWrite(res, this.frame(event));
+        }
+      }
     }
     const cleanup = () => this.clients.delete(res);
     res.on("close", cleanup);
