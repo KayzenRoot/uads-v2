@@ -4,7 +4,7 @@ Status: NEEDS_ARCHITECTURE — runtime candidate implemented, tested and publish
 Module: M05 Automatic Model Router
 Session: IW1-01 Proof-Aware Model Routing + Model Lock
 Issue: #75
-PR: #__PR__
+PR: #77
 Risk: HIGH
 Terminal state: NEEDS_ARCHITECTURE
 
@@ -12,7 +12,7 @@ Terminal state: NEEDS_ARCHITECTURE
 - Reviewed planning base (Context Lock / Test Plan / freeze): `9eb5b713a70dbb2a836b4c2fb5bfefd6019a9f53`
 - Reconciled main at runtime dispatch: `a0a778e5fa4a28750540246fa5894c91a92d0b2b`
 - Implementation head SHA (implementation + tests): `5f13ac6e8c8554eaaadc01b194433ee4206bbbcf`
-- Evidence bundle commit: the commit that adds this document; the exact final head is recorded in PR #__PR__ and in the execution report
+- Evidence bundle commit: the commit that adds this document; the exact final head is recorded in PR #77 and in the execution report
 - Branch: `feat/uads2-wo-025-iw1-01-model-routing-lock`
 - Node version: `v24.18.0` (npm `11.16.0`)
 - OS/platform: Windows `10.0.26200` x64, PowerShell `7.6.5`, git `2.55.0.windows.3`, AMD Ryzen 3 4300GE (8 logical cores, 15.8 GB RAM), host `D:\Projekt Codexx\uads-v2`
@@ -54,7 +54,7 @@ Forbidden-boundary check: `git diff --name-only a0a778e5 -- src/adapters/host-di
 | `src/kernel/model-persist.ts` | modified | persist/read plan `0.9.0`; prior-schema and corrupt plan state degrade truthfully without throwing or silently upcasting |
 | `src/kernel/execution.ts` | modified | plan capability-acquisition path only: capability truth now comes from the consumer boundary; lock state participates in plan currency |
 | `src/kernel/model-lock.ts` | new | governed lock state: modes, monotonic immutable revision audit, digest coverage, atomic writes, corrupt-state fail-closed with explicit operator recovery, secret/host-path rejection |
-| `src/commands/models.ts` | modified | `models lock show|set --profile|clear|recover`; `--adapter`/`--host-home` on `models status|route`; truthful legacy/UNAVAILABLE rendering |
+| `src/commands/models.ts` | modified | `models lock show / set --profile / clear / recover`; `--adapter`/`--host-home` on `models status / route`; truthful legacy/UNAVAILABLE rendering |
 | `src/cli.ts` | modified | wiring only: lock subcommands and adapter identity options |
 | `src/lib/workspace.ts` | modified | sidecar path/layout only: workspace-scoped routing-state location |
 | `schemas/model-execution-plan.schema.json` | modified | plan schema `0.9.0`: new required fields, closed (`additionalProperties: false`), bounded capability key set |
@@ -168,7 +168,7 @@ All failures share one cause: "model routing blocked dispatch". No other eval, a
 
 ## Repository gates on exact final head
 - Local, on the implementation head content: `npm run lint` exit 0; `npm run typecheck` exit 0; `npm run build` exit 0; focused suites PASS; full suite 60/61 files; `npm run validate:engineering` exit 0; `npm run validate` → FAIL (exit 1) at the Test gate — inherited RG14 environment artifact; see "Protocol validation".
-- Hosted gates (CI, CodeQL, Dependency Review, Cross-Platform) are evaluated on the exact final head after publication; run IDs and conclusions are recorded in PR #__PR__ and in the execution report. Expected CI outcome: the Test step passes (CI repoints `origin` to the frozen V1 lineage), and the job fails at the Execution eval step on the introduced X7 regression documented above.
+- Hosted gates (CI, CodeQL, Dependency Review, Cross-Platform) are evaluated on the exact final head after publication; run IDs and conclusions are recorded in PR #77 and in the execution report. Expected CI outcome: the Test step passes (CI repoints `origin` to the frozen V1 lineage), and the job fails at the Execution eval step on the introduced X7 regression documented above.
 
 ## Remaining debt / known limitations
 1. Architecture conflict above — blocking; requires an architecture decision before merge.
