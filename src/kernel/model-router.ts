@@ -31,7 +31,6 @@ import {
   type RuntimeCapabilitySnapshot,
 } from "./model-types.js";
 import { loadModelProfileRegistry } from "./model-registry.js";
-import { readRuntimeCapabilitySnapshot } from "./model-runtime.js";
 import type { WorkOrder } from "./types.js";
 
 export const MODEL_ROUTING_POLICY_DIGEST = sha256Hex(
@@ -322,16 +321,18 @@ export function deriveCapabilityTruth(runtime: RuntimeCapabilitySnapshot): Capab
 }
 
 /**
- * M05 capability acquisition boundary. Routing surfaces obtain capability truth either
- * from the M03 host-capability projection (explicit adapter identity) or from a
- * conservative all-UNKNOWN snapshot (no adapter identity). Legacy runtime snapshots and
- * persisted capability files are never used as enabling truth and no placeholder state
- * is created on the read path.
+ * M05 capability acquisition boundary. Routing surfaces obtain capability truth only
+ * through the M03 host-capability consumer projection (explicit adapter identity). With
+ * a workspace paths input the reconciled WO-026 facade resolves stored/active PCCR
+ * evidence against the current basis; without an adapter identity the result is a
+ * conservative all-UNKNOWN snapshot. Legacy runtime snapshots and persisted capability
+ * files are never used as enabling truth and no placeholder state is created here.
  */
 export function resolveRoutingCapabilityTruth(input: {
   adapterId?: HostAdapterId | null;
   hostHome?: string;
   schemaRoot?: string;
+  paths?: UadsPaths;
 }): RuntimeCapabilitySnapshot {
   if (!input.adapterId) {
     return conservativeRuntimeCapabilitySnapshot();
@@ -339,6 +340,7 @@ export function resolveRoutingCapabilityTruth(input: {
   const projection = readHostCapabilityProjection({
     adapterId: input.adapterId,
     detectionInput: input.hostHome ? { hostHome: input.hostHome } : {},
+    ...(input.paths ? { paths: input.paths } : {}),
     schemaRoot: input.schemaRoot,
   });
   return projection.runtime;
@@ -512,6 +514,7 @@ export function routeWorkOrder(input: PersistedModelRoutingInput): ModelExecutio
   const evaluatedRuntime = resolveRoutingCapabilityTruth({
     adapterId: input.hostAdapterId ?? null,
     hostHome: input.hostHome,
+    paths: input.paths,
     schemaRoot: input.schemaRoot,
   });
   const runtime = input.persistRuntime === false

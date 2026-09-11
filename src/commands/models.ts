@@ -64,6 +64,7 @@ export function runModelsStatusCommand(input: { cwd?: string; uadsHome?: string;
     const runtime = resolveRoutingCapabilityTruth({
       adapterId: (input.adapter ?? null) as HostAdapterId | null,
       hostHome: input.hostHome,
+      paths: ctx.paths,
       schemaRoot,
     });
     const capabilityTruth = deriveCapabilityTruth(runtime);
@@ -189,6 +190,7 @@ export function runModelsRouteCommand(input: { cwd?: string; uadsHome?: string; 
       resolveRoutingCapabilityTruth({
         adapterId: (input.adapter ?? null) as HostAdapterId | null,
         hostHome: input.hostHome,
+        paths: ctx.paths,
         schemaRoot,
       }),
       schemaRoot,
