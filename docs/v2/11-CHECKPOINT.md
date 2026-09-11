@@ -1,7 +1,7 @@
 # UADS V2 — Current Checkpoint
 
-Status: M30 S00/S01/S01.5/S02/S03/S04/S05.1 FROZEN; AEG/HEDS 2.1 FROZEN; Graph + Harness Engineering Program FROZEN AS ARCHITECTURE; UADS Technology Acquisition Radar FROZEN; Implementation Sequencing & Ownership Freeze FROZEN; IW1-01 M05 Proof-Aware Model Routing + Model Lock package FROZEN (planning); IW1-01 runtime dispatch next (no runtime implementation claim).
-Date: 2026-09-10
+Status: M30 S00/S01/S01.5/S02/S03/S04/S05.1 FROZEN; AEG/HEDS 2.1 FROZEN; Graph + Harness Engineering Program FROZEN AS ARCHITECTURE; UADS Technology Acquisition Radar FROZEN; Implementation Sequencing & Ownership Freeze FROZEN; IW1-01 M05 Proof-Aware Model Routing + Model Lock package FROZEN (planning); WO-026 M03 Proven Capability Resolution + Dispatch Adapter Binding FROZEN (planning); WO-026 runtime prerequisite next; PR #77 IW1-01 runtime remains BLOCKED / NEEDS_ARCHITECTURE pending that prerequisite.
+Date: 2026-09-11
 
 ## Completed M30 increments
 
@@ -112,14 +112,29 @@ Date: 2026-09-10
 - Critical rule: the 13 frozen source identities must be re-verified at actual IW1-01 runtime dispatch; any movement is a controlled source-baseline delta, not permission to redesign. No executor may be dispatched while architecture is unresolved.
 - Truth discipline: `VERIFIED_MATCH`/`HOST_FIXED` remain UNKNOWN without host-execution evidence; UNKNOWN never enables; the lock is a constraint, never a hint; no silent expensive fallback; no ensemble/broadcast.
 
+### UADS2-WO-026 — M03 Proven Capability Resolution + Dispatch Adapter Binding (planning freeze)
+- Issue: #78 — CLOSED / COMPLETED
+- PR: #79 — MERGED
+- Final exact head: `fcaec3560e911b4b9cf93a66dfcb302880a98626`
+- Final HEDS review: `5178812202` — APPROVED (COMMENT form because the authenticated identity is also the PR author)
+- Merge SHA: `c0b68f707ddd0dc6e2cc8e2d6f8cd292c200c69a`
+- Merge method: squash with expected-head SHA protection.
+- Result: M03 proven-capability resolution + dispatch adapter-binding package FROZEN (planning only); runtime implementation NOT STARTED.
+- Frozen outputs: IF-001 evolution behind `readHostCapabilityProjection()` using current basis-bound stored/active PCCR evidence; TRUE only from current valid SUPPORTED proof; NPC-valid FALSE only from current UNSUPPORTED proof; all missing/rejected/stale/mismatched/expired evidence remains UNKNOWN and non-enabling; `proven` provenance only from current validated PCCR-backed evidence; passive TRUE remains UNKNOWN; explicit validated dispatch adapter identity; runtime snapshot contract `0.8.0` unchanged; no `requireProvenRuntime` relaxation.
+- Context Lock: LOCKED / CODEX_READY with 26 exact identity entries at base `a0a778e5fa4a28750540246fa5894c91a92d0b2b` (PR metadata previously called this 25; that was a non-blocking count-label typo, not a missing identity).
+- Test/Proof Plan: P1–P10 frozen, including positive proof, stale/expired/corrupt/basis mismatch negatives, NPC FALSE, provenance discipline, adapter binding/absence/mismatch, consumer-boundary structural proof, privacy/economic bounds, cross-platform determinism and PR #77 X7/FI recovery strategy.
+- Exact-head gates before merge: CI `34599965572`, CodeQL `34599965590`, Dependency Review `34599965558`, Cross-Platform `34599965580` — all SUCCESS.
+- PR #77 remains open at `5889e0251ce8aa515902a05e1753f5882374bc3c` with HEDS `5178444951 = NEEDS_ARCHITECTURE`; it is not eligible for merge until the WO-026 runtime prerequisite merges and PR #77 is then rebased/reconciled and re-audited.
+
 ## Persistent debt / independent findings
 - Issue #39: M30 telemetry overhead / M03 B6 performance debt remains OPEN for runtime optimization and representative benchmarking.
-- Issue #9: repository administration governance debt remains independent of WO-020 completion.
-- Historical RG14 `v0.11.0` tag proof remains separate release-governance debt; it was proven pre-existing at the WO-020 base and was not silently modified by M30 scope.
+- Issue #9: repository administration governance debt remains independent of current runtime work.
+- Historical RG14 `v0.11.0` tag proof remains separate release-governance debt; it was proven pre-existing and must not be silently reclassified.
 
 ## Next governed action
-1. Treat `0c3fe2853e973056cadd1ec3f670281c177f5364` plus this reconciliation commit as the new main baseline.
-2. Dispatch the IW1-01 runtime increment as a separate governed execution from the frozen package (`docs/v2/planning/UADS2-WO-025-DISPATCH-BINDING.md`; `.engineering/context-locks/UADS2-WO-025.md` -> `.engineering/plans/UADS2-WO-025-TEST-PLAN.md` -> freeze doc); re-verify the 13 frozen source identities against then-current main and record any controlled source-baseline delta.
-3. Do not dispatch an executor while architecture is unresolved or while this package lacks required evidence; do not absorb M06/M07/M24 responsibilities into IW1-01.
-4. Preserve M03/M07/M21/M24/M29/M30/M31 authority boundaries, GLOBAL-FIRST/ZERO-PROJECT-FOOTPRINT, deterministic-first execution and dashboard truth semantics.
-5. Keep Issue #39, Issue #9 and the historical RG14 `v0.11.0` lineage tag-proof debt visible; do not convert developer-host observations into production SLO claims.
+1. Treat `c0b68f707ddd0dc6e2cc8e2d6f8cd292c200c69a` plus this post-merge reconciliation as the new main baseline.
+2. Create/dispatch the separate WO-026 runtime increment from then-current main using `docs/v2/planning/UADS2-WO-026-DISPATCH-BINDING.md`; before material edits, re-verify the 26 Context Lock identity entries and record any controlled source-baseline delta.
+3. Implement only the frozen M03 proof-resolution facade evolution, explicit dispatch adapter-identity plumbing, deterministic proof fixtures and P1–P10 evidence; preserve fail-closed UNKNOWN, PCCR truth, runtime snapshot `0.8.0`, `requireProvenRuntime`, Model Lock, single-target/no-broadcast and M06/M07/M24 boundaries.
+4. Do not edit/merge/close PR #77 during the WO-026 runtime increment.
+5. After WO-026 runtime merges, rebase/reconcile PR #77 in its own governed increment, remove the X7/FI regressions without restoring legacy enablement, rerun exact-head CI/CodeQL/Dependency/Cross-Platform and return PR #77 to independent HEDS.
+6. Preserve GLOBAL-FIRST/ZERO-PROJECT-FOOTPRINT, M03/M07/M21/M24/M29/M30/M31 authority, deterministic-first execution and truthful dashboard semantics. Keep Issue #39, Issue #9 and RG14 debt visible.
