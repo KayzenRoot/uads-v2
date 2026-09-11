@@ -189,6 +189,29 @@ export function getHostCapabilityActiveEvidenceContract(contractId:string):HostC
   return contract;
 }
 
+export function activeEvidenceContractBlockReason(
+  contract:HostCapabilityActiveEvidenceContract,
+):string|null {
+  if(contract.availability==="TEST_ONLY" && process.env.NODE_ENV!=="test") return "TEST_ONLY_ACTIVE_CONTRACT_BLOCKED";
+  if(contract.availability!=="TEST_ONLY") return "NO_PRODUCTION_ACTIVE_CONTRACT_IN_WO009";
+  return null;
+}
+
+export function findRegisteredActiveEvidenceContract(input:{
+  probeId:string;
+  adapterId:string;
+  capabilityId:ModelCapability;
+}):HostCapabilityActiveEvidenceContract|null {
+  let match:HostCapabilityActiveEvidenceContract|null=null;
+  for(const contract of REGISTRY.values()){
+    if(contract.probeId!==input.probeId) continue;
+    if(contract.adapterId!==input.adapterId) continue;
+    if(contract.capabilityId!==input.capabilityId) continue;
+    if(match!==null) return null;
+    match=contract;
+  }
+  return match;
+}
 export function listProductionActiveEvidenceContracts():HostCapabilityActiveEvidenceContract[] {
   return [...REGISTRY.values()].filter((contract)=>contract.availability==="PRODUCTION");
 }
@@ -334,11 +357,9 @@ export function compileActiveEvidenceToPccr(input:{
   }
   assertCurrent(input.current);
   const currentBasis=basis(contract,input.current);
-  if(contract.availability==="TEST_ONLY" && process.env.NODE_ENV!=="test"){
-    return {status:"CONTRACT_BLOCKED",state:"UNKNOWN",proof:null,currentBasis,reasonCodes:["TEST_ONLY_ACTIVE_CONTRACT_BLOCKED"]};
-  }
-  if(contract.availability!=="TEST_ONLY"){
-    return {status:"CONTRACT_BLOCKED",state:"UNKNOWN",proof:null,currentBasis,reasonCodes:["NO_PRODUCTION_ACTIVE_CONTRACT_IN_WO009"]};
+  const blockReason=activeEvidenceContractBlockReason(contract);
+  if(blockReason!==null){
+    return {status:"CONTRACT_BLOCKED",state:"UNKNOWN",proof:null,currentBasis,reasonCodes:[blockReason]};
   }
   if(input.current.adapterId!==contract.adapterId) return reject(contract,input.current,"ACTIVE_CONTRACT_ADAPTER_MISMATCH");
   if(input.receipt===undefined||input.receipt===null){

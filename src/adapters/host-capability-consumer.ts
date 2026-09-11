@@ -1,7 +1,10 @@
 import { sha256Hex } from "../lib/hash.js";
 import type { UadsPaths } from "../lib/workspace.js";
 import { canonicalHostCapabilityJson } from "../kernel/host-capability-subject.js";
-import { resolveHostCapabilityProofs } from "../kernel/host-capability-resolver.js";
+import {
+  resolveHostCapabilityProofs,
+  type ActiveEvidenceCurrentContext,
+} from "../kernel/host-capability-resolver.js";
 import { conservativeRuntimeCapabilitySnapshot } from "../kernel/model-runtime.js";
 import type { RuntimeCapabilitySnapshot } from "../kernel/model-types.js";
 import {
@@ -33,6 +36,11 @@ export type HostCapabilityConsumerInput = Omit<
 > & {
   /** Enables stored-proof resolution against the current basis; never written by this read API. */
   paths?: UadsPaths;
+  /**
+   * Current host context used to derive the current basis of registered active-evidence
+   * contracts. Optional: when absent, stored active proofs stay UNKNOWN and non-enabling.
+   */
+  activeEvidenceCurrent?: ActiveEvidenceCurrentContext | null;
 };
 
 function blockedProjection(
@@ -93,6 +101,7 @@ export function readHostCapabilityProjection(
           currentBasis: bridge.currentBasis,
           projectedRuntime: bridge.projectedRuntime,
         },
+        activeEvidenceCurrent: input.activeEvidenceCurrent ?? null,
         now: input.now,
         schemaRoot: input.schemaRoot,
       }).runtime
