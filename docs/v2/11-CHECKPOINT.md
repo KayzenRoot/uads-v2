@@ -1,6 +1,6 @@
 # UADS V2 — Current Checkpoint
 
-Status: M30 S00/S01/S01.5/S02/S03/S04/S05.1 FROZEN; AEG/HEDS 2.1 FROZEN; Graph + Harness Engineering Program FROZEN AS ARCHITECTURE; UADS Technology Acquisition Radar FROZEN; Implementation Sequencing & Ownership Freeze FROZEN; next runtime implementation slice selection pending.
+Status: M30 S00/S01/S01.5/S02/S03/S04/S05.1 FROZEN; AEG/HEDS 2.1 FROZEN; Graph + Harness Engineering Program FROZEN AS ARCHITECTURE; UADS Technology Acquisition Radar FROZEN; Implementation Sequencing & Ownership Freeze FROZEN; IW1-01 M05 Proof-Aware Model Routing + Model Lock package FROZEN (planning); IW1-01 runtime dispatch next (no runtime implementation claim).
 Date: 2026-09-10
 
 ## Completed M30 increments
@@ -100,14 +100,26 @@ Date: 2026-09-10
 - Result: FROZEN implementation ownership, interface seams, source boundaries, Codex readiness criteria and I-WAVE-0..8 sequence.
 - Critical rule: future executor-heavy slices must start from a numbered Work Order with exact current-main/source reconciliation, Context Lock, Test Plan, Evidence Bundle and explicit stop condition.
 
+### UADS2-WO-025 — IW1-01 M05 Proof-Aware Model Routing + Model Lock (planning freeze)
+- Issue: #75 — CLOSED by merge
+- PR: #76 — MERGED
+- Final exact head: `c3505d134ca9b56ee3bbc9bb1e1c252f17c0c109`
+- Final HEDS review: `5628476313` — APPROVED (COMMENT form because GitHub forbids self-approval through the authenticated author identity)
+- Merge SHA: `0c3fe2853e973056cadd1ec3f670281c177f5364`
+- Merge method: squash with expected-head SHA protection.
+- Result: I-WAVE-1 IW1-01 slice package FROZEN (planning only).
+- Frozen outputs: M05 routing freeze (capability acquisition through `readHostCapabilityProjection()`; Model Lock contract/runtime/CLI; router-side enforcement projection; single-target fan-out; plan schema `0.9.0` with runtime snapshot contract `0.8.0` unchanged), IW1-01 Context Lock, Test/Proof Plan (T1..T10 mapped to RT-001/002/003/009/010/011 and ES-013/014), Evidence Bundle template, runtime dispatch binding and 13 exact source-baseline blob identities at `9eb5b713a70dbb2a836b4c2fb5bfefd6019a9f53`.
+- Critical rule: the 13 frozen source identities must be re-verified at actual IW1-01 runtime dispatch; any movement is a controlled source-baseline delta, not permission to redesign. No executor may be dispatched while architecture is unresolved.
+- Truth discipline: `VERIFIED_MATCH`/`HOST_FIXED` remain UNKNOWN without host-execution evidence; UNKNOWN never enables; the lock is a constraint, never a hint; no silent expensive fallback; no ensemble/broadcast.
+
 ## Persistent debt / independent findings
 - Issue #39: M30 telemetry overhead / M03 B6 performance debt remains OPEN for runtime optimization and representative benchmarking.
 - Issue #9: repository administration governance debt remains independent of WO-020 completion.
 - Historical RG14 `v0.11.0` tag proof remains separate release-governance debt; it was proven pre-existing at the WO-020 base and was not silently modified by M30 scope.
 
 ## Next governed action
-1. Treat `8ce7b1ab202cb514bad44b110632816b0ff7a349` plus this reconciliation commit as the new main baseline.
-2. Select the next runtime implementation slice from the frozen UADS2-WO-024 I-WAVE sequence; do not reopen S05.1 unless a new defect is proven.
-3. Create a new numbered Work Order with exact current-main/source identities, Context Lock, frozen Test Plan, mandatory negative/failure proofs, Evidence Bundle template and STOP CONDITION before executor dispatch.
+1. Treat `0c3fe2853e973056cadd1ec3f670281c177f5364` plus this reconciliation commit as the new main baseline.
+2. Dispatch the IW1-01 runtime increment as a separate governed execution from the frozen package (`docs/v2/planning/UADS2-WO-025-DISPATCH-BINDING.md`; `.engineering/context-locks/UADS2-WO-025.md` -> `.engineering/plans/UADS2-WO-025-TEST-PLAN.md` -> freeze doc); re-verify the 13 frozen source identities against then-current main and record any controlled source-baseline delta.
+3. Do not dispatch an executor while architecture is unresolved or while this package lacks required evidence; do not absorb M06/M07/M24 responsibilities into IW1-01.
 4. Preserve M03/M07/M21/M24/M29/M30/M31 authority boundaries, GLOBAL-FIRST/ZERO-PROJECT-FOOTPRINT, deterministic-first execution and dashboard truth semantics.
-5. Keep Issue #39 visible while collecting representative performance evidence; do not convert developer-host observations into production SLO claims.
+5. Keep Issue #39, Issue #9 and the historical RG14 `v0.11.0` lineage tag-proof debt visible; do not convert developer-host observations into production SLO claims.

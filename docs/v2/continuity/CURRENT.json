@@ -2,36 +2,31 @@
   "schema": "uads-v2.chat-continuity",
   "schemaVersion": "1.0.0",
   "repository": "KayzenRoot/uads-v2",
-  "date": "2026-09-09",
-  "programState": "UADS2_WO_010_APPROVED_MERGED_M03_S06_INTEGRATION_NEXT",
-  "completedWorkOrder": "UADS2-WO-010",
-  "completedPullRequest": 38,
-  "approvedHead": "51884e5716a362ab983bced0d3d8dfef4efb0868",
-  "mergeCommit": "886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721",
-  "hedsReviewId": 5161673161,
-  "lastRecordedHead": "886bfaee6fcf3fb42ce5e0bcc2782fd8484cf721",
+  "date": "2026-09-10",
+  "programState": "UADS2_WO_025_APPROVED_MERGED_IW1_01_RUNTIME_DISPATCH_NEXT",
+  "completedWorkOrder": "UADS2-WO-025",
+  "completedPullRequest": 76,
+  "approvedHead": "c3505d134ca9b56ee3bbc9bb1e1c252f17c0c109",
+  "mergeCommit": "0c3fe2853e973056cadd1ec3f670281c177f5364",
+  "hedsReviewId": 5628476313,
+  "lastRecordedHead": "0c3fe2853e973056cadd1ec3f670281c177f5364",
   "activeWorkOrder": null,
   "activePullRequest": null,
   "activeBranch": null,
-  "activeModule": "M03 Host Capability Detector",
-  "activeSession": "S05.1-S05.5 approved/merged; S06 integration next",
-  "nextNecessaryAction": "Create bounded M03 S06.1 Work Order to migrate host-dispatch capability input to proof-aware compatibility projection without vendor-specific active probes.",
+  "activeModule": "M05 Automatic Model Router",
+  "activeSession": "IW1-01 planning freeze APPROVED/MERGED (WO-025); runtime implementation dispatch next",
+  "nextNecessaryAction": "Dispatch the numbered IW1-01 runtime increment from the frozen package: re-verify the 13 critical blobs against then-current main, then implement proof-aware capability acquisition, Model Lock contract/runtime/CLI, enforcement projection and plan schema 0.9.0 under .engineering/context-locks/UADS2-WO-025.md.",
   "knownBlockers": [
     "Issue #9 admin-only repository configuration",
-    "M30 B6 telemetry CPU overhead remains documented performance debt"
+    "Issue #39 M30 telemetry overhead / performance debt remains OPEN",
+    "Historical RG14 v0.11.0 lineage tag-proof remains separate release-governance debt"
   ],
-  "m03": {
-    "completedSlices": [
-      "S05.1",
-      "S05.2",
-      "S05.3",
-      "S05.4",
-      "S05.5"
-    ],
-    "nextSlice": "S06.1 proof-aware host-dispatch integration",
-    "vendorSpecificProbes": "NOT_AUTHORIZED",
-    "localMachineRequired": false,
-    "s07Frozen": false
+  "m05": {
+    "planningFreeze": "IW1-01 FROZEN (WO-025, PR #76, base 9eb5b713a70dbb2a836b4c2fb5bfefd6019a9f53)",
+    "frozenSourceIdentities": 13,
+    "runtimeImplementation": "NOT_STARTED",
+    "modelLock": "CONTRACT_FROZEN_RUNTIME_NOT_IMPLEMENTED",
+    "enforcementProjection": "ROUTER_SIDE_SUBSET_FROZEN; VERIFIED_MATCH/HOST_FIXED deferred pending M06/M15/M16 host-execution evidence"
   },
   "reviewModel": "HEDS_CANONICAL",
   "operatingModes": [
