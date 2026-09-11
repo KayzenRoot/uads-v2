@@ -32,6 +32,8 @@ export type UadsPaths = {
   modelRouting: string;
   currentModelRouting: string;
   modelRoutingHistory: string;
+  modelLock: string;
+  modelLockRevisions: string;
   specialistRouting: string;
   currentSpecialistSelection: string;
   specialistSelectionHistory: string;
@@ -93,6 +95,8 @@ export function getUadsPaths(projectId: string, uadsHome?: string): UadsPaths {
     modelRouting: path.join(workspace, "model-routing"),
     currentModelRouting: path.join(workspace, "model-routing", "current.json"),
     modelRoutingHistory: path.join(workspace, "model-routing", "history"),
+    modelLock: path.join(workspace, "model-routing", "lock.json"),
+    modelLockRevisions: path.join(workspace, "model-routing", "revisions"),
     specialistRouting: path.join(workspace, "specialist-routing"),
     currentSpecialistSelection: path.join(workspace, "specialist-routing", "current.json"),
     specialistSelectionHistory: path.join(workspace, "specialist-routing", "history"),
@@ -151,6 +155,7 @@ export function ensureWorkspace(projectId: string, uadsHome?: string): UadsPaths
     paths.executionRuns,
     paths.modelRouting,
     paths.modelRoutingHistory,
+    paths.modelLockRevisions,
     paths.specialistRouting,
     paths.specialistSelectionHistory,
     paths.hostDispatch,
