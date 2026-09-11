@@ -3,7 +3,7 @@
 Status: PRE-MERGE CANDIDATE
 Date: 2026-09-11
 Issue: #78
-PR: #<recorded in the follow-up commit on this branch after PR creation>
+PR: #79
 Base main: `a0a778e5fa4a28750540246fa5894c91a92d0b2b`
 
 ## Program state
