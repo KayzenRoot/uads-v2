@@ -3,9 +3,10 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { afterEach, describe, expect, it } from "vitest";
-import { runGefDoctor, runGefStatus } from "../src/commands/gef.js";
+import { runGefDoctor, runGefProfileShow, runGefStatus } from "../src/commands/gef.js";
 import { adoptGefProject, readGefProject } from "../src/gef/registry.js";
 import { checkGefSource } from "../src/gef/source-drift.js";
+import { gefBaselinePath, gefCurrentPath, gefProfilePath } from "../src/gef/storage.js";
 import { validateAgainstSchema } from "../src/lib/json-schema.js";
 
 const previousHome = process.env.UADS_HOME;
@@ -23,6 +24,8 @@ function tempRepo(): string {
   fs.mkdirSync(path.join(repo, "docs", "v2"), { recursive: true });
   fs.writeFileSync(path.join(repo, "docs", "v2", "03-SCOPE.md"), "scope\n");
   fs.writeFileSync(path.join(repo, "package.json"), JSON.stringify({ scripts: { build: "tsc", test: "vitest", typecheck: "tsc --noEmit", lint: "eslint" } }));
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "fixture"], { cwd: repo });
   return repo;
 }
 
@@ -32,7 +35,10 @@ describe("GEF W0 contracts and skeleton", () => {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-home-"));
     process.env.UADS_HOME = home;
 
-    const result = adoptGefProject(repo, "SHADOW");
+    expect(JSON.parse(runGefStatus({ cwd: repo, json: true })).adoption.status).toBe("NOT_ADOPTED");
+    expect(JSON.parse(runGefStatus({ cwd: repo, json: true })).sourceCheck).toBe("UNKNOWN");
+
+    const result = adoptGefProject(repo);
     expect(result.profile.projectId).toHaveLength(16);
     expect(result.profile.repositoryIdentity).toBe("https://github.com/example/gef-fixture");
     expect(result.profile.adoptionMode).toBe("SHADOW");
@@ -41,6 +47,83 @@ describe("GEF W0 contracts and skeleton", () => {
     expect(readGefProject(repo).current?.status).toBe("ADOPTED");
     expect(runGefStatus({ cwd: repo, json: true })).toContain('"zeroProjectFootprint": true');
     expect(runGefDoctor({ cwd: repo, json: true })).toContain('"status": "PASS"');
+  });
+
+  it("treats malformed profile and current state as corrupt, never not-adopted", () => {
+    const repo = tempRepo();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-home-"));
+    process.env.UADS_HOME = home;
+    const result = adoptGefProject(repo);
+
+    fs.unlinkSync(gefProfilePath(result.paths, result.profile.projectId));
+    expect(readGefProject(repo).reasonCode).toBe("PROFILE_MISSING");
+    adoptGefProject(repo);
+    fs.unlinkSync(gefCurrentPath(result.paths, result.profile.projectId));
+    expect(readGefProject(repo).reasonCode).toBe("CURRENT_MISSING");
+    adoptGefProject(repo);
+
+    fs.writeFileSync(gefProfilePath(result.paths, result.profile.projectId), "{ malformed");
+    expect(readGefProject(repo).reasonCode).toBe("PROFILE_MALFORMED_JSON");
+    expect(JSON.parse(runGefStatus({ cwd: repo, json: true })).adoption.status).toBe("CORRUPT");
+    expect(JSON.parse(runGefProfileShow({ cwd: repo, json: true })).status).toBe("CORRUPT");
+    expect(JSON.parse(runGefDoctor({ cwd: repo, json: true })).status).toBe("BLOCKED");
+
+    adoptGefProject(repo);
+    fs.writeFileSync(gefCurrentPath(result.paths, result.profile.projectId), "{ malformed");
+    expect(readGefProject(repo).reasonCode).toBe("CURRENT_MALFORMED_JSON");
+    expect(JSON.parse(runGefStatus({ cwd: repo, json: true }).toString()).adoption.status).toBe("CORRUPT");
+  });
+
+  it("rejects schema-valid tampering and cross-record identity changes", () => {
+    const repo = tempRepo();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-home-"));
+    process.env.UADS_HOME = home;
+    const result = adoptGefProject(repo);
+
+    const profilePath = gefProfilePath(result.paths, result.profile.projectId);
+    const profile = JSON.parse(fs.readFileSync(profilePath, "utf8")) as Record<string, unknown>;
+    profile.adoptionMode = "ACTIVE";
+    fs.writeFileSync(profilePath, `${JSON.stringify(profile)}\n`);
+    expect(readGefProject(repo).reasonCode).toBe("PROFILE_DIGEST_MISMATCH");
+
+    adoptGefProject(repo);
+    const currentPath = gefCurrentPath(result.paths, result.profile.projectId);
+    const current = JSON.parse(fs.readFileSync(currentPath, "utf8")) as Record<string, unknown>;
+    current.profileDigest = "f".repeat(64);
+    fs.writeFileSync(currentPath, `${JSON.stringify(current)}\n`);
+    expect(readGefProject(repo).reasonCode).toBe("PROFILE_DIGEST_MISMATCH");
+
+    adoptGefProject(repo);
+    const registry = JSON.parse(fs.readFileSync(result.paths.gefRegistry, "utf8")) as { entries: Array<Record<string, unknown>> };
+    registry.entries[0]!.fingerprint = "b".repeat(64);
+    fs.writeFileSync(result.paths.gefRegistry, `${JSON.stringify(registry)}\n`);
+    expect(readGefProject(repo).reasonCode).toBe("REGISTRY_IDENTITY_MISMATCH");
+  });
+
+  it("uses a persisted baseline and reports branch, head, and policy drift", () => {
+    const repo = tempRepo();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-home-"));
+    process.env.UADS_HOME = home;
+    const result = adoptGefProject(repo);
+    expect(JSON.parse(runGefStatus({ cwd: repo, json: true })).sourceCheck).toBe("MATCH");
+
+    execFileSync("git", ["checkout", "-b", "gef-drift"], { cwd: repo });
+    const branchDrift = JSON.parse(runGefStatus({ cwd: repo, json: true }));
+    expect(branchDrift.sourceCheck).toBe("SOURCE_CONFLICT");
+    expect(branchDrift.sourceReasons).toContain("BRANCH_CHANGED");
+
+    execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "--allow-empty", "-m", "head drift"], { cwd: repo });
+    const headDrift = checkGefSource(repo, readGefProject(repo).baseline ?? {});
+    expect(headDrift.reasons).toContain("HEAD_CHANGED");
+
+    fs.writeFileSync(path.join(repo, "AGENTS.md"), "policy drift\n");
+    const policyDrift = checkGefSource(repo, readGefProject(repo).baseline ?? {});
+    expect(policyDrift.status).toBe("SOURCE_CONFLICT");
+    expect(policyDrift.reasons).toContain("POLICY_CHANGED");
+
+    fs.unlinkSync(gefBaselinePath(result.paths, result.profile.projectId));
+    expect(JSON.parse(runGefStatus({ cwd: repo, json: true })).sourceCheck).toBe("UNKNOWN");
+    expect(JSON.parse(runGefDoctor({ cwd: repo, json: true })).status).toBe("BLOCKED");
   });
 
   it("reports source conflict when an expected branch changes", () => {

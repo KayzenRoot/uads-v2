@@ -4,7 +4,7 @@
   "title": "GEF Current Project State",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "schemaVersion", "projectId", "fingerprint", "adoptionMode", "status", "branch", "headSha", "profileDigest", "updatedAt"],
+  "required": ["schema", "schemaVersion", "projectId", "fingerprint", "adoptionMode", "status", "branch", "headSha", "profileDigest", "baselineDigest", "updatedAt"],
   "properties": {
     "schema": { "const": "uads.gef-current" },
     "schemaVersion": { "const": "0.1.0" },
@@ -15,6 +15,7 @@
     "branch": { "type": ["string", "null"], "maxLength": 200 },
     "headSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
     "profileDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "baselineDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "updatedAt": { "type": "string", "format": "date-time" }
   }
 }

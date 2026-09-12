@@ -31,13 +31,16 @@ GEF persists only under the UADS global sidecar:
   telemetry/<event-id>.json
 ```
 
-`uads gef status` and `uads gef doctor` do not create this layout. `uads gef adopt` is the explicit mutation boundary. Project-local `.uads` state is never created by GEF adoption.
+`uads gef status` and `uads gef doctor` do not create this layout. `uads gef adopt` is the explicit mutation/reconciliation boundary. Project-local `.uads` state is never created by GEF adoption.
 
 ## Fail-closed and privacy rules
 
 - An unknown project is `NOT_ADOPTED`; it is never implicitly registered by a read-only command.
-- Corrupt registry/profile/current data raises an unavailable/corrupt state rather than fabricating authority.
+- Missing profile/current/baseline files are distinguished from malformed, unreadable, schema-invalid, or tampered files. Existing-invalid state raises `CORRUPT`/`UNAVAILABLE`, never `NOT_ADOPTED`.
+- Profile, current, baseline, and registry records are cross-bound by deterministic digests and project identity.
+- Adoption persists a source baseline (fingerprint, branch, head SHA, and policy digest). Read-only status/doctor compare against it; `adopt` is the explicit reconciliation mutation.
 - Source mismatch is represented as `SOURCE_CONFLICT`.
+- Adoption is `SHADOW` by default. W0 exposes no active-authority adoption path; shadow mode grants no test/proof-skipping authority.
 - Telemetry contains bounded metadata and no prompt bodies, source snippets, credentials, tokens, or raw environment values.
 - Receipts are schema-validated and written atomically.
 

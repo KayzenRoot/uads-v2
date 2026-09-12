@@ -1,14 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { computeProjectFingerprint } from "../lib/fingerprint.js";
 import { readGitSummary } from "../lib/git.js";
 import { findPackageRoot } from "../lib/version.js";
 import { getUadsPaths, type UadsPaths } from "../lib/workspace.js";
 import { sha256Hex } from "../lib/hash.js";
 import { runProcess } from "../lib/exec.js";
-import { type GefAdoptionMode, type GefCurrent, type GefProjectClass, type GefProjectProfile, type GefRegistryEntry } from "./types.js";
-import { ensureGefLayout, readGefCurrent, readGefProfile, readGefRegistry, writeGefCurrent, writeGefProfile, writeGefRegistry } from "./storage.js";
+import { captureGefSourceSnapshot } from "./source-drift.js";
+import { computeGefProfileDigest, computeGefSourceSnapshotDigest, type GefAdoptionMode, type GefCurrent, type GefProjectClass, type GefProjectProfile, type GefProjectRead, type GefRegistryEntry } from "./types.js";
+import { ensureGefLayout, readGefBaseline, readGefCurrent, readGefProfile, readGefRegistry, writeGefBaseline, writeGefCurrent, writeGefProfile, writeGefRegistry } from "./storage.js";
 import { writeGefTelemetry } from "./storage.js";
 
 function commandFromPackageJson(repoRoot: string, name: string): string | null {
@@ -47,7 +48,7 @@ function repositoryGeneration(fingerprint: string, headSha: string | null): stri
   return sha256Hex(`${fingerprint}|${headSha ?? "unknown"}`).slice(0, 16);
 }
 
-function createProfile(cwd: string, mode: GefAdoptionMode): { paths: UadsPaths; profile: GefProjectProfile; current: GefCurrent; projectClass: GefProjectClass } {
+function createProfile(cwd: string, mode: GefAdoptionMode): { paths: UadsPaths; profile: GefProjectProfile; current: GefCurrent; baseline: ReturnType<typeof captureGefSourceSnapshot>; projectClass: GefProjectClass } {
   const git = readGitSummary(cwd);
   const repoRoot = git.repoRoot ?? path.resolve(cwd);
   const fingerprint = computeProjectFingerprint({ originUrl: git.originUrl, repoRoot });
@@ -80,8 +81,9 @@ function createProfile(cwd: string, mode: GefAdoptionMode): { paths: UadsPaths; 
     createdAt: now,
     updatedAt: now,
   } satisfies Omit<GefProjectProfile, "createdAt" | "updatedAt"> & { createdAt: string; updatedAt: string };
-  const profileDigest = createHash("sha256").update(JSON.stringify(profileWithoutDigest)).digest("hex");
   const profile = profileWithoutDigest;
+  const profileDigest = computeGefProfileDigest(profile);
+  const baseline = captureGefSourceSnapshot(cwd);
   const current: GefCurrent = {
     schema: "uads.gef-current",
     schemaVersion: "0.1.0",
@@ -92,15 +94,19 @@ function createProfile(cwd: string, mode: GefAdoptionMode): { paths: UadsPaths; 
     branch: git.branch,
     headSha: git.head,
     profileDigest,
+    baselineDigest: computeGefSourceSnapshotDigest(baseline),
     updatedAt: now,
   };
-  return { paths, profile, current, projectClass };
+  return { paths, profile, current, baseline, projectClass };
 }
 
-export function adoptGefProject(cwd: string, mode: GefAdoptionMode): { profile: GefProjectProfile; current: GefCurrent; paths: UadsPaths } {
+export function adoptGefProject(cwd: string, requestedMode: GefAdoptionMode = "SHADOW"): { profile: GefProjectProfile; current: GefCurrent; paths: UadsPaths } {
+  if (requestedMode === "ACTIVE") throw new Error("ACTIVE_ADOPTION_UNAVAILABLE");
+  const mode: GefAdoptionMode = "SHADOW";
   const result = createProfile(cwd, mode);
   ensureGefLayout(result.paths);
   writeGefProfile(result.paths, result.profile, findPackageRoot());
+  writeGefBaseline(result.paths, result.baseline, findPackageRoot());
   writeGefCurrent(result.paths, result.current, findPackageRoot());
   const registry = readGefRegistry(result.paths, findPackageRoot());
   const entry: GefRegistryEntry = {
@@ -139,14 +145,44 @@ export function adoptGefProject(cwd: string, mode: GefAdoptionMode): { profile: 
   return result;
 }
 
-export function readGefProject(cwd: string): { paths: UadsPaths; profile: GefProjectProfile | null; current: GefCurrent | null; error: string | null } {
+export function readGefProject(cwd: string): GefProjectRead {
   const git = readGitSummary(cwd);
   const repoRoot = git.repoRoot ?? path.resolve(cwd);
   const fingerprint = computeProjectFingerprint({ originUrl: git.originUrl, repoRoot });
   const paths = getUadsPaths(fingerprint.projectId);
+  const profileState = readGefProfile(paths, fingerprint.projectId, findPackageRoot());
+  const currentState = readGefCurrent(paths, fingerprint.projectId, findPackageRoot());
+  const baselineState = readGefBaseline(paths, fingerprint.projectId, findPackageRoot());
+  let registry;
   try {
-    return { paths, profile: readGefProfile(paths, fingerprint.projectId, findPackageRoot()), current: readGefCurrent(paths, fingerprint.projectId, findPackageRoot()), error: null };
-  } catch (error) {
-    return { paths, profile: null, current: null, error: error instanceof Error ? error.message : String(error) };
+    registry = readGefRegistry(paths, findPackageRoot());
+  } catch {
+    return { paths, profile: null, current: null, baseline: null, status: "UNAVAILABLE", reasonCode: "REGISTRY_UNAVAILABLE" };
   }
+  const noProjectState = profileState.status === "MISSING" && currentState.status === "MISSING" && baselineState.status === "MISSING";
+  if (noProjectState) {
+    return registry.entries.some((entry) => entry.projectId === fingerprint.projectId)
+      ? { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "PROJECT_STATE_MISSING" }
+      : { paths, profile: null, current: null, baseline: null, status: "NOT_ADOPTED", reasonCode: null };
+  }
+  if (profileState.status === "CORRUPT") return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: `PROFILE_${profileState.reasonCode}` };
+  if (currentState.status === "CORRUPT") return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: `CURRENT_${currentState.reasonCode}` };
+  if (baselineState.status === "CORRUPT") return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: `BASELINE_${baselineState.reasonCode}` };
+  if (profileState.status === "MISSING") return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "PROFILE_MISSING" };
+  if (currentState.status === "MISSING") return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "CURRENT_MISSING" };
+  if (baselineState.status === "MISSING") return { paths, profile: null, current: null, baseline: null, status: "UNAVAILABLE", reasonCode: "BASELINE_MISSING" };
+  const profile = profileState.value;
+  const current = currentState.value;
+  const baseline = baselineState.value;
+  if (profile.projectId !== fingerprint.projectId || profile.fingerprint !== fingerprint.fingerprint) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "PROFILE_IDENTITY_MISMATCH" };
+  if (current.projectId !== fingerprint.projectId || current.fingerprint !== fingerprint.fingerprint) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "CURRENT_IDENTITY_MISMATCH" };
+  if (baseline.projectId !== fingerprint.projectId || baseline.fingerprint !== fingerprint.fingerprint) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "BASELINE_IDENTITY_MISMATCH" };
+  if (computeGefProfileDigest(profile) !== current.profileDigest) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "PROFILE_DIGEST_MISMATCH" };
+  if (computeGefSourceSnapshotDigest(baseline) !== current.baselineDigest) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "BASELINE_DIGEST_MISMATCH" };
+  if (profile.adoptionMode !== current.adoptionMode) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "ADOPTION_MODE_MISMATCH" };
+  const entry = registry.entries.find((item) => item.projectId === fingerprint.projectId);
+  if (!entry) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_ENTRY_MISSING" };
+  if (entry.fingerprint !== profile.fingerprint || entry.projectId !== profile.projectId) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_IDENTITY_MISMATCH" };
+  if (entry.profileDigest !== current.profileDigest) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_DIGEST_MISMATCH" };
+  return { paths, profile, current, baseline, status: "VALID", reasonCode: null };
 }

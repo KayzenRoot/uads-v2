@@ -40,6 +40,7 @@ export function checkGefSource(
   expected: Partial<Pick<GefSourceSnapshot, "branch" | "headSha" | "policyDigest" | "fingerprint">> = {},
 ): GefSourceCheck {
   const snapshot = captureGefSourceSnapshot(cwd);
+  if (Object.keys(expected).length === 0) return { status: "UNKNOWN", reasons: ["BASELINE_MISSING"], snapshot };
   const reasons: string[] = [];
   if (expected.branch !== undefined && expected.branch !== snapshot.branch) reasons.push("BRANCH_CHANGED");
   if (expected.headSha !== undefined && expected.headSha !== snapshot.headSha) reasons.push("HEAD_CHANGED");

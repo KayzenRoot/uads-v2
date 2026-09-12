@@ -7,8 +7,10 @@ import { type UadsPaths } from "../lib/workspace.js";
 import {
   type GefCommandReceipt,
   type GefCurrent,
+  type GefReadState,
   type GefProjectProfile,
   type GefRegistry,
+  type GefSourceSnapshot,
   type GefTelemetryEvent,
 } from "./types.js";
 
@@ -30,6 +32,10 @@ export function gefCurrentPath(paths: UadsPaths, projectId: string): string {
   return path.join(gefProjectDirectory(paths, projectId), "current.json");
 }
 
+export function gefBaselinePath(paths: UadsPaths, projectId: string): string {
+  return path.join(gefProjectDirectory(paths, projectId), "baseline.json");
+}
+
 export function writeGefProfile(paths: UadsPaths, profile: GefProjectProfile, schemaRoot?: string): void {
   assertSchema("gef-project-profile.schema.json", profile, schemaRoot);
   atomicWriteJson(gefProfilePath(paths, profile.projectId), profile);
@@ -40,18 +46,37 @@ export function writeGefCurrent(paths: UadsPaths, current: GefCurrent, schemaRoo
   atomicWriteJson(gefCurrentPath(paths, current.projectId), current);
 }
 
-export function readGefProfile(paths: UadsPaths, projectId: string, schemaRoot?: string): GefProjectProfile | null {
-  const parsed = readJsonIfValid<GefProjectProfile>(gefProfilePath(paths, projectId));
-  if (!parsed.ok) return null;
-  assertSchema("gef-project-profile.schema.json", parsed.value, schemaRoot);
-  return parsed.value;
+export function writeGefBaseline(paths: UadsPaths, baseline: GefSourceSnapshot, schemaRoot?: string): void {
+  assertSchema("gef-source-snapshot.schema.json", baseline, schemaRoot);
+  atomicWriteJson(gefBaselinePath(paths, baseline.projectId), baseline);
 }
 
-export function readGefCurrent(paths: UadsPaths, projectId: string, schemaRoot?: string): GefCurrent | null {
-  const parsed = readJsonIfValid<GefCurrent>(gefCurrentPath(paths, projectId));
-  if (!parsed.ok) return null;
-  assertSchema("gef-current.schema.json", parsed.value, schemaRoot);
-  return parsed.value;
+function readGefDocument<T>(target: string, schemaFile: string, schemaRoot?: string): GefReadState<T> {
+  if (!fs.existsSync(target)) return { status: "MISSING", value: null, reasonCode: null };
+  let parsed: T;
+  try {
+    parsed = JSON.parse(fs.readFileSync(target, "utf8")) as T;
+  } catch (error) {
+    return { status: "CORRUPT", value: null, reasonCode: error instanceof SyntaxError ? "MALFORMED_JSON" : "READ_FAILED" };
+  }
+  try {
+    assertSchema(schemaFile, parsed, schemaRoot);
+  } catch {
+    return { status: "CORRUPT", value: null, reasonCode: "SCHEMA_INVALID" };
+  }
+  return { status: "VALID", value: parsed, reasonCode: null };
+}
+
+export function readGefProfile(paths: UadsPaths, projectId: string, schemaRoot?: string): GefReadState<GefProjectProfile> {
+  return readGefDocument(gefProfilePath(paths, projectId), "gef-project-profile.schema.json", schemaRoot);
+}
+
+export function readGefCurrent(paths: UadsPaths, projectId: string, schemaRoot?: string): GefReadState<GefCurrent> {
+  return readGefDocument(gefCurrentPath(paths, projectId), "gef-current.schema.json", schemaRoot);
+}
+
+export function readGefBaseline(paths: UadsPaths, projectId: string, schemaRoot?: string): GefReadState<GefSourceSnapshot> {
+  return readGefDocument(gefBaselinePath(paths, projectId), "gef-source-snapshot.schema.json", schemaRoot);
 }
 
 export function readGefRegistry(paths: UadsPaths, schemaRoot?: string): GefRegistry {
