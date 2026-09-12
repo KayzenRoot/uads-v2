@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-current.schema.json",
+  "title": "GEF Current Project State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "fingerprint", "adoptionMode", "status", "branch", "headSha", "profileDigest", "baselineDigest", "updatedAt"],
+  "properties": {
+    "schema": { "const": "uads.gef-current" },
+    "schemaVersion": { "const": "0.1.0" },
+    "projectId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "adoptionMode": { "type": "string", "enum": ["SHADOW", "ACTIVE"] },
+    "status": { "type": "string", "enum": ["NOT_ADOPTED", "ADOPTED", "CORRUPT", "SOURCE_CONFLICT"] },
+    "branch": { "type": ["string", "null"], "maxLength": 200 },
+    "headSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "profileDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "baselineDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

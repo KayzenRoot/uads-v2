@@ -48,6 +48,11 @@ export type UadsPaths = {
   currentState: string;
   repositoryMap: string;
   repositoryMapMeta: string;
+  gef: string;
+  gefRegistry: string;
+  gefProjects: string;
+  gefReceipts: string;
+  gefTelemetry: string;
 };
 
 export function resolveUadsHome(override?: string): string {
@@ -109,6 +114,11 @@ export function getUadsPaths(projectId: string, uadsHome?: string): UadsPaths {
     currentState: path.join(workspace, "state", "current.json"),
     repositoryMap: path.join(workspace, "index", "repository-map.json"),
     repositoryMapMeta: path.join(workspace, "index", "repository-map.meta.json"),
+    gef: path.join(home, "gef"),
+    gefRegistry: path.join(home, "gef", "registry", "projects.json"),
+    gefProjects: path.join(home, "gef", "projects"),
+    gefReceipts: path.join(home, "gef", "command-receipts"),
+    gefTelemetry: path.join(home, "gef", "telemetry"),
   };
 }
 

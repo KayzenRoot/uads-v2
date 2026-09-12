@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-telemetry-event.schema.json",
+  "title": "GEF Metadata-First Telemetry Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "eventId", "projectId", "fingerprint", "workOrder", "taskClass", "event", "executorRequested", "executorApplied", "filesOpened", "filesChanged", "activeExecutorSeconds", "focusedTestSeconds", "cacheHits", "cacheMisses", "sourceConflictCount", "budgetExpansionCount", "finalVerdict", "createdAt"],
+  "properties": {
+    "schema": { "const": "uads.gef-telemetry-event" },
+    "schemaVersion": { "const": "0.1.0" },
+    "eventId": { "type": "string", "format": "uuid" },
+    "projectId": { "type": ["string", "null"], "pattern": "^[a-f0-9]{16}$" },
+    "fingerprint": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "workOrder": { "type": ["string", "null"], "maxLength": 200 },
+    "taskClass": { "type": ["string", "null"], "enum": ["T0", "T1", "T2", "T3", null] },
+    "event": { "type": "string", "enum": ["adoption", "source-check", "receipt", "status"] },
+    "executorRequested": { "type": ["string", "null"], "maxLength": 100 },
+    "executorApplied": { "type": ["string", "null"], "maxLength": 100 },
+    "filesOpened": { "type": ["integer", "null"], "minimum": 0 },
+    "filesChanged": { "type": ["integer", "null"], "minimum": 0 },
+    "activeExecutorSeconds": { "type": ["number", "null"], "minimum": 0 },
+    "focusedTestSeconds": { "type": ["number", "null"], "minimum": 0 },
+    "cacheHits": { "type": "integer", "minimum": 0 },
+    "cacheMisses": { "type": "integer", "minimum": 0 },
+    "sourceConflictCount": { "type": "integer", "minimum": 0 },
+    "budgetExpansionCount": { "type": "integer", "minimum": 0 },
+    "finalVerdict": { "type": ["string", "null"], "maxLength": 100 },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

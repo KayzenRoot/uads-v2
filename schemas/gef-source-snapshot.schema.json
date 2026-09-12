@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-source-snapshot.schema.json",
+  "title": "GEF Source Drift Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "fingerprint", "branch", "headSha", "policyDigest", "capturedAt"],
+  "properties": {
+    "schema": { "const": "uads.gef-source-snapshot" },
+    "schemaVersion": { "const": "0.1.0" },
+    "projectId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "branch": { "type": ["string", "null"], "maxLength": 200 },
+    "headSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "policyDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "capturedAt": { "type": "string", "format": "date-time" }
+  }
+}

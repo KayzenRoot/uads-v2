@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-command-receipt.schema.json",
+  "title": "GEF Deterministic Command Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "receiptId", "projectId", "fingerprint", "command", "validityDigest", "status", "exitCode", "durationMs", "outputSummary", "createdAt"],
+  "properties": {
+    "schema": { "const": "uads.gef-command-receipt" },
+    "schemaVersion": { "const": "0.1.0" },
+    "receiptId": { "type": "string", "format": "uuid" },
+    "projectId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "command": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "validityDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "status": { "type": "string", "enum": ["PASS", "FAIL", "BLOCKED", "NOT_RUN"] },
+    "exitCode": { "type": ["integer", "null"] },
+    "durationMs": { "type": ["integer", "null"], "minimum": 0 },
+    "outputSummary": { "type": "string", "maxLength": 2000 },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

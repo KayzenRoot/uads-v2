@@ -49,6 +49,7 @@ import {
   runAdaptersStatusCommand,
   runAdaptersUninstallCommand,
 } from "./commands/adapters.js";
+import { runGefAdopt, runGefDoctor, runGefProfileShow, runGefStatus } from "./commands/gef.js";
 
 const program = new Command();
 
@@ -553,6 +554,39 @@ program
   .option("--json", "JSON output")
   .action((options: { json?: boolean }) => {
     process.stdout.write(runStatus(process.cwd(), { json: options.json }));
+  });
+
+const gef = program.command("gef").description("Global Engineering Fabric control plane");
+gef
+  .command("status")
+  .description("Show GEF project adoption and global registry status")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runGefStatus({ json: options.json }));
+  });
+gef
+  .command("adopt")
+  .description("Register or reconcile the current project in the global GEF registry")
+  .option("--project <path>", "project path", process.cwd())
+  .option("--shadow", "adopt in shadow assurance mode")
+  .option("--json", "JSON output")
+  .action((options: { project: string; shadow?: boolean; json?: boolean }) => {
+    process.stdout.write(runGefAdopt({ cwd: options.project, shadow: options.shadow, json: options.json }));
+  });
+gef
+  .command("profile")
+  .description("Show the current project's GEF profile")
+  .command("show")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runGefProfileShow({ json: options.json }));
+  });
+gef
+  .command("doctor")
+  .description("Check GEF global storage, identity, and source-truth foundations")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runGefDoctor({ json: options.json }));
   });
 
 program
