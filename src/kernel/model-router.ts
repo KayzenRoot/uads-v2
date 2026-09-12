@@ -454,7 +454,10 @@ export function routeModel(input: ModelRoutingInput): ModelExecutionPlan {
   };
   const capabilityTruth = deriveCapabilityTruth(input.runtime);
   const workOrderDigest = computeWorkOrderRoutingDigest(input.workOrder);
-  const planId = newPrefixedId("mrp", `${input.workOrder.projectId}:${input.workOrder.workOrderId}:${workOrderDigest}:${input.runtime.identityDigest}:${input.registry.registryDigest}:${MODEL_ROUTING_POLICY_DIGEST}:${currentTier}:${input.changeDigest ?? "none"}:${routingMode}:${lockRevision}`);
+  // Lock-state availability is part of plan identity: an UNAVAILABLE routing state must
+  // never share a planId (and history record) with an ABSENT autoroute decision that
+  // happens to carry the same default mode/revision. CURRENT always carries revision >= 1.
+  const planId = newPrefixedId("mrp", `${input.workOrder.projectId}:${input.workOrder.workOrderId}:${workOrderDigest}:${input.runtime.identityDigest}:${input.registry.registryDigest}:${MODEL_ROUTING_POLICY_DIGEST}:${currentTier}:${input.changeDigest ?? "none"}:${routingMode}:${lockRevision}:${lockInput.status}`);
   const plan: ModelExecutionPlan = {
     schema: "uads.model-execution-plan",
     schemaVersion: MODEL_EXECUTION_PLAN_SCHEMA_VERSION,

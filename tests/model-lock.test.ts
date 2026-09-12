@@ -6,6 +6,7 @@ import { ensureWorkspace } from "../src/lib/workspace.js";
 import {
   clearModelLock,
   computeModelRoutingStateRevisionDigest,
+  countInvalidRevisionRecords,
   readModelRoutingState,
   readModelRoutingStateRevisions,
   recoverModelRoutingState,
@@ -295,5 +296,55 @@ describe("governed Model Lock state and routing-state audit", () => {
     fs.unlinkSync(paths.currentModelRouting);
     const absent = readCurrentModelExecutionPlanState(paths);
     expect(absent.status).toBe("UNAVAILABLE");
+  });
+
+  it("CR-02: valid revision 1/2 records read with recomputed digests and zero invalid evidence", () => {
+    const { home } = tempDirs();
+    const paths = ensureWorkspace(PROJECT_ID, home);
+    setModelLock({
+      paths,
+      projectId: PROJECT_ID,
+      profile: { profileId: "locked", providerId: "fixture-provider", modelId: "fixture-model-locked" },
+      registryDigest: REGISTRY_DIGEST,
+      now: NOW,
+    });
+    clearModelLock({ paths, projectId: PROJECT_ID, registryDigest: REGISTRY_DIGEST, now: NOW });
+    const records = readModelRoutingStateRevisions(paths);
+    expect(records.map((record) => record.lockRevision)).toEqual([1, 2]);
+    for (const record of records) {
+      const { recordDigest, ...rest } = record;
+      expect(recordDigest).toBe(computeModelRoutingStateRevisionDigest(rest));
+    }
+    expect(countInvalidRevisionRecords(paths)).toBe(0);
+  });
+
+  it("CR-02: a digest-tampered revision is not surfaced and cannot inflate the next lockRevision", () => {
+    const { home } = tempDirs();
+    const paths = ensureWorkspace(PROJECT_ID, home);
+    setModelLock({
+      paths,
+      projectId: PROJECT_ID,
+      profile: { profileId: "locked", providerId: "fixture-provider", modelId: "fixture-model-locked" },
+      registryDigest: REGISTRY_DIGEST,
+      now: NOW,
+    });
+    clearModelLock({ paths, projectId: PROJECT_ID, registryDigest: REGISTRY_DIGEST, now: NOW });
+    const tamperedPath = path.join(paths.modelLockRevisions, "rev-000002.json");
+    const tampered = JSON.parse(fs.readFileSync(tamperedPath, "utf8")) as Record<string, unknown>;
+    // Schema-valid mutation (integer >= 1) without recomputing recordDigest: isolates digest validation.
+    tampered.lockRevision = 99;
+    fs.writeFileSync(tamperedPath, JSON.stringify(tampered), "utf8");
+    const tamperedBytes = fs.readFileSync(tamperedPath, "utf8");
+    expect(validateAgainstSchema("model-routing-state-revision.schema.json", JSON.parse(tamperedBytes))).toEqual([]);
+    const records = readModelRoutingStateRevisions(paths);
+    expect(records.map((record) => record.lockRevision)).toEqual([1]);
+    expect(countInvalidRevisionRecords(paths)).toBe(1);
+    const next = setModelRoutingMode({ paths, projectId: PROJECT_ID, mode: "CHEAPEST_QUALIFIED", registryDigest: REGISTRY_DIGEST, now: NOW });
+    expect(next.lockRevision).toBe(3);
+    // The tampered file is neither trusted, repaired, nor overwritten by ordinary writes.
+    expect(fs.readFileSync(tamperedPath, "utf8")).toBe(tamperedBytes);
+    expect(fs.existsSync(path.join(paths.modelLockRevisions, "rev-000003.json"))).toBe(true);
+    expect(countInvalidRevisionRecords(paths)).toBe(1);
+    expect(readModelRoutingStateRevisions(paths).map((record) => record.lockRevision)).toEqual([1, 3]);
   });
 });

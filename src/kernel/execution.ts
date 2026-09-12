@@ -461,11 +461,28 @@ function ensureCurrentModelPlan(input: {
   const runtime = input.runtime;
   const current = readCurrentModelExecutionPlan(input.ctx.paths, input.schemaRoot);
   const lockState = modelRoutingLockInput(readModelRoutingState(input.ctx.paths, input.ctx.projectId, input.schemaRoot));
-  const currentMode = lockState.status === "CURRENT" ? lockState.mode : DEFAULT_MODEL_ROUTING_MODE;
-  const currentLockRevision = lockState.status === "CURRENT" ? lockState.lockRevision : 0;
   const contextPack = input.contextPlan.contextPackId
     ? readCurrentContextPack(input.ctx.paths, input.schemaRoot)
     : null;
+  if (lockState.status === "UNAVAILABLE") {
+    // CR-01: an unreadable routing state must never reuse a persisted plan. A stored
+    // autoroute revision-0 plan proves nothing about a lock that may exist, so currency
+    // re-derives fail-closed and routeModel() returns BLOCKED/ROUTING_STATE_UNAVAILABLE.
+    const blocked = routeModel({
+      projectId: input.ctx.projectId,
+      workOrder: input.workOrder,
+      registry,
+      runtime,
+      contextPack,
+      previousPlan: current,
+      changeDigest: input.changeDigest,
+      lockState,
+    });
+    return persistModelExecutionPlan(input.ctx.paths, blocked, input.schemaRoot);
+  }
+  // Only true ABSENT state uses the governed default; UNAVAILABLE never reaches here.
+  const currentMode = lockState.status === "CURRENT" ? lockState.mode : DEFAULT_MODEL_ROUTING_MODE;
+  const currentLockRevision = lockState.status === "CURRENT" ? lockState.lockRevision : 0;
   const contextHintsCurrent =
     current &&
     current.cacheHints.staticLayerDigest === (contextPack?.staticLayerDigest ?? null) &&

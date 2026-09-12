@@ -136,6 +136,42 @@ function normalizeRoutingState(raw: unknown): ModelRoutingState {
   return { ...unsigned, stateDigest };
 }
 
+/**
+ * CR-02: single normalization/validation path for immutable revision-record reads.
+ * Validates schema, safe content and bounded project/revision fields, then recomputes
+ * recordDigest from the canonical unsigned revision payload. A digest mismatch means
+ * the audit evidence is invalid and the record must not be trusted.
+ */
+function normalizeRoutingStateRevision(raw: unknown): ModelRoutingStateRevision {
+  if (!isRecord(raw)) throw new ModelLockStateError("routing state revision must be an object");
+  const errors = validateAgainstSchema("model-routing-state-revision.schema.json", raw);
+  if (errors.length > 0) throw new ModelLockStateError(`routing state revision failed schema validation: ${errors.join("; ")}`);
+  assertSafeRoutingState(raw);
+  const projectId = typeof raw.projectId === "string" ? raw.projectId.trim() : "";
+  if (!projectId) throw new ModelLockStateError("routing state revision project is missing");
+  if (!Number.isInteger(raw.lockRevision) || (raw.lockRevision as number) < 1) {
+    throw new ModelLockStateError("routing state revision number is out of bounds");
+  }
+  const unsigned: Omit<ModelRoutingStateRevision, "recordDigest"> = {
+    schema: MODEL_ROUTING_STATE_REVISION_SCHEMA,
+    schemaVersion: MODEL_ROUTING_STATE_SCHEMA_VERSION,
+    projectId,
+    lockRevision: raw.lockRevision as number,
+    action: raw.action as ModelRoutingStateRevisionAction,
+    mode: raw.mode as ModelRoutingMode,
+    locked: raw.locked === null ? null : normalizeLockedIdentity(raw.locked),
+    previousMode: (raw.previousMode as ModelRoutingMode | null) ?? null,
+    previousRevision: typeof raw.previousRevision === "number" ? raw.previousRevision : null,
+    previousStateDigest: typeof raw.previousStateDigest === "string" ? raw.previousStateDigest : null,
+    registryDigest: raw.registryDigest === null ? null : String(raw.registryDigest),
+    updatedAt: String(raw.updatedAt),
+    stateDigest: String(raw.stateDigest),
+  };
+  const recordDigest = computeModelRoutingStateRevisionDigest(unsigned);
+  if (raw.recordDigest !== recordDigest) throw new ModelLockStateError("routing state revision digest mismatch");
+  return { ...unsigned, recordDigest };
+}
+
 function listRevisionRecords(paths: UadsPaths): ModelRoutingStateRevision[] {
   if (!fs.existsSync(paths.modelLockRevisions)) return [];
   const records: ModelRoutingStateRevision[] = [];
@@ -143,11 +179,40 @@ function listRevisionRecords(paths: UadsPaths): ModelRoutingStateRevision[] {
     if (!/^rev-\d{6}\.json$/.test(entry)) continue;
     const parsed = readJsonIfValid<unknown>(path.join(paths.modelLockRevisions, entry));
     if (!parsed.ok) continue;
-    const errors = validateAgainstSchema("model-routing-state-revision.schema.json", parsed.value);
-    if (errors.length > 0) continue;
-    records.push(parsed.value as ModelRoutingStateRevision);
+    // CR-02: a revision file that fails validation (corrupt or digest-tampered) is never
+    // surfaced as audit evidence and never drives revision authority. Ordinary reads do
+    // not overwrite or repair it; explicit operator recovery owns that decision.
+    try {
+      records.push(normalizeRoutingStateRevision(parsed.value));
+    } catch {
+      continue;
+    }
   }
   return records.sort((left, right) => left.lockRevision - right.lockRevision);
+}
+
+/**
+ * CR-02: explicit invalid-evidence detector. Counts `rev-NNNNNN.json` files that exist
+ * but fail revision validation, so callers can surface an audit UNAVAILABLE condition
+ * instead of guessing. Never returns, trusts, or repairs the invalid records.
+ */
+export function countInvalidRevisionRecords(paths: UadsPaths): number {
+  if (!fs.existsSync(paths.modelLockRevisions)) return 0;
+  let invalid = 0;
+  for (const entry of fs.readdirSync(paths.modelLockRevisions).sort()) {
+    if (!/^rev-\d{6}\.json$/.test(entry)) continue;
+    const parsed = readJsonIfValid<unknown>(path.join(paths.modelLockRevisions, entry));
+    if (!parsed.ok) {
+      invalid += 1;
+      continue;
+    }
+    try {
+      normalizeRoutingStateRevision(parsed.value);
+    } catch {
+      invalid += 1;
+    }
+  }
+  return invalid;
 }
 
 export function readModelRoutingStateRevisions(paths: UadsPaths): ModelRoutingStateRevision[] {
@@ -216,7 +281,14 @@ function writeStateAndRevision(input: {
   now?: string;
   previous: ModelRoutingState | null;
 }): ModelRoutingState {
-  const revision = highestKnownLockRevision(input.paths, input.previous) + 1;
+  const revisionId = (revision: number): string => `rev-${String(revision).padStart(6, "0")}`;
+  let allocated = highestKnownLockRevision(input.paths, input.previous) + 1;
+  // CR-02: never overwrite an existing revision file — even one holding invalid evidence
+  // that no longer drives revision authority. Allocation skips occupied slots instead.
+  while (fs.existsSync(path.join(input.paths.modelLockRevisions, `${revisionId(allocated)}.json`))) {
+    allocated += 1;
+  }
+  const revision = allocated;
   const updatedAt = input.now ?? new Date().toISOString();
   const unsigned: Omit<ModelRoutingState, "stateDigest"> = {
     schema: MODEL_ROUTING_STATE_SCHEMA,
@@ -251,8 +323,7 @@ function writeStateAndRevision(input: {
   };
   assertSchema("model-routing-state-revision.schema.json", revisionRecord, input.schemaRoot);
   assertSchema("model-routing-state.schema.json", state, input.schemaRoot);
-  const revisionId = `rev-${String(revision).padStart(6, "0")}`;
-  atomicWriteJson(sidecarJsonPath(input.paths.modelLockRevisions, revisionId), revisionRecord);
+  atomicWriteJson(sidecarJsonPath(input.paths.modelLockRevisions, revisionId(revision)), revisionRecord);
   atomicWriteJson(input.paths.modelLock, state);
   return state;
 }
