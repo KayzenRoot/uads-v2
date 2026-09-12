@@ -1,18 +1,19 @@
 # EVIDENCE — UADS2-WO-025
 
-Status: COMPLETE_CANDIDATE — reconciled onto the merged WO-026 baseline; the historical NEEDS_ARCHITECTURE state is explicitly SUPERSEDED by this reconciliation (proof: execution X7 9/9, fault-injection 32/32). Independent HEDS and hosted exact-head gates are still pending. DO NOT MERGE before a fresh HEDS APPROVED verdict on the exact head plus CI/CodeQL/Dependency Review/Cross-Platform SUCCESS on that same head.
+Status: COMPLETE_CANDIDATE — HEDS correction increment (HEDS `5184911721` CORRECTION REQUIRED addressed: CR-01 + CR-02 fixed, proven, and re-gated). Independent HEDS re-review is still pending. DO NOT MERGE before a fresh HEDS APPROVED verdict on the exact head plus CI/CodeQL/Dependency Review/Cross-Platform SUCCESS on that same head.
 Module: M05 Automatic Model Router
 Session: IW1-01 Proof-Aware Model Routing + Model Lock
 Issue: #75
 PR: #77
 Risk: HIGH
-Terminal state: COMPLETE_CANDIDATE (reconciliation; review pending)
+Terminal state: COMPLETE_CANDIDATE (correction; review pending)
 
 ## Exact identities
 - Reviewed planning base (Context Lock / Test Plan / freeze): `9eb5b713a70dbb2a836b4c2fb5bfefd6019a9f53`
 - Stale PR #77 head (pre-reconciliation, pre-WO-026): `5889e0251ce8aa515902a05e1753f5882374bc3c`
 - Reconciled base (current `main` at dispatch, verified with `git rev-parse origin/main`): `5b55eb8d06fde7d616ac72d31a3b1e31a1b4381` — matches the resume prompt exactly; main did not advance beyond it (no delta to record).
-- Reconciliation commits on top of the base: `276efaf` (M05 replay) + `fd757a5` + `c73145f` (runtime evidence docs) + `e0c34e5` (semantic WO-026 facade fix). All local proof below ran on working-tree content byte-identical to `e0c34e5` for every code/test/schema/eval path.
+- Reconciliation commits on top of the base: `276efaf` (M05 replay) + `fd757a5` + `c73145f` (runtime evidence docs) + `e0c34e5` (semantic WO-026 facade fix) + `734130f` (reconciliation evidence).
+- HEDS correction commits on top of the rejected head `734130f8655c36d111c68e9ac9a05577a8194fb5` (HEDS `5184911721` CORRECTION REQUIRED): CR-01 plan-currency fix (`src/kernel/execution.ts`) + lock-availability plan identity (`src/kernel/model-router.ts`), CR-02 revision validation (`src/kernel/model-lock.ts`), CR-01/CR-02 regression tests, and this evidence update. All correction proof below ran on working-tree content byte-identical to the pre-evidence correction head for every code/test/schema/eval path.
 - Evidence bundle commit: the commit that adds this document; the exact final head is recorded in PR #77 and in the execution report. The evidence commit touches only this document; code-blob invariance versus `e0c34e5` is verified post-commit with `git hash-object` and recorded in the PR reconciliation comment.
 - Branch: `feat/uads2-wo-025-iw1-01-model-routing-lock`
 - Reconciliation method: rebase replay of the stale PR implementation onto `origin/main` (linear history; `git merge-base --is-ancestor origin/main HEAD` passes), plus one targeted semantic fix commit. No merge commit, no blanket ours/theirs.
@@ -29,9 +30,29 @@ Semantic resolutions (never blanket ours/theirs; both sides' changes are present
 - `src/cli.ts`: WO-026 dispatch `--adapter <id>` wiring (explicit governed adapter identity `cursor | codex | generic-agent-skills`) preserved byte-for-byte; M05 additions are purely additive — `models lock show|set|clear|recover` subcommands and `--adapter`/`--host-home` on `models status`/`models route`.
 - `src/kernel/execution.ts`: WO-026 `resolveDispatchRuntimeCapability` (missing-identity `CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED` hard-block, unknown-identity block, BLOCKED-detection block), `persistRuntimeCapabilitySnapshot` at dispatch, and `ensureCurrentModelPlan({ runtime: modelRuntime })` threading preserved; M05 adds only lock currency to plan reuse (`current.routingMode === currentMode && current.modelLock.revision === currentLockRevision`) plus the `modelRoutingLockInput`/`readModelRoutingState`/`DEFAULT_MODEL_ROUTING_MODE` wiring.
 - `src/kernel/model-router.ts` + `src/commands/models.ts` (`e0c34e5`): the M05 acquisition boundary `resolveRoutingCapabilityTruth` calls `readHostCapabilityProjection` with the workspace `paths` forwarded, so stored/active PCCR evidence resolves behind the WO-026 facade against the current basis; the orphaned legacy `readRuntimeCapabilitySnapshot` import is removed. Adapter-absent callers still receive the conservative all-UNKNOWN snapshot. No `requireProvenRuntime`, Model Lock, or UNKNOWN fail-closed semantics weakened.
-Final changed files versus reconciled base `5b55eb8` (16 paths, all inside freeze §6; no new dependencies, no project-local UADS state, no broad refactor): `.engineering/reports/EVIDENCE-UADS2-WO-025.md`, `evals/model-routing/cases.json`, `schemas/model-execution-plan.schema.json`, `schemas/model-routing-state-revision.schema.json`, `schemas/model-routing-state.schema.json`, `src/cli.ts`, `src/commands/models.ts`, `src/eval/model-routing.ts`, `src/kernel/execution.ts`, `src/kernel/model-lock.ts`, `src/kernel/model-persist.ts`, `src/kernel/model-router.ts`, `src/kernel/model-types.ts`, `src/lib/workspace.ts`, `tests/model-lock.test.ts`, `tests/model-routing.test.ts`.
+Final changed files versus reconciled base `5b55eb8` (17 paths, all inside freeze §6 plus the CR-01 regression test; no new dependencies, no project-local UADS state, no broad refactor): `.engineering/reports/EVIDENCE-UADS2-WO-025.md`, `evals/model-routing/cases.json`, `schemas/model-execution-plan.schema.json`, `schemas/model-routing-state(-revision).schema.json`, `src/cli.ts`, `src/commands/models.ts`, `src/eval/model-routing.ts`, `src/kernel/execution.ts`, `src/kernel/model-{lock,router,types,persist}.ts`, `src/lib/workspace.ts`, `tests/model-{lock,routing}.test.ts`, `tests/execution-routing-state-unavailable.test.ts` (new).
 Forbidden-boundary check versus `5b55eb8`: `git diff --name-only` contains none of `src/adapters/host-dispatch.ts`, `src/kernel/model-requirements.ts`, `src/kernel/model-registry.ts`, `src/adapters/host-capability-consumer.ts`, `src/adapters/host-capability-passive.ts`, `src/kernel/host-capability-proof.ts`, `src/eval/execution.ts`, `src/eval/fault-injection.ts`, `scripts/`, `.github/` — 0 violations.
 Invariant pins on the reconciled head: runtime snapshot contract `0.8.0` (`MODEL_ROUTING_SCHEMA_VERSION`, unchanged from main); plan schema `0.9.0` (`MODEL_EXECUTION_PLAN_SCHEMA_VERSION`, M05 only); `requireProvenRuntime` policy line identical to main; UNKNOWN never maps to ALLOW (conservative snapshot + `NO_PROVEN_CAPABILITY` rejection intact).
+
+## HEDS correction (HEDS `5184911721` CORRECTION REQUIRED) — CR-01 + CR-02
+Both findings are fixed narrowly on top of the approved reconciliation (`734130f`). No WO-026 M03 file is touched; IF-001/PCCR/explicit adapter binding remain authoritative and byte-identical.
+
+### CR-01 — routing-state UNAVAILABLE must invalidate plan reuse
+Root cause: `ensureCurrentModelPlan()` (`src/kernel/execution.ts`) collapsed `lockState.status === "UNAVAILABLE"` to the governed defaults (mode `QUALITY_FLOOR_AUTOROUTE`, revision 0), so a persisted ABSENT-era autoroute plan still satisfied every currency check and was reused.
+Fix (preferred behavior from the finding): when the routing state reads UNAVAILABLE, currency skips reuse entirely and re-derives with `lockState=UNAVAILABLE`, so `routeModel()` returns BLOCKED with `ROUTING_STATE_UNAVAILABLE`; the BLOCKED plan is persisted (uniform plan-currency semantics, truthful status surfaces) and `runDispatch` refuses dispatch with `model routing blocked dispatch` / `ROUTING_STATE_UNAVAILABLE` before any run advances — no model-bearing execution proceeds. ABSENT remains distinct: only true ABSENT uses the governed default (comment-pinned in code).
+Companion integrity fix found while proving CR-01: the BLOCKED re-derivation initially shared the old plan's deterministic `planId` (same default mode/revision seed), which would overwrite the SELECTED plan's history record under one identity. Lock-state availability (`ABSENT`/`CURRENT`/`UNAVAILABLE`) is now part of the `planId` seed in `routeModel()`, so distinct routing realities get distinct plan identities and history records. Same-input determinism is unchanged (existing `planId` equality tests green); no literal planId is asserted anywhere.
+Regression tests (`tests/execution-routing-state-unavailable.test.ts`, 2 tests, drive the real `runDispatch` currency path on a clean plan→dispatch fixture):
+- corrupt-JSON routing state after a valid ABSENT autoroute dispatch ⇒ dispatch throws `ExecutionBlockedError` (`model routing blocked dispatch`, blockers contain `ROUTING_STATE_UNAVAILABLE`); the persisted plan is BLOCKED/`ROUTING_STATE_UNAVAILABLE` with `routingEnforcement UNKNOWN/ROUTING_STATE_UNAVAILABLE` and a different `planId` — the old SELECTED plan is not reused.
+- digest-invalid routing state (valid state with one `stateDigest` character flipped; read sanity-confirms `ROUTING_STATE_DIGEST_INVALID`) ⇒ identical fail-closed assertions.
+Model Lock, `requireProvenRuntime`, UNKNOWN discipline, adapter binding and WO-026 PCCR behavior are not weakened (touched-seam suites + execution 9/9 + fault-injection 32/32 re-proven below).
+
+### CR-02 — validate immutable revision-record integrity on read
+Root cause: `listRevisionRecords()` (`src/kernel/model-lock.ts`) schema-checked revision files but never recomputed `recordDigest`, so a tampered payload with otherwise-valid JSON/schema was returned as valid audit evidence and drove `highestKnownLockRevision()`.
+Fix: a single normalization/validation path `normalizeRoutingStateRevision()` (schema + safe content + bounded project/revision fields + `recordDigest` recomputed from the canonical unsigned payload). Invalid records are never returned from `readModelRoutingStateRevisions()`, never drive `highestKnownLockRevision()`, and are never overwritten or auto-repaired during ordinary reads. New explicit detector `countInvalidRevisionRecords()` lets callers surface an audit UNAVAILABLE condition instead of guessing. Allocation in `writeStateAndRevision()` additionally skips occupied `rev-NNNNNN.json` slots, so a tampered file can neither be overwritten nor inflate numbering.
+Regression tests (`tests/model-lock.test.ts`, 2 tests):
+- valid revision 1/2 records still read with recomputed digests; invalid count 0.
+- `rev-000002.json` payload mutated (`lockRevision` 2→99, schema still valid, digest stale) ⇒ surfaced records are `[1]` only; invalid count 1; next `setModelRoutingMode` allocates revision 3 (not 100); the tampered bytes are untouched and `rev-000003.json` is created alongside — no trust, no repair, no overwrite, no inflation.
+Existing set/clear/recover monotonic revision tests and raw-state recovery behavior are preserved (full focused + full suite green).
 
 ## Source baseline verification (historical dispatch preflight, retained)
 Method at original dispatch: frozen identity from `.engineering/context-locks/UADS2-WO-025.md`, verified with `git rev-parse a0a778e5:<path>` versus `git hash-object <path>` (pre-edit working tree) and versus the committed implementation head.
@@ -70,10 +91,11 @@ Method at original dispatch: frozen identity from `.engineering/context-locks/UA
 | `schemas/model-routing-state-revision.schema.json` | new | closed (`additionalProperties: false`) immutable revision-record contract `0.1.0` |
 | `tests/model-routing.test.ts` | modified | router-side T1..T10 proofs and negative scenarios |
 | `tests/model-lock.test.ts` | new | lock state, revision audit, corruption/fail-closed, legacy/corrupt plan degradation proofs |
+| `tests/execution-routing-state-unavailable.test.ts` | new | CR-01 currency regression: corrupt-JSON and digest-invalid UNAVAILABLE states block dispatch instead of reusing the ABSENT autoroute plan |
 | `src/eval/model-routing.ts` | modified | deterministic eval extension MR23..MR31 |
 | `evals/model-routing/cases.json` | modified | eval case registry for MR23..MR31 |
 
-## Proof results (reconciliation re-run on head `e0c34e5`, base `5b55eb8`)
+## Proof results (correction re-run; T1–T10 remain PASS, NOT_APPLICABLE families unchanged)
 Labels: PASS / FAIL / BLOCKED / NOT_APPLICABLE. Test references are test names in `tests/model-routing.test.ts` (router side) and `tests/model-lock.test.ts` (lock state side); `MR` references are deterministic eval cases. All T1..T10 PASS.
 
 - RT-001 Model Lock hard constraint + audit trail: PASS — "WO-025 T2: an active Model Lock is a hard constraint that suppresses fallback substitution" (router), "WO-025 T2: set/clear persist immutable revision records with monotonic revisions" (state); `MR23`, `MR24`.
@@ -100,24 +122,24 @@ Labels: PASS / FAIL / BLOCKED / NOT_APPLICABLE. Test references are test names i
 Absence of proof for the NOT_APPLICABLE families is not a failure of this slice and is never claimed as proven.
 
 ## Tests
-### Focused (M05 model-routing/model-lock)
-Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/model-routing.test.ts tests/model-lock.test.ts`
-Result: `2 files passed / 41 tests passed (41), exit 0, 10.66 s` on head `e0c34e5`.
+### Focused (M05 model-routing/model-lock + CR-01 currency)
+Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/model-routing.test.ts tests/model-lock.test.ts tests/execution-routing-state-unavailable.test.ts`
+Result: `3 files passed / 45 tests passed (45)` — 41 pre-existing T1..T10/M05 proofs plus 2 CR-02 revision-validation tests plus 2 CR-01 currency tests.
 
 ### Touched WO-026 M03/dispatch seams
 Command: `node node_modules/vitest/vitest.mjs run --maxWorkers=1 tests/host-capability-resolver.test.ts tests/host-dispatch-adapter-binding.test.ts tests/execution-happy.test.ts tests/execution-gates.test.ts`
-Result: `4 files passed / 31 tests passed (31), exit 0, 124.41 s` on head `e0c34e5`. WO-026 invariants (explicit adapter identity, missing-adapter hard-block, source-aware stored/active PCCR, snapshot `0.8.0`) intact.
+Result: `4 files passed / 31 tests passed (31), exit 0` on the correction working tree. WO-026 invariants (explicit adapter identity, missing-adapter hard-block, source-aware stored/active PCCR, snapshot `0.8.0`) intact.
 
-Build/lint: `npm run build` → exit 0; `npm run lint` → exit 0; `npm run typecheck` → exit 0 (all on head `e0c34e5` content).
+Build/lint: `npm run build` → exit 0; `npm run lint` → exit 0; `npm run typecheck` → exit 0 (all on the correction working tree).
 
 ### Full suite
 Command: `npm test` (`vitest run --maxWorkers=1`)
-Result: 63 files — 62 passed / 1 failed; 622 tests — 621 passed / 1 failed; duration 2049.97 s; worktree clean before and after.
+Result: 64 files — 63 passed / 1 failed; 626 tests — 625 passed / 1 failed; duration 1606.83 s; worktree clean before and after.
 Sole failure: `tests/release-security-proof.test.ts` — "RG14 keeps v0.11.0 outside corrected-release proof semantics and immutable" (`git ls-remote origin refs/tags/v0.11.0` returns empty because `KayzenRoot/uads-v2` has 0 tags; the historical tag exists only in the predecessor lineage `KayzenRoot/uads`, `d5cb361274cb19f70c8bd02dd023b596b8babf13`).
 Inherited proof (base evidence, not relabeling): `git ls-remote origin refs/tags/` returns 0 lines on this host (remote state, identical for base `5b55eb8` by construction); `tests/release-security-proof.test.ts` is byte-identical between base `5b55eb8` and this head (absent from the branch diff) and imports only `node:` builtins, `vitest`, `src/lib/json-schema.ts` and `src/github/*` — none of which this branch touches; isolated run gives 25 tests — 24 passed / 1 failed with the identical `ls-remote`-empty assertion. The file passes 25/25 when `origin` is temporarily repointed to the frozen V1 lineage — the same repoint CI performs for the Test and Validate-foundation steps (`.github/workflows/ci.yml`). No new failure is classified as inherited.
-The suite ran on working-tree content byte-identical to head `e0c34e5` for all 15 code/test/schema/eval paths (worktree `git status --porcelain` empty before and after; the only following commit touches this document alone).
+The suite ran on working-tree content byte-identical to the pre-evidence correction head for all 16 code/test/schema/eval paths (worktree `git status --porcelain` empty before and after; the only following commit touches this document alone).
 
-### Deterministic evaluations (reconciled head `e0c34e5`, same toolchain; base reference `5b55eb8` / WO-026 PR #80 evidence for unchanged paths)
+### Deterministic evaluations (correction working tree, same toolchain; base reference `5b55eb8` / WO-026 PR #80 evidence for unchanged paths)
 | Eval | Head | Base reference | Status |
 | --- | --- | --- | --- |
 | `eval:orchestrator` | 9/9 | 9/9 | PASS |
@@ -177,7 +199,7 @@ The six blocking facts from the stale-head investigation, and their resolutions 
 Resolution proof: `eval:execution` head 8/9→9/9 (X7 fixed); `eval:fault-injection` head 27/32→32/32 (FI4/FI5/FI8/FI9/FI10 fixed); all failures previously shared the single cause "model routing blocked dispatch" and no other eval or test regresses relative to base. No architecture redesign, no Model Lock bypass/advisory downgrade, no `requireProvenRuntime` weakening, no missing-adapter compatibility path was introduced to achieve this.
 
 ## Repository gates on exact final head
-- Local, on head `e0c34e5` content: `npm run build` exit 0; `npm run typecheck` exit 0; `npm run lint` exit 0; focused M05 suites 41/41; WO-026 seam suites 31/31; full suite 621/622 (sole inherited RG14, base-evidenced above); `npm run validate:engineering` exit 0; all deterministic evals green (execution 9/9, fault-injection 32/32, cost 27/27, model-routing 31/31, orchestrator 9/9, context 19/19, fault 18/18, specialist-routing 26/26, adapters 40/40, assurance 22/22, host-execution via full suite).
+- Local, on the correction working tree: `npm run build` exit 0; `npm run typecheck` exit 0; `npm run lint` exit 0; focused M05+CR-01 suites 45/45; WO-026 seam suites 31/31; full suite (see below); `npm run validate:engineering` exit 0; all deterministic evals green (execution 9/9, fault-injection 32/32, cost 27/27, model-routing 31/31, orchestrator 9/9, context 19/19, fault 18/18, specialist-routing 26/26, adapters 40/40, assurance 22/22, host-execution via full suite).
 - Hosted gates (CI, CodeQL, Dependency Review, Cross-Platform) are evaluated on the exact final head after publication; run IDs and conclusions are recorded in PR #77. Any later commit invalidates earlier receipts.
 
 ## Remaining debt / known limitations
@@ -188,7 +210,8 @@ Resolution proof: `eval:execution` head 8/9→9/9 (X7 fixed); `eval:fault-inject
 5. Before any active-evidence contract is promoted to PRODUCTION, M03 must independently derive/attest the active current context inside the M03 host/probe boundary (WO-026 forward requirement, unchanged).
 
 ## HEDS
-Review ID: PENDING — the reconciled head returns to independent final audit outside the executor (ChatGPT HEDS) after publication; the executor does not approve its own increment. The historical NEEDS_ARCHITECTURE review state is explicitly superseded by this reconciliation evidence; a fresh verdict on the new exact head is required.
+Review history: historical NEEDS_ARCHITECTURE SUPERSEDED by the reconciliation; HEDS `5184911721` CORRECTION REQUIRED (CR-01 + CR-02) ADDRESSED by this increment with the regression proofs above.
+Current: PENDING — the correction head returns to independent re-audit outside the executor (ChatGPT HEDS) after publication; the executor does not approve its own increment. A fresh verdict on the new exact head is required.
 
 ## Final verdict
-COMPLETE_CANDIDATE (not APPROVED, not merged). PR #77 is reconciled onto current main with WO-026 semantics preserved, M05 behavior preserved, T1–T10 green, execution 9/9, fault-injection 32/32, Evidence Bundle bound to the reconciled head, and hosted exact-head gates awaited. Merge only after fresh HEDS APPROVED plus exact-head CI, CodeQL, Dependency Review and Cross-Platform SUCCESS.
+COMPLETE_CANDIDATE (not APPROVED, not merged). PR #77 carries the CR-01/CR-02 correction on top of the reconciled WO-026 baseline: UNAVAILABLE routing state can never reuse an old plan, tampered revision records are never trusted as valid audit evidence or revision authority, T1–T10 stay green, execution is 9/9, fault-injection is 32/32, the Evidence Bundle is bound to the correction head, and hosted exact-head gates are awaited. Merge only after fresh HEDS APPROVED plus exact-head CI, CodeQL, Dependency Review and Cross-Platform SUCCESS.
