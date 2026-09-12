@@ -100,6 +100,47 @@ describe("GEF W0 contracts and skeleton", () => {
     expect(readGefProject(repo).reasonCode).toBe("REGISTRY_IDENTITY_MISMATCH");
   });
 
+  it("requires adopted current state and complete cross-binding", () => {
+    const repo = tempRepo();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-home-"));
+    process.env.UADS_HOME = home;
+    const result = adoptGefProject(repo);
+    const currentPath = gefCurrentPath(result.paths, result.profile.projectId);
+    for (const status of ["CORRUPT", "NOT_ADOPTED", "SOURCE_CONFLICT"]) {
+      adoptGefProject(repo);
+      const current = JSON.parse(fs.readFileSync(currentPath, "utf8")) as Record<string, unknown>;
+      current.status = status;
+      fs.writeFileSync(currentPath, `${JSON.stringify(current)}\n`);
+      expect(readGefProject(repo).reasonCode).toBe("CURRENT_STATUS_INVALID");
+      expect(JSON.parse(runGefDoctor({ cwd: repo, json: true })).status).toBe("BLOCKED");
+    }
+
+    adoptGefProject(repo);
+    const current = JSON.parse(fs.readFileSync(currentPath, "utf8")) as Record<string, unknown>;
+    current.branch = "other-branch";
+    fs.writeFileSync(currentPath, `${JSON.stringify(current)}\n`);
+    expect(readGefProject(repo).reasonCode).toBe("CURRENT_BRANCH_BASELINE_MISMATCH");
+    adoptGefProject(repo);
+    const headCurrent = JSON.parse(fs.readFileSync(currentPath, "utf8")) as Record<string, unknown>;
+    headCurrent.headSha = "a".repeat(40);
+    fs.writeFileSync(currentPath, `${JSON.stringify(headCurrent)}\n`);
+    expect(readGefProject(repo).reasonCode).toBe("CURRENT_HEAD_BASELINE_MISMATCH");
+
+    const registryCases: Array<[string, string, string]> = [
+      ["adoptionMode", "ACTIVE", "REGISTRY_ADOPTION_MODE_MISMATCH"],
+      ["projectClass", "NEW_PROJECT", "REGISTRY_PROJECT_CLASS_MISMATCH"],
+      ["defaultBranch", "other", "REGISTRY_DEFAULT_BRANCH_MISMATCH"],
+      ["repositoryIdentity", "other", "REGISTRY_REPOSITORY_IDENTITY_MISMATCH"],
+    ];
+    for (const [field, value, reason] of registryCases) {
+      adoptGefProject(repo);
+      const registry = JSON.parse(fs.readFileSync(result.paths.gefRegistry, "utf8")) as { entries: Array<Record<string, unknown>> };
+      registry.entries[0]![field] = value;
+      fs.writeFileSync(result.paths.gefRegistry, `${JSON.stringify(registry)}\n`);
+      expect(readGefProject(repo).reasonCode).toBe(reason);
+    }
+  });
+
   it("uses a persisted baseline and reports branch, head, and policy drift", () => {
     const repo = tempRepo();
     const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-home-"));

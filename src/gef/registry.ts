@@ -179,10 +179,17 @@ export function readGefProject(cwd: string): GefProjectRead {
   if (baseline.projectId !== fingerprint.projectId || baseline.fingerprint !== fingerprint.fingerprint) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "BASELINE_IDENTITY_MISMATCH" };
   if (computeGefProfileDigest(profile) !== current.profileDigest) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "PROFILE_DIGEST_MISMATCH" };
   if (computeGefSourceSnapshotDigest(baseline) !== current.baselineDigest) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "BASELINE_DIGEST_MISMATCH" };
+  if (current.status !== "ADOPTED") return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "CURRENT_STATUS_INVALID" };
+  if (current.branch !== baseline.branch) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "CURRENT_BRANCH_BASELINE_MISMATCH" };
+  if (current.headSha !== baseline.headSha) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "CURRENT_HEAD_BASELINE_MISMATCH" };
   if (profile.adoptionMode !== current.adoptionMode) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "ADOPTION_MODE_MISMATCH" };
   const entry = registry.entries.find((item) => item.projectId === fingerprint.projectId);
   if (!entry) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_ENTRY_MISSING" };
   if (entry.fingerprint !== profile.fingerprint || entry.projectId !== profile.projectId) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_IDENTITY_MISMATCH" };
   if (entry.profileDigest !== current.profileDigest) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_DIGEST_MISMATCH" };
+  if (entry.repositoryIdentity !== profile.repositoryIdentity) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_REPOSITORY_IDENTITY_MISMATCH" };
+  if (entry.defaultBranch !== profile.defaultBranch) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_DEFAULT_BRANCH_MISMATCH" };
+  if (entry.adoptionMode !== profile.adoptionMode) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_ADOPTION_MODE_MISMATCH" };
+  if (entry.projectClass !== profile.projectClass) return { paths, profile: null, current: null, baseline: null, status: "CORRUPT", reasonCode: "REGISTRY_PROJECT_CLASS_MISMATCH" };
   return { paths, profile, current, baseline, status: "VALID", reasonCode: null };
 }
