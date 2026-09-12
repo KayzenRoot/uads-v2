@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-project-profile.schema.json",
+  "title": "GEF Project Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "fingerprint", "repositoryIdentity", "repositoryGeneration", "defaultBranch", "packageManager", "buildSystem", "commands", "governancePaths", "evidencePaths", "hostedGateNames", "supportedExecutorAdapters", "currentGefVersion", "adoptionMode", "projectClass", "createdAt", "updatedAt"],
+  "properties": {
+    "schema": { "const": "uads.gef-project-profile" },
+    "schemaVersion": { "const": "0.1.0" },
+    "projectId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "repositoryIdentity": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "repositoryGeneration": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "defaultBranch": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "packageManager": { "type": ["string", "null"], "maxLength": 40 },
+    "buildSystem": { "type": ["string", "null"], "maxLength": 80 },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["build", "test", "typecheck", "lint"],
+      "properties": {
+        "build": { "type": ["string", "null"], "maxLength": 200 },
+        "test": { "type": ["string", "null"], "maxLength": 200 },
+        "typecheck": { "type": ["string", "null"], "maxLength": 200 },
+        "lint": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "governancePaths": { "type": "array", "items": { "type": "string", "maxLength": 200 }, "maxItems": 50 },
+    "evidencePaths": { "type": "array", "items": { "type": "string", "maxLength": 200 }, "maxItems": 50 },
+    "hostedGateNames": { "type": "array", "items": { "type": "string", "maxLength": 200 }, "maxItems": 50 },
+    "supportedExecutorAdapters": { "type": "array", "items": { "type": "string", "enum": ["codex", "cursor", "generic"] }, "uniqueItems": true, "maxItems": 3 },
+    "currentGefVersion": { "const": "0.1.0" },
+    "adoptionMode": { "type": "string", "enum": ["SHADOW", "ACTIVE"] },
+    "projectClass": { "type": "string", "enum": ["NEW_PROJECT", "EXISTING_PROJECT", "PARTIALLY_GOVERNED"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-registry.schema.json",
+  "title": "GEF Global Project Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "entries", "updatedAt"],
+  "properties": {
+    "schema": { "const": "uads.gef-registry" },
+    "schemaVersion": { "const": "0.1.0" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "fingerprint", "repositoryIdentity", "defaultBranch", "adoptionMode", "projectClass", "profileDigest", "updatedAt"],
+        "properties": {
+          "projectId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+          "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "repositoryIdentity": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "defaultBranch": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "adoptionMode": { "type": "string", "enum": ["SHADOW", "ACTIVE"] },
+          "projectClass": { "type": "string", "enum": ["NEW_PROJECT", "EXISTING_PROJECT", "PARTIALLY_GOVERNED"] },
+          "profileDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "maxItems": 10000
+    },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}
