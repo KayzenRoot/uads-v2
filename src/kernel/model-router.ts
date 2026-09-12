@@ -4,11 +4,21 @@ import { readCurrentContextPack } from "./intelligence-persist.js";
 import type { ContextPack } from "./intelligence-types.js";
 import type { UadsPaths } from "../lib/workspace.js";
 import { capabilityRank, deriveModelRequirements, maxCapability, minimumReasoningFor, reasoningRank } from "./model-requirements.js";
-import { effectiveCapability } from "./model-runtime.js";
+import { conservativeRuntimeCapabilitySnapshot, effectiveCapability, persistRuntimeCapabilitySnapshot, RUNTIME_CAPABILITY_KEYS } from "./model-runtime.js";
+import { readHostCapabilityProjection } from "../adapters/host-capability-consumer.js";
+import type { HostAdapterId } from "../adapters/host-adapter-types.js";
+import { readModelRoutingState, type ModelRoutingStateRead } from "./model-lock.js";
 import {
+  MODEL_EXECUTION_PLAN_SCHEMA_VERSION,
   MODEL_ROUTING_POLICY_VERSION,
   MODEL_ROUTING_SCHEMA_VERSION,
   type CapabilityClass,
+  type CapabilityTruth,
+  type CapabilityTruthCapabilities,
+  type CapabilityTruthState,
+  type ModelLockPlanBlock,
+  type ModelRoutingMode,
+  type RoutingEnforcement,
   type ModelCapability,
   type ModelCandidateSummary,
   type ModelExecutionPlan,
@@ -21,7 +31,6 @@ import {
   type RuntimeCapabilitySnapshot,
 } from "./model-types.js";
 import { loadModelProfileRegistry } from "./model-registry.js";
-import { readRuntimeCapabilitySnapshot } from "./model-runtime.js";
 import type { WorkOrder } from "./types.js";
 
 export const MODEL_ROUTING_POLICY_DIGEST = sha256Hex(
@@ -46,6 +55,16 @@ const LATENCY_RANK: Record<ModelProfile["relativeLatencyClass"], number> = {
 };
 const ROLES: ModelRole[] = ["implementation", "review", "testing", "assurance"];
 
+export type ModelRoutingLockInput =
+  | { status: "ABSENT" }
+  | { status: "UNAVAILABLE"; reasonCodes?: string[] }
+  | {
+      status: "CURRENT";
+      mode: ModelRoutingMode;
+      locked: { profileId: string; providerId: string; modelId: string } | null;
+      lockRevision: number;
+    };
+
 export type ModelRoutingInput = {
   workOrder: WorkOrder;
   projectId?: string;
@@ -60,7 +79,19 @@ export type ModelRoutingInput = {
   blockedProviderIds?: string[];
   estimatedInputTokens?: number;
   requiredOutputTokens?: number;
+  /** Governed routing-mode/Model Lock state (M05-owned). Absent state means default autoroute. */
+  lockState?: ModelRoutingLockInput;
+  /** Model call targets per routing decision; anything other than exactly 1 is rejected. */
+  requestedModelTargets?: number;
 };
+
+export function modelRoutingLockInput(read: ModelRoutingStateRead): ModelRoutingLockInput {
+  if (read.status === "CURRENT") {
+    return { status: "CURRENT", mode: read.state.mode, locked: read.state.locked, lockRevision: read.state.lockRevision };
+  }
+  if (read.status === "UNAVAILABLE") return { status: "UNAVAILABLE", reasonCodes: read.reasonCodes };
+  return { status: "ABSENT" };
+}
 
 export type PersistedModelRoutingInput = {
   paths: UadsPaths;
@@ -76,6 +107,11 @@ export type PersistedModelRoutingInput = {
   estimatedInputTokens?: number;
   requiredOutputTokens?: number;
   schemaRoot?: string;
+  /** Explicit host adapter identity for capability acquisition; absent means conservative UNKNOWN. */
+  hostAdapterId?: HostAdapterId | null;
+  hostHome?: string;
+  /** Persist the evaluated capability runtime so dispatch currency checks stay coherent. */
+  persistRuntime?: boolean;
 };
 
 export function computeWorkOrderRoutingDigest(workOrder: WorkOrder): string {
@@ -248,6 +284,68 @@ function executionStrategy(selected: ModelProfile | null, runtime: RuntimeCapabi
   };
 }
 
+export const CAPABILITY_TRUTH_REASON_CODES = {
+  ADAPTER_UNSPECIFIED: "CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED",
+} as const;
+
+function capabilityTruthState(value: boolean | "unknown"): CapabilityTruthState {
+  if (value === true) return "SUPPORTED";
+  if (value === false) return "UNSUPPORTED";
+  return "UNKNOWN";
+}
+
+/**
+ * Pure derivation of the bounded capability truth recorded on a routing decision.
+ *
+ * Truth is derived from the runtime projection actually evaluated, never from adapter
+ * declarations or persisted legacy snapshots. The `host-managed` runtime identity means
+ * no adapter identity was specified for the routing surface (conservative UNKNOWN).
+ * BLOCKED host detection is not derivable from the frozen runtime snapshot contract and
+ * is therefore not emitted here; it stays non-enabling as UNKNOWN.
+ */
+export function deriveCapabilityTruth(runtime: RuntimeCapabilitySnapshot): CapabilityTruth {
+  const adapterId = runtime.adapterId === "host-managed" ? null : runtime.adapterId;
+  const capabilities = Object.fromEntries(
+    RUNTIME_CAPABILITY_KEYS.map((key) => [key, capabilityTruthState(runtime.capabilities[key])]),
+  ) as CapabilityTruthCapabilities;
+  const reasonCodes = adapterId === null ? [CAPABILITY_TRUTH_REASON_CODES.ADAPTER_UNSPECIFIED] : [];
+  return {
+    adapterId,
+    runtimeIdentityDigest: runtime.identityDigest,
+    subjectDigest: null,
+    adapterContractDigest: null,
+    provenanceConfidence: "unknown",
+    capabilities,
+    reasonCodes,
+  };
+}
+
+/**
+ * M05 capability acquisition boundary. Routing surfaces obtain capability truth only
+ * through the M03 host-capability consumer projection (explicit adapter identity). With
+ * a workspace paths input the reconciled WO-026 facade resolves stored/active PCCR
+ * evidence against the current basis; without an adapter identity the result is a
+ * conservative all-UNKNOWN snapshot. Legacy runtime snapshots and persisted capability
+ * files are never used as enabling truth and no placeholder state is created here.
+ */
+export function resolveRoutingCapabilityTruth(input: {
+  adapterId?: HostAdapterId | null;
+  hostHome?: string;
+  schemaRoot?: string;
+  paths?: UadsPaths;
+}): RuntimeCapabilitySnapshot {
+  if (!input.adapterId) {
+    return conservativeRuntimeCapabilitySnapshot();
+  }
+  const projection = readHostCapabilityProjection({
+    adapterId: input.adapterId,
+    detectionInput: input.hostHome ? { hostHome: input.hostHome } : {},
+    ...(input.paths ? { paths: input.paths } : {}),
+    schemaRoot: input.schemaRoot,
+  });
+  return projection.runtime;
+}
+
 export function routeModel(input: ModelRoutingInput): ModelExecutionPlan {
   if (input.workOrder.projectId !== (input.projectId ?? input.workOrder.projectId)) throw new Error("cross-project model routing rejected");
   if (input.registry.schemaVersion !== MODEL_ROUTING_SCHEMA_VERSION || input.runtime.schemaVersion !== MODEL_ROUTING_SCHEMA_VERSION) throw new Error("model routing schema/version mismatch");
@@ -261,27 +359,108 @@ export function routeModel(input: ModelRoutingInput): ModelExecutionPlan {
   const rejectedIds = new Set(rejections.map((item) => item.profileId));
   let eligible = candidates.filter((profile) => !rejectedIds.has(profile.profileId));
   eligible.sort((a, b) => compareCandidate(a, b, currentTier, currentRequirements.minimumReasoningClass, currentRequirements.estimatedInputTokens));
+  const autoEligibleProfileIds = eligible.map((profile) => profile.profileId);
 
   const escalationReasons = [...new Set([
     ...requirements.reasons.filter((reason) => reason.includes("ESCALATION")),
     ...(input.failureSignals?.explicitReasons ?? []),
     ...(priorTier && capabilityRank(priorTier) > capabilityRank(requirements.requiredCapabilityClass) ? ["MONOTONIC_PRIOR_FLOOR"] : []),
   ])];
-  const noConcreteProfileCompatibility = eligible.length === 0 && input.registry.profiles.length === 0 && capabilityRank(currentTier) <= capabilityRank("balanced") && input.workOrder.riskLevel !== "CRITICAL";
-  const selected = noConcreteProfileCompatibility ? null : (eligible[0] ?? null);
+  const lockInput: ModelRoutingLockInput = input.lockState ?? { status: "ABSENT" };
+  const routingMode: ModelRoutingMode = lockInput.status === "CURRENT" ? lockInput.mode : "QUALITY_FLOOR_AUTOROUTE";
+  const lockRevision = lockInput.status === "CURRENT" ? lockInput.lockRevision : 0;
+  const lockedIdentity = lockInput.status === "CURRENT" && lockInput.mode === "MODEL_LOCK" ? lockInput.locked : null;
+  const lockActive = lockInput.status === "CURRENT" && lockInput.mode === "MODEL_LOCK";
+  const routingStateUnavailable = lockInput.status === "UNAVAILABLE";
+  const requestedTargets = input.requestedModelTargets ?? 1;
+  const ensembleRejected = !Number.isInteger(requestedTargets) || requestedTargets !== 1;
+  const lockReasonCodes: string[] = [];
+  const lockedProfile = lockedIdentity
+    ? candidates.find((profile) => profile.profileId === lockedIdentity.profileId) ?? null
+    : null;
+  const lockRejection = lockedProfile ? profileRejection(lockedProfile, input, currentRequirements) : null;
+  if (lockActive && !lockedIdentity) lockReasonCodes.push("MODEL_LOCK_UNAVAILABLE", "MODEL_LOCK_IDENTITY_MISSING");
+  if (lockActive && lockedIdentity && !lockedProfile) {
+    lockReasonCodes.push("MODEL_LOCK_UNAVAILABLE", "MODEL_LOCK_ALIAS_UNSUPPORTED");
+    rejections.push(rejection(lockedIdentity.profileId, ["MODEL_LOCK_UNAVAILABLE", "MODEL_LOCK_ALIAS_UNSUPPORTED"], ["locked profile id does not resolve to an exact registry profile"]));
+  }
+  if (lockActive && lockedProfile && lockRejection) {
+    lockReasonCodes.push("MODEL_LOCK_UNAVAILABLE", ...lockRejection.reasonCodes);
+    rejections.push(rejection(lockedProfile.profileId, [...lockRejection.reasonCodes, "MODEL_LOCK_UNAVAILABLE"], [...lockRejection.reasons, "locked profile is not admissible for this routing decision"]));
+  }
+  if (lockActive) {
+    const suppressedFallbacks = autoEligibleProfileIds.filter((profileId) => profileId !== lockedIdentity?.profileId);
+    if (suppressedFallbacks.length > 0) lockReasonCodes.push("MODEL_LOCK_FALLBACK_FORBIDDEN");
+  }
+  let selected: ModelProfile | null;
+  let selectionMode: ModelExecutionPlan["selectionMode"] = "router";
+  let blockedReason: string | null = null;
+  let noConcreteProfileCompatibility = false;
+  if (ensembleRejected) {
+    selected = null;
+    eligible = [];
+    blockedReason = "ENSEMBLE_NOT_AUTHORIZED";
+  } else if (routingStateUnavailable) {
+    selected = null;
+    eligible = [];
+    blockedReason = "ROUTING_STATE_UNAVAILABLE";
+  } else if (lockActive) {
+    if (!lockedProfile || lockRejection) {
+      selected = null;
+      eligible = [];
+      blockedReason = "MODEL_LOCK_UNAVAILABLE";
+    } else {
+      selected = lockedProfile;
+      eligible = [lockedProfile];
+    }
+  } else {
+    noConcreteProfileCompatibility = eligible.length === 0 && input.registry.profiles.length === 0 && capabilityRank(currentTier) <= capabilityRank("balanced") && input.workOrder.riskLevel !== "CRITICAL";
+    selected = noConcreteProfileCompatibility ? null : (eligible[0] ?? null);
+    selectionMode = noConcreteProfileCompatibility ? "host-managed" : "router";
+    blockedReason = selected || noConcreteProfileCompatibility ? null : "NO_ELIGIBLE_MODEL";
+  }
   const status: ModelExecutionPlan["status"] = selected || noConcreteProfileCompatibility ? "SELECTED" : "BLOCKED";
-  const selectionMode: ModelExecutionPlan["selectionMode"] = noConcreteProfileCompatibility ? "host-managed" : "router";
-  const blockedReason = status === "BLOCKED" ? "NO_ELIGIBLE_MODEL" : null;
   const selectionReasonCodes: string[] = [];
   if (noConcreteProfileCompatibility) selectionReasonCodes.push("HOST_MANAGED_COMPATIBILITY", "NO_CONCRETE_PROFILE", "QUALITY_FLOOR_RETAINED");
   if (selected) selectionReasonCodes.push("MINIMUM_CAPABILITY_FLOOR", "REASONING_ADEQUATE", "CONTEXT_HEADROOM", "RELATIVE_COST_PREFERENCE", "RELATIVE_LATENCY_PREFERENCE", "LEXICOGRAPHIC_PROFILE_ID_TIE_BREAK");
-  if (status === "BLOCKED") selectionReasonCodes.push("NO_ELIGIBLE_MODEL", "FAIL_CLOSED");
-  const fallbackProfileIds = selected ? eligible.slice(1).map((profile) => profile.profileId) : [];
+  if (selected && lockActive) selectionReasonCodes.push("MODEL_LOCK_ENFORCED");
+  if (routingMode === "CHEAPEST_QUALIFIED" && selected) {
+    const cheapestRank = Math.min(...eligible.map((profile) => COST_RANK[profile.relativeCostClass]));
+    if (COST_RANK[selected.relativeCostClass] === cheapestRank && selected.relativeCostClass !== "unknown") {
+      selectionReasonCodes.push("CHEAPEST_QUALIFIED_SELECTED");
+    } else {
+      selectionReasonCodes.push("CHEAPEST_QUALIFIED_COST_EVIDENCE_UNKNOWN");
+    }
+  }
+  if (status === "BLOCKED") selectionReasonCodes.push(blockedReason ?? "NO_ELIGIBLE_MODEL", "FAIL_CLOSED");
+  const fallbackProfileIds = selected && !lockActive ? eligible.slice(1).map((profile) => profile.profileId) : [];
+  const routingEnforcement: RoutingEnforcement = routingStateUnavailable
+    ? { state: "UNKNOWN", reasonCodes: ["ROUTING_STATE_UNAVAILABLE"] }
+    : lockActive
+      ? status === "SELECTED" && selected?.profileId === lockedIdentity?.profileId
+        ? { state: "ENFORCED", reasonCodes: ["MODEL_LOCK_ENFORCED"] }
+        : status === "SELECTED"
+          ? { state: "MISMATCH", reasonCodes: ["MODEL_LOCK_MISMATCH", "FAIL_CLOSED_INVESTIGATION"] }
+          : { state: "UNKNOWN", reasonCodes: ["NO_HOST_EXECUTION_EVIDENCE"] }
+      : { state: "UNKNOWN", reasonCodes: ["NO_ACTIVE_LOCK", "NO_HOST_EXECUTION_EVIDENCE"] };
+  const modelLock: ModelLockPlanBlock = {
+    active: lockActive,
+    mode: routingMode,
+    revision: lockRevision,
+    profileId: lockedIdentity?.profileId ?? null,
+    providerId: lockedIdentity?.providerId ?? null,
+    modelId: lockedIdentity?.modelId ?? null,
+    reasonCodes: [...new Set(lockReasonCodes)],
+  };
+  const capabilityTruth = deriveCapabilityTruth(input.runtime);
   const workOrderDigest = computeWorkOrderRoutingDigest(input.workOrder);
-  const planId = newPrefixedId("mrp", `${input.workOrder.projectId}:${input.workOrder.workOrderId}:${workOrderDigest}:${input.runtime.identityDigest}:${input.registry.registryDigest}:${MODEL_ROUTING_POLICY_DIGEST}:${currentTier}:${input.changeDigest ?? "none"}`);
+  // Lock-state availability is part of plan identity: an UNAVAILABLE routing state must
+  // never share a planId (and history record) with an ABSENT autoroute decision that
+  // happens to carry the same default mode/revision. CURRENT always carries revision >= 1.
+  const planId = newPrefixedId("mrp", `${input.workOrder.projectId}:${input.workOrder.workOrderId}:${workOrderDigest}:${input.runtime.identityDigest}:${input.registry.registryDigest}:${MODEL_ROUTING_POLICY_DIGEST}:${currentTier}:${input.changeDigest ?? "none"}:${routingMode}:${lockRevision}:${lockInput.status}`);
   const plan: ModelExecutionPlan = {
     schema: "uads.model-execution-plan",
-    schemaVersion: MODEL_ROUTING_SCHEMA_VERSION,
+    schemaVersion: MODEL_EXECUTION_PLAN_SCHEMA_VERSION,
     planId,
     projectId: input.projectId ?? input.workOrder.projectId,
     workOrderId: input.workOrder.workOrderId,
@@ -318,18 +497,39 @@ export function routeModel(input: ModelRoutingInput): ModelExecutionPlan {
     selectionMode,
     status,
     blockedReason,
+    routingMode,
+    modelLock,
+    capabilityTruth,
+    routingEnforcement,
   };
   return plan;
 }
 
+/**
+ * Persisted routing entry point used by production surfaces: acquires capability truth
+ * through the M05 boundary (projection when an adapter identity is explicit, conservative
+ * all-UNKNOWN otherwise), reads governed routing state fail-closed, and persists the
+ * evaluated runtime so dispatch-time currency checks stay coherent.
+ */
 export function routeWorkOrder(input: PersistedModelRoutingInput): ModelExecutionPlan {
   const registry = loadModelProfileRegistry(input.paths, input.schemaRoot);
-  const runtime = readRuntimeCapabilitySnapshot(input.paths, "generic-runtime", input.schemaRoot);
+  const projectId = input.projectId ?? input.workOrder.projectId;
+  const evaluatedRuntime = resolveRoutingCapabilityTruth({
+    adapterId: input.hostAdapterId ?? null,
+    hostHome: input.hostHome,
+    paths: input.paths,
+    schemaRoot: input.schemaRoot,
+  });
+  const runtime = input.persistRuntime === false
+    ? evaluatedRuntime
+    : persistRuntimeCapabilitySnapshot(input.paths, evaluatedRuntime, input.schemaRoot);
   const contextPack = input.contextPack ?? readCurrentContextPack(input.paths, input.schemaRoot);
   return routeModel({
     ...input,
+    projectId,
     registry,
     runtime,
     contextPack,
+    lockState: modelRoutingLockInput(readModelRoutingState(input.paths, projectId, input.schemaRoot)),
   });
 }

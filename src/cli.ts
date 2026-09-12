@@ -25,6 +25,10 @@ import {
   runCapabilitiesStatusCommand,
   runModelsExplainCommand,
   runModelsListCommand,
+  runModelsLockClearCommand,
+  runModelsLockRecoverCommand,
+  runModelsLockSetCommand,
+  runModelsLockShowCommand,
   runModelsRegisterCommand,
   runModelsRouteCommand,
   runModelsStatusCommand,
@@ -110,7 +114,11 @@ models
   .command("status")
   .description("Show model registry, runtime identity, and current routing plan")
   .option("--json", "JSON output")
-  .action((options: { json?: boolean }) => { process.stdout.write(runModelsStatusCommand({ json: options.json })); });
+  .option("--adapter <id>", "host adapter id used for proof-aware capability truth")
+  .option("--host-home <path>", "host home directory override")
+  .action((options: { json?: boolean; adapter?: string; hostHome?: string }) => {
+    process.stdout.write(runModelsStatusCommand({ json: options.json, adapter: options.adapter, hostHome: options.hostHome }));
+  });
 models
   .command("explain")
   .description("Explain a persisted model routing plan")
@@ -122,13 +130,40 @@ models
   .description("Route a Work Order using the current global registry and runtime snapshot")
   .requiredOption("--work-order <id>", "Work Order id")
   .option("--json", "JSON output")
-  .action((options: { workOrder: string; json?: boolean }) => { process.stdout.write(runModelsRouteCommand({ workOrderId: options.workOrder, json: options.json })); });
+  .option("--adapter <id>", "host adapter id used for proof-aware capability truth")
+  .option("--host-home <path>", "host home directory override")
+  .action((options: { workOrder: string; json?: boolean; adapter?: string; hostHome?: string }) => {
+    process.stdout.write(runModelsRouteCommand({ workOrderId: options.workOrder, json: options.json, adapter: options.adapter, hostHome: options.hostHome }));
+  });
 models
   .command("register")
   .description("Register safe JSON model profile data; never executes the input")
   .requiredOption("--file <path>", "safe JSON profile or profile array")
   .option("--json", "JSON output")
   .action((options: { file: string; json?: boolean }) => { process.stdout.write(runModelsRegisterCommand({ filePath: options.file, json: options.json })); });
+
+const modelsLock = models.command("lock").description("Governed Model Lock state (workspace-scoped, revision-audited)");
+modelsLock
+  .command("show")
+  .description("Show the current Model Lock state, mode, and revision audit")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => { process.stdout.write(runModelsLockShowCommand({ json: options.json })); });
+modelsLock
+  .command("set")
+  .description("Set a hard Model Lock to one registered profile id")
+  .requiredOption("--profile <id>", "registered model profile id")
+  .option("--json", "JSON output")
+  .action((options: { profile: string; json?: boolean }) => { process.stdout.write(runModelsLockSetCommand({ profileId: options.profile, json: options.json })); });
+modelsLock
+  .command("clear")
+  .description("Clear the Model Lock back to QUALITY_FLOOR_AUTOROUTE with an auditable revision")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => { process.stdout.write(runModelsLockClearCommand({ json: options.json })); });
+modelsLock
+  .command("recover")
+  .description("Recover from corrupt Model Lock state by archiving raw bytes and resetting explicitly")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => { process.stdout.write(runModelsLockRecoverCommand({ json: options.json })); });
 
 const capabilities = program.command("capabilities").description("Runtime/host capability negotiation");
 capabilities

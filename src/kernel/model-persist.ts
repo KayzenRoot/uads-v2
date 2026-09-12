@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { atomicWriteJson, readJsonIfValid, sidecarJsonPath } from "../lib/atomic-write.js";
-import { assertSchema } from "../lib/json-schema.js";
+import { assertSchema, validateAgainstSchema } from "../lib/json-schema.js";
 import { containsAbsoluteHostPath, containsUnredactedSecret } from "../lib/secrets.js";
 import { sanitizeOperationalValue } from "../lib/safe-persist.js";
 import type { UadsPaths } from "../lib/workspace.js";
 import { routeWorkOrder } from "./model-router.js";
-import type { ModelExecutionPlan } from "./model-types.js";
+import { MODEL_EXECUTION_PLAN_SCHEMA_VERSION, type ModelExecutionPlan } from "./model-types.js";
 
 export class ModelRoutingStateError extends Error {
   constructor(message: string) {
@@ -44,16 +44,50 @@ export function readModelExecutionPlan(paths: UadsPaths, planId: string, schemaR
   return parsed.value;
 }
 
-export function readCurrentModelExecutionPlan(paths: UadsPaths, schemaRoot?: string): ModelExecutionPlan | null {
-  const parsed = readJsonIfValid<ModelExecutionPlan>(paths.currentModelRouting);
-  if (!parsed.ok) return null;
-  assertSafeModelPlan(parsed.value);
-  try {
-    assertSchema("model-execution-plan.schema.json", parsed.value, schemaRoot);
-  } catch (error) {
-    throw new ModelRoutingStateError(`current model execution plan is corrupt: ${error instanceof Error ? error.message : String(error)}`);
+export type CurrentModelPlanRead =
+  | { status: "CURRENT"; plan: ModelExecutionPlan }
+  | { status: "LEGACY"; observedSchemaVersion: string | null; reasonCode: "PLAN_SCHEMA_LEGACY" }
+  | { status: "UNAVAILABLE"; reasonCodes: string[]; message: string };
+
+/**
+ * Truthful current-plan read for status/cockpit surfaces. Never throws: a persisted plan
+ * with a prior schema version degrades to LEGACY (no silent upcast) and unreadable or
+ * invalid content degrades to UNAVAILABLE with explicit reason codes.
+ */
+export function readCurrentModelExecutionPlanState(paths: UadsPaths, schemaRoot?: string): CurrentModelPlanRead {
+  const parsed = readJsonIfValid<unknown>(paths.currentModelRouting);
+  if (!parsed.ok) {
+    return { status: "UNAVAILABLE", reasonCodes: ["PLAN_UNAVAILABLE"], message: parsed.error };
   }
-  return parsed.value;
+  try {
+    assertSafeModelPlan(parsed.value);
+  } catch (error) {
+    return {
+      status: "UNAVAILABLE",
+      reasonCodes: ["PLAN_UNAVAILABLE", "PLAN_UNSAFE_CONTENT"],
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+  const errors = validateAgainstSchema("model-execution-plan.schema.json", parsed.value, schemaRoot);
+  if (errors.length > 0) {
+    const observed = typeof parsed.value === "object" && parsed.value !== null
+      ? (parsed.value as { schemaVersion?: unknown }).schemaVersion
+      : null;
+    if (observed !== MODEL_EXECUTION_PLAN_SCHEMA_VERSION) {
+      return {
+        status: "LEGACY",
+        observedSchemaVersion: typeof observed === "string" ? observed : null,
+        reasonCode: "PLAN_SCHEMA_LEGACY",
+      };
+    }
+    return { status: "UNAVAILABLE", reasonCodes: ["PLAN_UNAVAILABLE", "PLAN_CORRUPT"], message: errors.join("; ") };
+  }
+  return { status: "CURRENT", plan: parsed.value as ModelExecutionPlan };
+}
+
+export function readCurrentModelExecutionPlan(paths: UadsPaths, schemaRoot?: string): ModelExecutionPlan | null {
+  const read = readCurrentModelExecutionPlanState(paths, schemaRoot);
+  return read.status === "CURRENT" ? read.plan : null;
 }
 
 export function routeAndPersistModelExecutionPlan(input: Parameters<typeof routeWorkOrder>[0]): ModelExecutionPlan {

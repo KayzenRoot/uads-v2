@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/model-routing-state-revision.schema.json",
+  "title": "UADS Model Routing State Revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schemaVersion", "projectId", "lockRevision", "action", "mode", "locked", "previousMode", "previousRevision", "previousStateDigest", "registryDigest", "updatedAt", "stateDigest", "recordDigest"],
+  "properties": {
+    "schema": { "const": "uads.model-routing-state-revision" },
+    "schemaVersion": { "const": "0.1.0" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "lockRevision": { "type": "integer", "minimum": 1 },
+    "action": { "enum": ["SET_LOCK", "SET_MODE", "CLEAR_LOCK", "OPERATOR_RECOVERY"] },
+    "mode": { "enum": ["MODEL_LOCK", "CHEAPEST_QUALIFIED", "QUALITY_FLOOR_AUTOROUTE"] },
+    "locked": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["profileId", "providerId", "modelId"],
+      "properties": {
+        "profileId": { "type": "string", "minLength": 1 },
+        "providerId": { "type": "string", "minLength": 1 },
+        "modelId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "previousMode": { "type": ["string", "null"], "enum": ["MODEL_LOCK", "CHEAPEST_QUALIFIED", "QUALITY_FLOOR_AUTOROUTE", null] },
+    "previousRevision": { "type": ["integer", "null"], "minimum": 0 },
+    "previousStateDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "registryDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "updatedAt": { "type": "string", "minLength": 1 },
+    "stateDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "recordDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

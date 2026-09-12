@@ -4,8 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createModelProfileRegistry, addModelProfiles, normalizeModelProfile } from "../kernel/model-registry.js";
 import { computeWorkOrderRoutingDigest, routeModel } from "../kernel/model-router.js";
-import { conservativeRuntimeCapabilitySnapshot, computeRuntimeIdentityDigest } from "../kernel/model-runtime.js";
-import { isModelExecutionPlanCurrent } from "../kernel/model-persist.js";
+import { computeRuntimeIdentityDigest, conservativeRuntimeCapabilitySnapshot, RUNTIME_CAPABILITY_KEYS } from "../kernel/model-runtime.js";
+import { isModelExecutionPlanCurrent, persistModelExecutionPlan, readCurrentModelExecutionPlanState } from "../kernel/model-persist.js";
 import type { ModelProfile, RuntimeCapabilitySnapshot } from "../kernel/model-types.js";
 import type { ContextPack } from "../kernel/intelligence-types.js";
 import type { WorkOrder } from "../kernel/types.js";
@@ -161,6 +161,96 @@ function runCase(id: string): void {
     assertEval(unconstrained.status === "SELECTED" && unconstrained.execution.parallel === true, "host runtime parallel capability was not selected");
     const constrained = route([profile("serial-only", "economy", { constraints: { maxConcurrency: 1 } })], workOrder(), runtime({ modelSelection: true, subagents: false, parallelAgents: true }));
     assertEval(constrained.status === "SELECTED" && constrained.execution.parallel === false, "maxConcurrency=1 did not disable parallel execution");
+  } else if (id === "MR23") {
+    const profiles = [profile("economy", "economy"), profile("balanced", "balanced", { relativeCostClass: "high" }), profile("strong", "strong")];
+    const unlocked = route(profiles);
+    assertEval(unlocked.selectedProfileId === "economy", "unlocked baseline did not prefer economy");
+    const locked = route(profiles, workOrder(), capableRuntime(), { lockState: { status: "CURRENT", mode: "MODEL_LOCK", locked: { profileId: "balanced", providerId: "fixture-provider", modelId: "fixture-model-balanced" }, lockRevision: 3 } });
+    assertEval(locked.status === "SELECTED" && locked.selectedProfileId === "balanced", "active Model Lock did not force the locked profile");
+    assertEval(locked.modelLock.active === true && locked.modelLock.revision === 3 && locked.modelLock.profileId === "balanced", "Model Lock block was not recorded");
+    assertEval(locked.routingEnforcement.state === "ENFORCED" && locked.selectionReasonCodes.includes("MODEL_LOCK_ENFORCED"), "enforcement was not projected as ENFORCED");
+    assertEval(locked.fallbackProfileIds.length === 0, "locked routing exposed fallback substitution");
+    assertEval(locked.modelLock.reasonCodes.includes("MODEL_LOCK_FALLBACK_FORBIDDEN"), "suppressed fallbacks were not recorded");
+  } else if (id === "MR24") {
+    const profiles = [profile("economy", "economy"), profile("balanced", "balanced")];
+    const missing = route(profiles, workOrder(), capableRuntime(), { lockState: { status: "CURRENT", mode: "MODEL_LOCK", locked: { profileId: "absent", providerId: "fixture-provider", modelId: "fixture-model-absent" }, lockRevision: 5 } });
+    assertEval(missing.status === "BLOCKED" && missing.blockedReason === "MODEL_LOCK_UNAVAILABLE", "unresolvable lock did not fail closed");
+    assertEval(missing.selectedProfileId === null && missing.fallbackProfileIds.length === 0 && missing.eligibleCandidates.length === 0, "unresolvable lock substituted another profile");
+    assertEval(missing.modelLock.reasonCodes.includes("MODEL_LOCK_ALIAS_UNSUPPORTED"), "alias-unsupported reason was not recorded");
+    const inadmissible = route([profile("tiny", "economy", { contextWindowTokens: 1_000 }), profile("ok", "economy")], workOrder(), capableRuntime(), { estimatedInputTokens: 600, requiredOutputTokens: 600, lockState: { status: "CURRENT", mode: "MODEL_LOCK", locked: { profileId: "tiny", providerId: "fixture-provider", modelId: "fixture-model-tiny" }, lockRevision: 6 } });
+    assertEval(inadmissible.status === "BLOCKED" && inadmissible.blockedReason === "MODEL_LOCK_UNAVAILABLE", "inadmissible locked profile did not fail closed");
+    assertEval(inadmissible.rejections.some((item) => item.profileId === "tiny" && item.reasonCodes.includes("MODEL_LOCK_UNAVAILABLE") && item.reasonCodes.includes("CONTEXT_WINDOW_TOO_SMALL")), "inadmissible lock rejection detail missing");
+    assertEval(inadmissible.routingEnforcement.state === "UNKNOWN" && inadmissible.routingEnforcement.reasonCodes.includes("NO_HOST_EXECUTION_EVIDENCE"), "blocked lock did not render UNKNOWN enforcement");
+  } else if (id === "MR25") {
+    const result = route([profile("economy", "economy")], workOrder(), capableRuntime(), { lockState: { status: "UNAVAILABLE", reasonCodes: ["ROUTING_STATE_DIGEST_INVALID"] } });
+    assertEval(result.status === "BLOCKED" && result.blockedReason === "ROUTING_STATE_UNAVAILABLE", "unavailable routing state did not fail closed");
+    assertEval(result.modelLock.active === false && result.routingMode === "QUALITY_FLOOR_AUTOROUTE" && result.modelLock.revision === 0, "unavailable routing state silently unlocked routing");
+    assertEval(result.routingEnforcement.state === "UNKNOWN" && result.routingEnforcement.reasonCodes.includes("ROUTING_STATE_UNAVAILABLE"), "unavailable routing state rendered an enforcement claim");
+    assertEval(result.selectedProfileId === null && result.fallbackProfileIds.length === 0, "unavailable routing state still produced a target");
+  } else if (id === "MR26") {
+    const profiles = [profile("economy", "economy"), profile("balanced", "balanced")];
+    const broadcast = route(profiles, workOrder(), capableRuntime(), { requestedModelTargets: 2 });
+    assertEval(broadcast.status === "BLOCKED" && broadcast.blockedReason === "ENSEMBLE_NOT_AUTHORIZED", "broadcast request was not rejected");
+    assertEval(broadcast.selectedProfileId === null && broadcast.eligibleCandidates.length === 0, "broadcast request still produced a model target");
+    const zero = route(profiles, workOrder(), capableRuntime(), { requestedModelTargets: 0 });
+    assertEval(zero.status === "BLOCKED" && zero.blockedReason === "ENSEMBLE_NOT_AUTHORIZED", "zero-target request was accepted");
+    const single = route(profiles);
+    assertEval(single.status === "SELECTED" && single.selectedProfileId === "economy", "default single-target routing regressed");
+    const selectedModelIds = new Set(single.roleSelections.map((item) => item.modelId).filter((value): value is string => Boolean(value)));
+    assertEval(selectedModelIds.size === 1, "routing emitted more than one model target");
+  } else if (id === "MR27") {
+    const order = workOrder({ tokenBudget: { ...workOrder().tokenBudget, capabilityClass: "balanced" } });
+    const priced = route([profile("cheap", "balanced", { relativeCostClass: "low" }), profile("mid", "balanced", { relativeCostClass: "medium" }), profile("high", "balanced", { relativeCostClass: "high" })], order, capableRuntime(), { lockState: { status: "CURRENT", mode: "CHEAPEST_QUALIFIED", locked: null, lockRevision: 2 } });
+    assertEval(priced.routingMode === "CHEAPEST_QUALIFIED" && priced.selectedProfileId === "cheap", "cheapest qualified did not select the least-cost admissible profile");
+    assertEval(priced.selectionReasonCodes.includes("CHEAPEST_QUALIFIED_SELECTED"), "objective price evidence did not produce a cheapest claim");
+    const unpriced = route([profile("opaque-a", "balanced", { relativeCostClass: "unknown" }), profile("opaque-b", "balanced", { relativeCostClass: "unknown" })], order, capableRuntime(), { lockState: { status: "CURRENT", mode: "CHEAPEST_QUALIFIED", locked: null, lockRevision: 2 } });
+    assertEval(unpriced.status === "SELECTED" && !unpriced.selectionReasonCodes.includes("CHEAPEST_QUALIFIED_SELECTED"), "unknown price produced a cheapest claim");
+    assertEval(unpriced.selectionReasonCodes.includes("CHEAPEST_QUALIFIED_COST_EVIDENCE_UNKNOWN"), "unknown price evidence was not surfaced");
+  } else if (id === "MR28") {
+    const explicit = route([profile("economy", "economy")]);
+    assertEval(explicit.capabilityTruth.adapterId === "eval-adapter", "explicit adapter identity was not carried into capability truth");
+    assertEval(explicit.capabilityTruth.capabilities.modelSelection === "SUPPORTED", "supported capability was not projected as SUPPORTED");
+    assertEval(!explicit.capabilityTruth.reasonCodes.includes("CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED"), "explicit adapter truth was marked unspecified");
+    const unspecified = route([profile("economy", "economy")], workOrder(), conservativeRuntimeCapabilitySnapshot());
+    assertEval(unspecified.status === "BLOCKED", "adapter-unspecified runtime was treated as enabling");
+    assertEval(unspecified.capabilityTruth.adapterId === null && unspecified.capabilityTruth.reasonCodes.includes("CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED"), "adapter-unspecified truth was not flagged");
+    assertEval(Object.values(unspecified.capabilityTruth.capabilities).every((value) => value === "UNKNOWN"), "conservative snapshot produced non-UNKNOWN capability truth");
+    assertEval(Object.keys(unspecified.capabilityTruth.capabilities).sort().join(",") === [...RUNTIME_CAPABILITY_KEYS].sort().join(","), "capability truth key set drifted");
+  } else if (id === "MR29") {
+    const first = route([profile("economy", "economy")]);
+    const second = route([profile("economy", "economy")]);
+    assertEval(first.schemaVersion === "0.9.0", "plan schema version did not advance to 0.9.0");
+    assertEval(capableRuntime().schemaVersion === "0.8.0", "runtime capability snapshot contract version moved");
+    assertEval(first.routingMode === "QUALITY_FLOOR_AUTOROUTE" && first.modelLock.active === false && first.modelLock.revision === 0, "default routing mode/lock block was not recorded");
+    assertEval(first.routingEnforcement.state === "UNKNOWN" && first.routingEnforcement.reasonCodes.includes("NO_ACTIVE_LOCK"), "inactive lock enforcement truth was not UNKNOWN");
+    assertEval(first.planId === second.planId, "identical inputs produced different plan ids");
+    const text = JSON.stringify(first);
+    assertEval(!text.includes("ghp_"), "plan leaked secret-like data");
+    const backslash = String.fromCharCode(92);
+    assertEval(!text.includes("C:" + backslash) && !text.includes("/home/") && !text.includes("/Users/"), "plan leaked absolute host paths");
+  } else if (id === "MR30") {
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-model-eval-plan-"));
+    const paths = ensureWorkspace("model-eval-plan-state", home);
+    fs.writeFileSync(paths.currentModelRouting, JSON.stringify({ schema: "uads.model-execution-plan", schemaVersion: "0.8.0" }), "utf8");
+    const legacy = readCurrentModelExecutionPlanState(paths);
+    assertEval(legacy.status === "LEGACY" && legacy.observedSchemaVersion === "0.8.0" && legacy.reasonCode === "PLAN_SCHEMA_LEGACY", "prior-schema plan did not degrade truthfully");
+    fs.writeFileSync(paths.currentModelRouting, "{ not-json", "utf8");
+    const corrupt = readCurrentModelExecutionPlanState(paths);
+    assertEval(corrupt.status === "UNAVAILABLE" && corrupt.reasonCodes.includes("PLAN_UNAVAILABLE"), "corrupt plan was not reported unavailable");
+    fs.writeFileSync(paths.currentModelRouting, JSON.stringify({ schema: "uads.model-execution-plan", schemaVersion: "0.9.0", note: "C:" + String.fromCharCode(92) + "Users" + String.fromCharCode(92) + "operator" }), "utf8");
+    const unsafe = readCurrentModelExecutionPlanState(paths);
+    assertEval(unsafe.status === "UNAVAILABLE" && unsafe.reasonCodes.includes("PLAN_UNSAFE_CONTENT"), "unsafe plan content was not rejected");
+    const plan = route([profile("economy", "economy")]);
+    persistModelExecutionPlan(paths, plan);
+    const current = readCurrentModelExecutionPlanState(paths);
+    assertEval(current.status === "CURRENT" && current.plan.planId === plan.planId, "current-schema plan was not readable after persist");
+  } else if (id === "MR31") {
+    const proven = profile("model-v1", "balanced");
+    const unproven = profile("model-v2", "balanced", { supports: { ...profile("nested", "balanced").supports, toolCalling: false } });
+    const order = workOrder({ objective: "Execute a shell command and report the result." });
+    const result = route([proven, unproven], order);
+    assertEval(result.selectedProfileId === "model-v1", "unproven successor model was authorized by ordering");
+    assertEval(result.rejections.some((item) => item.profileId === "model-v2" && item.reasonCodes.includes("RUNTIME_CAPABILITY_UNAVAILABLE")), "unproven successor rejection was not recorded");
   } else {
     throw new Error(`unknown model-routing eval case ${id}`);
   }

@@ -67,13 +67,14 @@ import { assertSpecialistSelectionBoundToWorkOrder, SpecialistSelectionPersisten
 import { assertSafeRelativeProjectPath } from "./safe-path.js";
 import { classifyChangedPath } from "./scope-guard.js";
 import { loadModelProfileRegistry } from "./model-registry.js";
-import { computeWorkOrderRoutingDigest, routeModel } from "./model-router.js";
+import { computeWorkOrderRoutingDigest, modelRoutingLockInput, routeModel } from "./model-router.js";
 import { isModelExecutionPlanCurrent, persistModelExecutionPlan, readCurrentModelExecutionPlan } from "./model-persist.js";
 import { MODEL_ROUTING_POLICY_DIGEST } from "./model-router.js";
 import {
   computeRuntimeIdentityDigest,
   persistRuntimeCapabilitySnapshot,
 } from "./model-runtime.js";
+import { DEFAULT_MODEL_ROUTING_MODE, readModelRoutingState } from "./model-lock.js";
 import type { ModelExecutionPlan, RuntimeCapabilitySnapshot } from "./model-types.js";
 import type { Checkpoint, ContextPlan, ContextRadius, RepositoryMap, WorkOrder } from "./types.js";
 import { IMPLEMENTER_ROLE, INDEPENDENT_REVIEWER_ROLE } from "./types.js";
@@ -459,9 +460,29 @@ function ensureCurrentModelPlan(input: {
   const registry = loadModelProfileRegistry(input.ctx.paths, input.schemaRoot);
   const runtime = input.runtime;
   const current = readCurrentModelExecutionPlan(input.ctx.paths, input.schemaRoot);
+  const lockState = modelRoutingLockInput(readModelRoutingState(input.ctx.paths, input.ctx.projectId, input.schemaRoot));
   const contextPack = input.contextPlan.contextPackId
     ? readCurrentContextPack(input.ctx.paths, input.schemaRoot)
     : null;
+  if (lockState.status === "UNAVAILABLE") {
+    // CR-01: an unreadable routing state must never reuse a persisted plan. A stored
+    // autoroute revision-0 plan proves nothing about a lock that may exist, so currency
+    // re-derives fail-closed and routeModel() returns BLOCKED/ROUTING_STATE_UNAVAILABLE.
+    const blocked = routeModel({
+      projectId: input.ctx.projectId,
+      workOrder: input.workOrder,
+      registry,
+      runtime,
+      contextPack,
+      previousPlan: current,
+      changeDigest: input.changeDigest,
+      lockState,
+    });
+    return persistModelExecutionPlan(input.ctx.paths, blocked, input.schemaRoot);
+  }
+  // Only true ABSENT state uses the governed default; UNAVAILABLE never reaches here.
+  const currentMode = lockState.status === "CURRENT" ? lockState.mode : DEFAULT_MODEL_ROUTING_MODE;
+  const currentLockRevision = lockState.status === "CURRENT" ? lockState.lockRevision : 0;
   const contextHintsCurrent =
     current &&
     current.cacheHints.staticLayerDigest === (contextPack?.staticLayerDigest ?? null) &&
@@ -470,6 +491,8 @@ function ensureCurrentModelPlan(input: {
   if (
     current &&
     contextHintsCurrent &&
+    current.routingMode === currentMode &&
+    current.modelLock.revision === currentLockRevision &&
     isModelExecutionPlanCurrent({
       plan: current,
       projectId: input.ctx.projectId,
@@ -491,6 +514,7 @@ function ensureCurrentModelPlan(input: {
     contextPack,
     previousPlan: current,
     changeDigest: input.changeDigest,
+    lockState,
   });
   return persistModelExecutionPlan(input.ctx.paths, next, input.schemaRoot);
 }
