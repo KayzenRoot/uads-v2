@@ -11,7 +11,7 @@ import { gefProjectDirectory } from "../gef/storage.js";
 import { atomicWriteJson, readJsonIfValid } from "../lib/atomic-write.js";
 import { assertSchema } from "../lib/json-schema.js";
 import { sanitizeOperationalValue } from "../lib/safe-persist.js";
-import { buildUpir, assertSafeTaskId, type Upir } from "../gef/upir.js";
+import { buildUpir, assertSafeTaskId, normalizeRepoRelativePath, type Upir } from "../gef/upir.js";
 import { classifyTask } from "../gef/task-classifier.js";
 import { compileContext, CONTEXT_PRODUCER_VERSION, CONTEXT_TOOLCHAIN_BASIS, type ContextSlice } from "../gef/context-compiler.js";
 import { contextCasGet, contextCasKey, contextCasPut, sliceContentDigest } from "../gef/context-cas.js";
@@ -119,9 +119,76 @@ type W1Manifest = {
   baseSha?: string;
   budgets?: Upir["budgets"];
   mode?: PromptMode;
+  architecturePaths?: string[];
+  broadGovernancePaths?: string[];
   decisionCapsule?: DecisionCapsule;
   patchRecipe?: PatchRecipe;
 };
+
+export type W1ArchitectureBinding = {
+  schema: "uads.gef-w1-architecture-binding";
+  schemaVersion: "0.1.0";
+  taskId: string;
+  architecturePaths: string[];
+  broadGovernancePaths: string[];
+};
+
+export const W1_MAX_ARCHITECTURE_PATHS = 8 as const;
+export const W1_MAX_BROAD_GOVERNANCE_PATHS = 4 as const;
+const UADS_FALLBACK_ARCHITECTURE_PATHS = ["AGENTS.md", "docs/v2/04-ARCHITECTURE.md"];
+
+function sanitizeProjectPaths(value: unknown, max: number, field: string): string[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new Error(`${field}_BOUND_REJECTED`);
+  if (value.length > max) throw new Error(`${field}_BOUND_REJECTED`);
+  const normalized = value.map((item) => {
+    if (typeof item !== "string") throw new Error(`${field}_BOUND_REJECTED`);
+    return normalizeRepoRelativePath(item);
+  });
+  return [...new Set(normalized)].sort().slice(0, max);
+}
+
+function assertArchitectureBinding(value: unknown): asserts value is W1ArchitectureBinding {
+  const record = value as W1ArchitectureBinding;
+  if (!record || typeof record !== "object") throw new Error("ARCHITECTURE_BINDING_CORRUPT");
+  if (record.schema !== "uads.gef-w1-architecture-binding" || record.schemaVersion !== "0.1.0") {
+    throw new Error("ARCHITECTURE_BINDING_CORRUPT");
+  }
+  assertSafeTaskId(record.taskId);
+  record.architecturePaths = sanitizeProjectPaths(record.architecturePaths, W1_MAX_ARCHITECTURE_PATHS, "ARCHITECTURE_PATHS");
+  record.broadGovernancePaths = sanitizeProjectPaths(record.broadGovernancePaths, W1_MAX_BROAD_GOVERNANCE_PATHS, "BROAD_GOVERNANCE_PATHS");
+}
+
+export type ArchitectureResolution = {
+  architecturePaths: string[];
+  broadGovernancePaths: string[];
+  basis: "explicit" | "profile" | "uads-fallback" | "none";
+};
+
+export function resolveArchitecturePaths(repoRoot: string, cwd: string, binding: W1ArchitectureBinding | null): ArchitectureResolution {
+  const existsFile = (relative: string): boolean => {
+    try {
+      return fs.statSync(path.join(repoRoot, ...relative.split("/"))).isFile();
+    } catch {
+      return false;
+    }
+  };
+  if (binding && (binding.architecturePaths.length > 0 || binding.broadGovernancePaths.length > 0)) {
+    return { architecturePaths: binding.architecturePaths.filter(existsFile), broadGovernancePaths: binding.broadGovernancePaths.filter(existsFile), basis: "explicit" };
+  }
+  try {
+    const project = readGefProject(cwd);
+    const owned = project.status === "VALID" ? (project.profile?.governancePaths ?? []) : [];
+    const files = owned.map((item) => { try { return normalizeRepoRelativePath(item); } catch { return null; } }).filter((item): item is string => item !== null);
+    const resolved = [...new Set(files)].sort().filter(existsFile).slice(0, W1_MAX_ARCHITECTURE_PATHS);
+    if (resolved.length > 0) return { architecturePaths: resolved, broadGovernancePaths: [], basis: "profile" };
+  } catch {
+    // Fall through to the explicitly identified UADS fallback below.
+  }
+  const fallback = UADS_FALLBACK_ARCHITECTURE_PATHS.filter(existsFile);
+  if (fallback.length > 0) return { architecturePaths: fallback, broadGovernancePaths: [], basis: "uads-fallback" };
+  return { architecturePaths: [], broadGovernancePaths: [], basis: "none" };
+}
 
 const DEFAULT_W1_BUDGETS: Upir["budgets"] = {
   maxRepositorySearches: 12,
@@ -137,7 +204,7 @@ const DEFAULT_W1_BUDGETS: Upir["budgets"] = {
 
 const DEFAULT_W1_STOP = ["STOP at COMPLETE_CANDIDATE, SOURCE_CONFLICT, NEEDS_ARCHITECTURE, SCOPE_EXPANSION_REQUIRED or BLOCKED_EVIDENCE."];
 
-function w1TaskPaths(projectId: string, paths: ReturnType<typeof getUadsPaths>): { tasks: string; slices: string; decisions: string; recipes: string; packs: string } {
+function w1TaskPaths(projectId: string, paths: ReturnType<typeof getUadsPaths>): { tasks: string; slices: string; decisions: string; recipes: string; packs: string; arch: string } {
   const base = gefProjectDirectory(paths, projectId);
   return {
     tasks: path.join(base, "w1-tasks"),
@@ -145,6 +212,7 @@ function w1TaskPaths(projectId: string, paths: ReturnType<typeof getUadsPaths>):
     decisions: path.join(base, "w1-decisions"),
     recipes: path.join(base, "w1-recipes"),
     packs: path.join(base, "w1-packs"),
+    arch: path.join(base, "w1-arch"),
   };
 }
 
@@ -200,6 +268,16 @@ export function runGefTaskCompile(manifestPath: string, options: GefOptions = {}
   });
   const dirs = w1TaskPaths(current.projectId, current.paths);
   const stored = path.relative(current.paths.home, writeW1Json(dirs.tasks, upir.taskId, upir, "gef-upir.schema.json"));
+  const binding: W1ArchitectureBinding = {
+    schema: "uads.gef-w1-architecture-binding",
+    schemaVersion: "0.1.0",
+    taskId: upir.taskId,
+    architecturePaths: sanitizeProjectPaths(raw.architecturePaths, W1_MAX_ARCHITECTURE_PATHS, "ARCHITECTURE_PATHS"),
+    broadGovernancePaths: sanitizeProjectPaths(raw.broadGovernancePaths, W1_MAX_BROAD_GOVERNANCE_PATHS, "BROAD_GOVERNANCE_PATHS"),
+  };
+  assertArchitectureBinding(binding);
+  fs.mkdirSync(dirs.arch, { recursive: true });
+  atomicWriteJson(path.join(dirs.arch, `${upir.taskId}.json`), binding);
   if (raw.decisionCapsule) {
     assertDecisionCapsule(raw.decisionCapsule);
     writeW1Json(dirs.decisions, upir.taskId, raw.decisionCapsule, "gef-decision-capsule.schema.json");
@@ -218,13 +296,22 @@ export function runGefContextPrepare(taskId: string, options: GefOptions = {}): 
   const repoRoot = current.git.repoRoot ?? path.resolve(cwd);
   const dirs = w1TaskPaths(current.projectId, current.paths);
   const upir = readW1Json<Upir>(dirs.tasks, taskId);
-  const slice = compileContext({ taskId, repoRoot, targetSymbols: upir.targetSymbols.length > 0 ? upir.targetSymbols : ["__gef_placeholder__"], radius: upir.contextRadius, invariants: upir.frozenInvariants });
+  let binding: W1ArchitectureBinding | null = null;
+  try {
+    const stored = readW1Json<W1ArchitectureBinding>(dirs.arch, taskId);
+    assertArchitectureBinding(stored);
+    binding = stored;
+  } catch (error) {
+    if (error instanceof Error && error.message !== "W1_TASK_MISSING") throw error;
+  }
+  const resolution = resolveArchitecturePaths(repoRoot, cwd, binding);
+  const slice = compileContext({ taskId, repoRoot, targetSymbols: upir.targetSymbols.length > 0 ? upir.targetSymbols : ["__gef_placeholder__"], radius: upir.contextRadius, invariants: upir.frozenInvariants, architecturePaths: resolution.architecturePaths, broadGovernancePaths: resolution.broadGovernancePaths });
   const key = contextCasKey({ contentDigest: sliceContentDigest(slice), producerVersion: slice.producerVersion, toolchainBasis: slice.toolchainBasis });
   const existing = contextCasGet(key);
   const casStatus = existing.status === "HIT" ? "HIT" : "MISS";
   if (existing.status === "MISS") contextCasPut(slice);
   const stored = path.relative(current.paths.home, writeW1Json(dirs.slices, taskId, slice, "gef-context-slice.schema.json"));
-  const output = { ...slice, casStatus, casKey: key, storagePath: stored, zeroProjectFootprint: true };
+  const output = { ...slice, casStatus, casKey: key, storagePath: stored, zeroProjectFootprint: true, architectureBasis: resolution.basis, architecturePaths: resolution.architecturePaths };
   void CONTEXT_PRODUCER_VERSION;
   void CONTEXT_TOOLCHAIN_BASIS;
   return options.json ? `${JSON.stringify(sanitizeOperationalValue(output), null, 2)}\n` : `GEF W1 context prepared\ntaskId: ${taskId}\nentries: ${slice.entries.length}\ncas: ${casStatus}\n`;

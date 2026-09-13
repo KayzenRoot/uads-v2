@@ -49,6 +49,7 @@ export type CompileContextInput = {
   expansions?: ContextExpansion[];
   invariants?: string[];
   architecturePaths?: string[];
+  broadGovernancePaths?: string[];
   maxFilesScanned?: number;
   maxExcerptChars?: number;
   maxEntries?: number;
@@ -59,6 +60,7 @@ const NAMED_IMPORT = /import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+["']([^"']+)["']
 const DEFAULT_GOVERNANCE_PATHS = ["AGENTS.md", "docs/v2/04-ARCHITECTURE.md"];
 const C4_EXTRA_GOVERNANCE_PATHS = ["docs/v2/03-SCOPE.md", "docs/v2/13-REVIEW-PROTOCOL.md"];
 const MAX_ARCHITECTURE_PATHS = 8;
+const MAX_BROAD_GOVERNANCE_PATHS = 4;
 const MAX_INTERFACES_PER_TARGET = 8;
 const MAX_DEPENDENCIES_PER_TARGET = 8;
 const MAX_SIBLING_FILES = 16;
@@ -66,18 +68,30 @@ const DEFAULT_MAX_ENTRIES = 24;
 const GOVERNANCE_EXCERPT_CHARS = 2000;
 const GOVERNANCE_READ_CHARS = 60000;
 
-function listTypeScriptFiles(repoRoot: string, limit: number): string[] {
+export type ScannedFiles = {
+  files: string[];
+  truncated: boolean;
+  scanned: number;
+  limit: number;
+};
+
+function listTypeScriptFiles(repoRoot: string, limit: number): ScannedFiles {
   const out: string[] = [];
+  let truncated = false;
   const visit = (directory: string): void => {
-    if (out.length >= limit) return;
+    if (truncated) return;
     let names: string[];
     try {
       names = fs.readdirSync(directory).sort();
     } catch {
       return;
     }
-    for (const name of names) {
-      if (out.length >= limit) return;
+    for (let index = 0; index < names.length; index += 1) {
+      if (out.length >= limit) {
+        truncated = true;
+        return;
+      }
+      const name = names[index] ?? "";
       if (name === "node_modules" || name === ".git" || name === "dist") continue;
       const candidate = path.join(directory, name);
       let stat: fs.Stats;
@@ -86,14 +100,16 @@ function listTypeScriptFiles(repoRoot: string, limit: number): string[] {
       } catch {
         continue;
       }
-      if (stat.isDirectory()) visit(candidate);
-      else if (stat.isFile() && (name.endsWith(".ts") || name.endsWith(".tsx") || name.endsWith(".js"))) {
+      if (stat.isDirectory()) {
+        visit(candidate);
+        if (truncated) return;
+      } else if (stat.isFile() && (name.endsWith(".ts") || name.endsWith(".tsx") || name.endsWith(".js"))) {
         out.push(candidate);
       }
     }
   };
   visit(repoRoot);
-  return out.sort();
+  return { files: out.sort(), truncated, scanned: out.length, limit };
 }
 
 function safeReadText(filePath: string, maxChars: number): string {
@@ -192,11 +208,14 @@ export function compileContext(input: CompileContextInput): ContextSlice {
   if (input.targetSymbols.length === 0 || input.targetSymbols.length > 32) throw new Error("CONTEXT_TARGET_BOUND_REJECTED");
   if ((input.expansions ?? []).length > 8) throw new Error("CONTEXT_EXPANSION_BOUND_REJECTED");
   if ((input.architecturePaths ?? []).length > MAX_ARCHITECTURE_PATHS) throw new Error("CONTEXT_ARCHITECTURE_BOUND_REJECTED");
+  if ((input.broadGovernancePaths ?? []).length > MAX_BROAD_GOVERNANCE_PATHS) throw new Error("CONTEXT_ARCHITECTURE_BOUND_REJECTED");
   const maxEntries = input.maxEntries ?? DEFAULT_MAX_ENTRIES;
   if (maxEntries <= 0 || maxEntries > 200) throw new Error("CONTEXT_ENTRY_BOUND_REJECTED");
   const excerptLimit = input.maxExcerptChars ?? 4000;
+  const scanLimit = input.maxFilesScanned ?? 200;
 
-  const files = listTypeScriptFiles(input.repoRoot, input.maxFilesScanned ?? 200);
+  const scan = listTypeScriptFiles(input.repoRoot, scanLimit);
+  const files = scan.files;
   const fileContents = new Map<string, string>();
   const readCached = (absolute: string, maxChars = 200000): string | null => {
     const cached = fileContents.get(absolute);
@@ -232,7 +251,12 @@ export function compileContext(input: CompileContextInput): ContextSlice {
       else fallbackCandidates.push(absolute);
     }
     const selected = [...declarationCandidates.sort(), ...fallbackCandidates.sort()][0];
-    if (!selected) throw new Error(`CONTEXT_SYMBOL_NOT_FOUND:${symbol}`);
+    if (!selected) {
+      if (scan.truncated) {
+        throw new Error(`CONTEXT_BUDGET_EXPANSION_REQUIRED:filesScanned(${scan.scanned}/${scan.limit})`);
+      }
+      throw new Error(`CONTEXT_SYMBOL_NOT_FOUND:${symbol}`);
+    }
     const content = readCached(selected) ?? "";
     placed.push({
       absolute: selected,
@@ -378,7 +402,10 @@ export function compileContext(input: CompileContextInput): ContextSlice {
   if (input.radius === "C2") return finalizeSlice(input, entries);
 
   // C3/C4: bounded architecture/governance contracts, never a repo dump.
+  // The path sets are project-specific operator inputs: they flow into slice
+  // entries, so they are part of the slice digest/basis by construction.
   const configured = (input.architecturePaths ?? []).map((item) => normalizeRepoRelativePath(item));
+  const broadConfigured = (input.broadGovernancePaths ?? []).map((item) => normalizeRepoRelativePath(item));
   const governanceBasis = configured.length > 0 ? configured : [...DEFAULT_GOVERNANCE_PATHS];
   const c3Paths = governanceBasis.slice(0, MAX_ARCHITECTURE_PATHS);
   for (const relative of c3Paths) {
@@ -407,7 +434,8 @@ export function compileContext(input: CompileContextInput): ContextSlice {
   }
   if (input.radius === "C3") return finalizeSlice(input, entries, c0Identities);
 
-  for (const relative of C4_EXTRA_GOVERNANCE_PATHS) {
+  const broadBasis = broadConfigured.length > 0 ? broadConfigured : [...C4_EXTRA_GOVERNANCE_PATHS];
+  for (const relative of broadBasis.slice(0, MAX_BROAD_GOVERNANCE_PATHS)) {
     if (configured.includes(relative) || c3Paths.includes(relative)) continue;
     const absolute = path.join(input.repoRoot, ...relative.split("/"));
     let content: string;

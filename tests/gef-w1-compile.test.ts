@@ -8,7 +8,7 @@ import { buildPatchRecipe, checkPatchPreconditions } from "../src/gef/patch-reci
 import { checkBudget } from "../src/gef/budget-governor.js";
 import { compilePrompt } from "../src/gef/prompt-compiler.js";
 import { buildExecutionPack } from "../src/gef/execution-pack.js";
-import { runGefPackBuild, runGefTaskCompile } from "../src/commands/gef.js";
+import { runGefContextPrepare, runGefPackBuild, runGefTaskCompile } from "../src/commands/gef.js";
 import { sha256Hex } from "../src/lib/hash.js";
 
 const previousHome = process.env.UADS_HOME;
@@ -164,5 +164,114 @@ describe("GEF W1 budgets + prompt compiler + execution pack", () => {
     const pack = JSON.parse(runGefPackBuild("w1-cli-zero", { cwd: repo, json: true, executor: "codex" }));
     expect(pack.mergeAllowed).toBe(false);
     expect(pack.packDigest).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("rejects unsafe architecture paths in the task manifest", () => {
+    const repo = tempGitRepo();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-arch-unsafe-"));
+    process.env.UADS_HOME = home;
+    const manifestPath = path.join(repo, "w1-manifest-unsafe.json");
+    fs.writeFileSync(
+      manifestPath,
+      JSON.stringify({ taskId: "w1-arch-unsafe", targetSymbols: ["targetSymbol"], architecturePaths: ["/absolute/contract.md"] }),
+    );
+    expect(() => runGefTaskCompile(manifestPath, { cwd: repo, json: true })).toThrow();
+    fs.writeFileSync(
+      manifestPath,
+      JSON.stringify({ taskId: "w1-arch-unsafe", targetSymbols: ["targetSymbol"], architecturePaths: ["../escape.md"] }),
+    );
+    expect(() => runGefTaskCompile(manifestPath, { cwd: repo, json: true })).toThrow();
+  });
+});
+
+function nonUadsFixture(): string {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-global-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-global-fixture.git"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "hello.ts"), `export function greetUser(name: string): string {\n  return name;\n}\n`);
+  fs.mkdirSync(path.join(repo, "docs"), { recursive: true });
+  fs.writeFileSync(path.join(repo, "docs", "architecture.md"), `# Service Architecture\nProject-specific contract context.\n`);
+  fs.writeFileSync(path.join(repo, "docs", "overview.md"), `# Service Overview\nBroad project governance context.\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "fixture"], { cwd: repo });
+  return repo;
+}
+
+function writeManifest(repo: string, name: string, body: Record<string, unknown>): string {
+  const manifestPath = path.join(repo, name);
+  fs.writeFileSync(manifestPath, JSON.stringify(body));
+  return manifestPath;
+}
+
+describe("GEF W1 project-specific architecture binding (CR-W1-02)", () => {
+  it("carries manifest architecture paths through task compile into context prepare", () => {
+    const repo = nonUadsFixture();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-global-home-"));
+    process.env.UADS_HOME = home;
+    expect(fs.existsSync(path.join(repo, "AGENTS.md"))).toBe(false);
+    const manifest = writeManifest(repo, "w1-global.json", {
+      taskId: "w1-global-c3",
+      workOrder: "GEF-W1",
+      goal: "Non-UADS bounded task",
+      targetSymbols: ["greetUser"],
+      contextRadius: "C3",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+      architecturePaths: ["docs/architecture.md"],
+      broadGovernancePaths: ["docs/overview.md"],
+    });
+    const compiled = JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
+    expect(compiled.taskId).toBe("w1-global-c3");
+    const prepared = JSON.parse(runGefContextPrepare("w1-global-c3", { cwd: repo, json: true }));
+    expect(prepared.architectureBasis).toBe("explicit");
+    expect(prepared.entries.some((entry: { path: string; inclusionReason: string }) => entry.path === "docs/architecture.md" && entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(true);
+    expect(JSON.stringify(prepared)).not.toContain("AGENTS.md");
+  });
+
+  it("adds bounded broad governance context at C4 without UADS path dependency", () => {
+    const repo = nonUadsFixture();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-global-c4-"));
+    process.env.UADS_HOME = home;
+    const manifest = writeManifest(repo, "w1-global-c4.json", {
+      taskId: "w1-global-c4",
+      workOrder: "GEF-W1",
+      goal: "Non-UADS broad task",
+      targetSymbols: ["greetUser"],
+      contextRadius: "C4",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+      architecturePaths: ["docs/architecture.md"],
+      broadGovernancePaths: ["docs/overview.md"],
+    });
+    JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
+    const prepared = JSON.parse(runGefContextPrepare("w1-global-c4", { cwd: repo, json: true }));
+    expect(prepared.entries.some((entry: { path: string; inclusionReason: string }) => entry.path === "docs/overview.md" && entry.inclusionReason === "BROAD_GOVERNANCE")).toBe(true);
+    expect(JSON.stringify(prepared)).not.toContain("AGENTS.md");
+  });
+
+  it("keeps pack digests deterministic for the same task and path basis", () => {
+    const repo = nonUadsFixture();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-global-det-"));
+    process.env.UADS_HOME = home;
+    const manifest = writeManifest(repo, "w1-global-det.json", {
+      taskId: "w1-global-det",
+      workOrder: "GEF-W1",
+      goal: "Deterministic global task",
+      targetSymbols: ["greetUser"],
+      contextRadius: "C3",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+      architecturePaths: ["docs/architecture.md"],
+    });
+    JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
+    const first = JSON.parse(runGefContextPrepare("w1-global-det", { cwd: repo, json: true }));
+    const second = JSON.parse(runGefContextPrepare("w1-global-det", { cwd: repo, json: true }));
+    expect(first.sliceDigest).toBe(second.sliceDigest);
+    const packFirst = JSON.parse(runGefPackBuild("w1-global-det", { cwd: repo, json: true, executor: "codex" }));
+    const packSecond = JSON.parse(runGefPackBuild("w1-global-det", { cwd: repo, json: true, executor: "codex" }));
+    expect(packFirst.packDigest).toBe(packSecond.packDigest);
   });
 });

@@ -176,4 +176,49 @@ describe("GEF W1 context radius semantics (CR-W1-01)", () => {
     expect(fs.existsSync(path.join(repo, ".uads"))).toBe(false);
     expect(fs.existsSync(path.join(repo, "gef"))).toBe(false);
   });
+
+  it("rejects unsafe or over-limit architecture path inputs", () => {
+    const repo = radiusFixture();
+    expect(() => compileContext({ taskId: "arch-safe", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["/absolute/contract.md"] })).toThrow();
+    expect(() => compileContext({ taskId: "arch-safe", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["../escape.md"] })).toThrow();
+    expect(() => compileContext({ taskId: "arch-safe", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["a.md", "b.md", "c.md", "d.md", "e.md", "f.md", "g.md", "h.md", "i.md"] })).toThrow("CONTEXT_ARCHITECTURE_BOUND_REJECTED");
+    expect(() => compileContext({ taskId: "arch-safe", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C4", architecturePaths: ["docs/contract.md"], broadGovernancePaths: ["1.md", "2.md", "3.md", "4.md", "5.md"] })).toThrow("CONTEXT_ARCHITECTURE_BOUND_REJECTED");
+  });
+
+  it("keeps digests deterministic for the same task and path basis", () => {
+    const repo = radiusFixture();
+    const first = compileContext({ taskId: "arch-digest", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["docs/contract.md"] });
+    const second = compileContext({ taskId: "arch-digest", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["docs/contract.md"] });
+    expect(first.sliceDigest).toBe(second.sliceDigest);
+    const other = compileContext({ taskId: "arch-digest", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C4", architecturePaths: ["docs/contract.md"] });
+    expect(other.sliceDigest).not.toBe(first.sliceDigest);
+  });
+});
+
+function scanFixture(): { repo: string; targetFile: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-scan-"));
+  for (let index = 0; index < 6; index += 1) {
+    fs.writeFileSync(path.join(repo, `a-fill-${index}.ts`), `export const fill${index} = ${index};\n`);
+  }
+  const targetFile = path.join(repo, "z-target.ts");
+  fs.writeFileSync(targetFile, `export function deepTargetSymbol(): number {\n  return 7;\n}\n`);
+  return { repo, targetFile };
+}
+
+describe("GEF W1 scan budget truth (CR-W1-03)", () => {
+  it("returns budget-expansion state when the target lies beyond the scan limit", () => {
+    const { repo } = scanFixture();
+    expect(() => compileContext({ taskId: "scan-truncated", repoRoot: repo, targetSymbols: ["deepTargetSymbol"], radius: "C0", maxFilesScanned: 2 })).toThrow("CONTEXT_BUDGET_EXPANSION_REQUIRED:filesScanned(2/2)");
+  });
+
+  it("finds the same target under a complete scan", () => {
+    const { repo } = scanFixture();
+    const slice = compileContext({ taskId: "scan-complete", repoRoot: repo, targetSymbols: ["deepTargetSymbol"], radius: "C0" });
+    expect(slice.entries.some((entry) => entry.symbol === "deepTargetSymbol")).toBe(true);
+  });
+
+  it("returns symbol-not-found only for genuine absence within a completed scan", () => {
+    const { repo } = scanFixture();
+    expect(() => compileContext({ taskId: "scan-absent", repoRoot: repo, targetSymbols: ["noSuchSymbolAnywhere"], radius: "C0" })).toThrow("CONTEXT_SYMBOL_NOT_FOUND:noSuchSymbolAnywhere");
+  });
 });
