@@ -43,3 +43,23 @@ export function describeRadius(radius: UpirContextRadius): string {
   if (radius === "C3") return "related architecture/contracts";
   return "broad project architecture";
 }
+
+export type SliceInclusionReason =
+  | "TARGET"
+  | "DIRECT_TEST"
+  | "DIRECT_DEPENDENCY"
+  | "MODULE_INTERFACE"
+  | "ARCHITECTURE_CONTRACT"
+  | "BROAD_GOVERNANCE";
+
+const RADIUS_INCLUSION_ALLOWLIST: Record<UpirContextRadius, SliceInclusionReason[]> = {
+  C0: ["TARGET", "DIRECT_TEST"],
+  C1: ["TARGET", "DIRECT_TEST", "DIRECT_DEPENDENCY"],
+  C2: ["TARGET", "DIRECT_TEST", "DIRECT_DEPENDENCY", "MODULE_INTERFACE"],
+  C3: ["TARGET", "DIRECT_TEST", "DIRECT_DEPENDENCY", "MODULE_INTERFACE", "ARCHITECTURE_CONTRACT"],
+  C4: ["TARGET", "DIRECT_TEST", "DIRECT_DEPENDENCY", "MODULE_INTERFACE", "ARCHITECTURE_CONTRACT", "BROAD_GOVERNANCE"],
+};
+
+export function allowedInclusionReasons(radius: UpirContextRadius): SliceInclusionReason[] {
+  return [...(RADIUS_INCLUSION_ALLOWLIST[radius] ?? RADIUS_INCLUSION_ALLOWLIST.C0)];
+}
