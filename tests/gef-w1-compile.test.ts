@@ -203,6 +203,19 @@ function writeManifest(repo: string, name: string, body: Record<string, unknown>
   return manifestPath;
 }
 
+function uadsIdentityFixture(): string {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-uads-id-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/KayzenRoot/uads-v2.git"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "AGENTS.md"), "# UADS agent notes\n");
+  fs.mkdirSync(path.join(repo, "docs", "v2"), { recursive: true });
+  fs.writeFileSync(path.join(repo, "docs", "v2", "04-ARCHITECTURE.md"), "# UADS architecture\n");
+  fs.writeFileSync(path.join(repo, "fixture.ts"), `export function fixtureTarget(): number {\n  return 1;\n}\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "fixture"], { cwd: repo });
+  return repo;
+}
+
 describe("GEF W1 project-specific architecture binding (CR-W1-02)", () => {
   it("carries manifest architecture paths through task compile into context prepare", () => {
     const repo = nonUadsFixture();
@@ -338,30 +351,22 @@ describe("GEF W1 fallback truth (CR-W1-04)", () => {
   });
 
   it("allows the bounded UADS fallback only for a positively identified UADS project", () => {
+    const repo = uadsIdentityFixture();
     const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-fallback-uads-"));
     process.env.UADS_HOME = home;
-    const cwd = process.cwd();
-    const manifestPath = path.join(cwd, "w1-fallback-uads.tmp.json");
-    try {
-      fs.writeFileSync(
-        manifestPath,
-        JSON.stringify({
-          taskId: "w1-fallback-uads",
-          workOrder: "GEF-W1",
-          goal: "UADS fallback check",
-          targetSymbols: ["compileContext"],
-          contextRadius: "C3",
-          frozenInvariants: [FROZEN],
-          stopConditions: [STOP],
-          requiredProofs: ["focused test"],
-        }),
-      );
-      JSON.parse(runGefTaskCompile(manifestPath, { cwd, json: true }));
-      const prepared = JSON.parse(runGefContextPrepare("w1-fallback-uads", { cwd, json: true }));
-      expect(prepared.architectureBasis).toBe("UADS_FALLBACK");
-      expect(prepared.entries.some((entry: { path: string; inclusionReason: string }) => entry.path === "AGENTS.md" && entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(true);
-    } finally {
-      fs.rmSync(manifestPath, { force: true });
-    }
+    const manifestPath = writeManifest(repo, "w1-fallback-uads.json", {
+      taskId: "w1-fallback-uads",
+      workOrder: "GEF-W1",
+      goal: "UADS fallback check",
+      targetSymbols: ["fixtureTarget"],
+      contextRadius: "C3",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+    });
+    JSON.parse(runGefTaskCompile(manifestPath, { cwd: repo, json: true }));
+    const prepared = JSON.parse(runGefContextPrepare("w1-fallback-uads", { cwd: repo, json: true }));
+    expect(prepared.architectureBasis).toBe("UADS_FALLBACK");
+    expect(prepared.entries.some((entry: { path: string; inclusionReason: string }) => entry.path === "AGENTS.md" && entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(true);
   });
 });
