@@ -224,7 +224,7 @@ describe("GEF W1 project-specific architecture binding (CR-W1-02)", () => {
     const compiled = JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
     expect(compiled.taskId).toBe("w1-global-c3");
     const prepared = JSON.parse(runGefContextPrepare("w1-global-c3", { cwd: repo, json: true }));
-    expect(prepared.architectureBasis).toBe("explicit");
+    expect(prepared.architectureBasis).toBe("EXPLICIT");
     expect(prepared.entries.some((entry: { path: string; inclusionReason: string }) => entry.path === "docs/architecture.md" && entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(true);
     expect(JSON.stringify(prepared)).not.toContain("AGENTS.md");
   });
@@ -273,5 +273,95 @@ describe("GEF W1 project-specific architecture binding (CR-W1-02)", () => {
     const packFirst = JSON.parse(runGefPackBuild("w1-global-det", { cwd: repo, json: true, executor: "codex" }));
     const packSecond = JSON.parse(runGefPackBuild("w1-global-det", { cwd: repo, json: true, executor: "codex" }));
     expect(packFirst.packDigest).toBe(packSecond.packDigest);
+  });
+});
+
+describe("GEF W1 fallback truth (CR-W1-04)", () => {
+  it("fails closed without fallback when an explicit architecture path is missing", () => {
+    const repo = nonUadsFixture();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-fallback-missing-"));
+    process.env.UADS_HOME = home;
+    const manifest = writeManifest(repo, "w1-fallback-missing.json", {
+      taskId: "w1-fallback-missing",
+      workOrder: "GEF-W1",
+      goal: "Missing explicit contract",
+      targetSymbols: ["greetUser"],
+      contextRadius: "C3",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+      architecturePaths: ["docs/missing.md"],
+    });
+    JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
+    expect(() => runGefContextPrepare("w1-fallback-missing", { cwd: repo, json: true })).toThrow("CONTEXT_ARCHITECTURE_PATH_MISSING:docs/missing.md");
+  });
+
+  it("fails closed without fallback when an explicit broad path is missing", () => {
+    const repo = nonUadsFixture();
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-fallback-broad-"));
+    process.env.UADS_HOME = home;
+    const manifest = writeManifest(repo, "w1-fallback-broad.json", {
+      taskId: "w1-fallback-broad",
+      workOrder: "GEF-W1",
+      goal: "Missing explicit broad context",
+      targetSymbols: ["greetUser"],
+      contextRadius: "C4",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+      architecturePaths: ["docs/architecture.md"],
+      broadGovernancePaths: ["docs/missing-broad.md"],
+    });
+    JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
+    expect(() => runGefContextPrepare("w1-fallback-broad", { cwd: repo, json: true })).toThrow("CONTEXT_ARCHITECTURE_PATH_MISSING:docs/missing-broad.md");
+  });
+
+  it("does not select UADS fallback for a non-UADS repo carrying AGENTS.md", () => {
+    const repo = nonUadsFixture();
+    fs.writeFileSync(path.join(repo, "AGENTS.md"), "# Foreign agent notes\n");
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-fallback-agents-"));
+    process.env.UADS_HOME = home;
+    const manifest = writeManifest(repo, "w1-fallback-agents.json", {
+      taskId: "w1-fallback-agents",
+      workOrder: "GEF-W1",
+      goal: "Foreign repo with AGENTS.md",
+      targetSymbols: ["greetUser"],
+      contextRadius: "C3",
+      frozenInvariants: [FROZEN],
+      stopConditions: [STOP],
+      requiredProofs: ["focused test"],
+    });
+    JSON.parse(runGefTaskCompile(manifest, { cwd: repo, json: true }));
+    const prepared = JSON.parse(runGefContextPrepare("w1-fallback-agents", { cwd: repo, json: true }));
+    expect(prepared.architectureBasis).toBe("NONE");
+    expect(prepared.entries.some((entry: { inclusionReason: string }) => entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(false);
+  });
+
+  it("allows the bounded UADS fallback only for a positively identified UADS project", () => {
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w1-fallback-uads-"));
+    process.env.UADS_HOME = home;
+    const cwd = process.cwd();
+    const manifestPath = path.join(cwd, "w1-fallback-uads.tmp.json");
+    try {
+      fs.writeFileSync(
+        manifestPath,
+        JSON.stringify({
+          taskId: "w1-fallback-uads",
+          workOrder: "GEF-W1",
+          goal: "UADS fallback check",
+          targetSymbols: ["compileContext"],
+          contextRadius: "C3",
+          frozenInvariants: [FROZEN],
+          stopConditions: [STOP],
+          requiredProofs: ["focused test"],
+        }),
+      );
+      JSON.parse(runGefTaskCompile(manifestPath, { cwd, json: true }));
+      const prepared = JSON.parse(runGefContextPrepare("w1-fallback-uads", { cwd, json: true }));
+      expect(prepared.architectureBasis).toBe("UADS_FALLBACK");
+      expect(prepared.entries.some((entry: { path: string; inclusionReason: string }) => entry.path === "AGENTS.md" && entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(true);
+    } finally {
+      fs.rmSync(manifestPath, { force: true });
+    }
   });
 });

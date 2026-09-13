@@ -4,7 +4,7 @@
   "title": "GEF Context Slice",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "taskId", "radius", "compilerVersion", "producerVersion", "toolchainBasis", "entries", "expansions", "sliceDigest"],
+  "required": ["schemaVersion", "taskId", "radius", "compilerVersion", "producerVersion", "toolchainBasis", "architectureBasis", "entries", "expansions", "sliceDigest"],
   "properties": {
     "schemaVersion": { "const": "0.1.0" },
     "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
@@ -12,6 +12,7 @@
     "compilerVersion": { "type": "string", "const": "1.0.0" },
     "producerVersion": { "type": "string", "minLength": 1, "maxLength": 80 },
     "toolchainBasis": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "architectureBasis": { "type": "string", "enum": ["NONE", "EXPLICIT", "PROFILE", "UADS_FALLBACK"] },
     "entries": {
       "type": "array",
       "maxItems": 200,

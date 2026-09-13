@@ -190,8 +190,24 @@ describe("GEF W1 context radius semantics (CR-W1-01)", () => {
     const first = compileContext({ taskId: "arch-digest", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["docs/contract.md"] });
     const second = compileContext({ taskId: "arch-digest", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["docs/contract.md"] });
     expect(first.sliceDigest).toBe(second.sliceDigest);
+    expect(first.architectureBasis).toBe("EXPLICIT");
     const other = compileContext({ taskId: "arch-digest", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C4", architecturePaths: ["docs/contract.md"] });
     expect(other.sliceDigest).not.toBe(first.sliceDigest);
+  });
+
+  it("uses NONE basis without UADS defaults when no paths are configured", () => {
+    const repo = radiusFixture();
+    fs.writeFileSync(path.join(repo, "AGENTS.md"), "# Foreign agent notes\n");
+    const slice = compileContext({ taskId: "arch-none", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3" });
+    expect(slice.architectureBasis).toBe("NONE");
+    expect(slice.entries.some((entry) => entry.inclusionReason === "ARCHITECTURE_CONTRACT")).toBe(false);
+    expect(JSON.stringify(slice)).not.toContain("AGENTS.md");
+  });
+
+  it("fails closed on missing explicit architecture paths without substitution", () => {
+    const repo = radiusFixture();
+    expect(() => compileContext({ taskId: "arch-missing", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C3", architecturePaths: ["docs/missing.md"] })).toThrow("CONTEXT_ARCHITECTURE_PATH_MISSING:docs/missing.md");
+    expect(() => compileContext({ taskId: "arch-missing", repoRoot: repo, targetSymbols: ["targetSymbol"], radius: "C4", architecturePaths: ["docs/contract.md"], broadGovernancePaths: ["docs/missing-broad.md"] })).toThrow("CONTEXT_ARCHITECTURE_PATH_MISSING:docs/missing-broad.md");
   });
 });
 

@@ -12,8 +12,9 @@ import { atomicWriteJson, readJsonIfValid } from "../lib/atomic-write.js";
 import { assertSchema } from "../lib/json-schema.js";
 import { sanitizeOperationalValue } from "../lib/safe-persist.js";
 import { buildUpir, assertSafeTaskId, normalizeRepoRelativePath, type Upir } from "../gef/upir.js";
+import { normalizeRemoteUrl } from "../lib/fingerprint.js";
 import { classifyTask } from "../gef/task-classifier.js";
-import { compileContext, CONTEXT_PRODUCER_VERSION, CONTEXT_TOOLCHAIN_BASIS, type ContextSlice } from "../gef/context-compiler.js";
+import { compileContext, CONTEXT_PRODUCER_VERSION, CONTEXT_TOOLCHAIN_BASIS, type ArchitectureBasis, type ContextSlice } from "../gef/context-compiler.js";
 import { contextCasGet, contextCasKey, contextCasPut, sliceContentDigest } from "../gef/context-cas.js";
 import { assertDecisionCapsule, type DecisionCapsule } from "../gef/decision-capsule.js";
 import { assertPatchRecipe, type PatchRecipe } from "../gef/patch-recipe.js";
@@ -162,8 +163,20 @@ function assertArchitectureBinding(value: unknown): asserts value is W1Architect
 export type ArchitectureResolution = {
   architecturePaths: string[];
   broadGovernancePaths: string[];
-  basis: "explicit" | "profile" | "uads-fallback" | "none";
+  basis: ArchitectureBasis;
 };
+
+const UADS_CANONICAL_REMOTE = "https://github.com/kayzenroot/uads-v2";
+
+export function isUadsRepository(cwd: string): boolean {
+  const git = readGitSummary(cwd);
+  if (!git.originUrl) return false;
+  try {
+    return normalizeRemoteUrl(git.originUrl).toLowerCase() === UADS_CANONICAL_REMOTE;
+  } catch {
+    return false;
+  }
+}
 
 export function resolveArchitecturePaths(repoRoot: string, cwd: string, binding: W1ArchitectureBinding | null): ArchitectureResolution {
   const existsFile = (relative: string): boolean => {
@@ -173,21 +186,28 @@ export function resolveArchitecturePaths(repoRoot: string, cwd: string, binding:
       return false;
     }
   };
+  // Explicit binding passes through unfiltered: missing requested paths must
+  // fail closed inside compileContext, never silently substitute a fallback.
   if (binding && (binding.architecturePaths.length > 0 || binding.broadGovernancePaths.length > 0)) {
-    return { architecturePaths: binding.architecturePaths.filter(existsFile), broadGovernancePaths: binding.broadGovernancePaths.filter(existsFile), basis: "explicit" };
+    return { architecturePaths: binding.architecturePaths, broadGovernancePaths: binding.broadGovernancePaths, basis: "EXPLICIT" };
   }
   try {
     const project = readGefProject(cwd);
     const owned = project.status === "VALID" ? (project.profile?.governancePaths ?? []) : [];
     const files = owned.map((item) => { try { return normalizeRepoRelativePath(item); } catch { return null; } }).filter((item): item is string => item !== null);
     const resolved = [...new Set(files)].sort().filter(existsFile).slice(0, W1_MAX_ARCHITECTURE_PATHS);
-    if (resolved.length > 0) return { architecturePaths: resolved, broadGovernancePaths: [], basis: "profile" };
+    if (resolved.length > 0) return { architecturePaths: resolved, broadGovernancePaths: [], basis: "PROFILE" };
   } catch {
-    // Fall through to the explicitly identified UADS fallback below.
+    // Fall through to the identity-gated UADS fallback below.
   }
-  const fallback = UADS_FALLBACK_ARCHITECTURE_PATHS.filter(existsFile);
-  if (fallback.length > 0) return { architecturePaths: fallback, broadGovernancePaths: [], basis: "uads-fallback" };
-  return { architecturePaths: [], broadGovernancePaths: [], basis: "none" };
+  // UADS fallback requires positive UADS repository identity via the canonical
+  // fingerprint remote primitive. File presence (e.g. AGENTS.md) alone never
+  // qualifies a foreign repository as UADS.
+  if (isUadsRepository(cwd)) {
+    const fallback = UADS_FALLBACK_ARCHITECTURE_PATHS.filter(existsFile);
+    if (fallback.length > 0) return { architecturePaths: fallback, broadGovernancePaths: [], basis: "UADS_FALLBACK" };
+  }
+  return { architecturePaths: [], broadGovernancePaths: [], basis: "NONE" };
 }
 
 const DEFAULT_W1_BUDGETS: Upir["budgets"] = {
@@ -305,7 +325,7 @@ export function runGefContextPrepare(taskId: string, options: GefOptions = {}): 
     if (error instanceof Error && error.message !== "W1_TASK_MISSING") throw error;
   }
   const resolution = resolveArchitecturePaths(repoRoot, cwd, binding);
-  const slice = compileContext({ taskId, repoRoot, targetSymbols: upir.targetSymbols.length > 0 ? upir.targetSymbols : ["__gef_placeholder__"], radius: upir.contextRadius, invariants: upir.frozenInvariants, architecturePaths: resolution.architecturePaths, broadGovernancePaths: resolution.broadGovernancePaths });
+  const slice = compileContext({ taskId, repoRoot, targetSymbols: upir.targetSymbols.length > 0 ? upir.targetSymbols : ["__gef_placeholder__"], radius: upir.contextRadius, invariants: upir.frozenInvariants, architecturePaths: resolution.architecturePaths, broadGovernancePaths: resolution.broadGovernancePaths, architectureBasis: resolution.basis });
   const key = contextCasKey({ contentDigest: sliceContentDigest(slice), producerVersion: slice.producerVersion, toolchainBasis: slice.toolchainBasis });
   const existing = contextCasGet(key);
   const casStatus = existing.status === "HIT" ? "HIT" : "MISS";
