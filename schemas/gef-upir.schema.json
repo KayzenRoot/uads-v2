@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-upir.schema.json",
+  "title": "GEF UPIR - Unified Prompt Intermediate Representation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "taskId", "projectFingerprint", "workOrder", "taskClass", "contextRadius", "baseSha", "reviewedHeadSha", "goal", "acceptedFindings", "openFindings", "targetSymbols", "frozenInvariants", "requiredProofs", "budgets", "stopConditions", "digest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "workOrder": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "taskClass": { "type": "string", "enum": ["T0", "T1", "T2", "T3"] },
+    "contextRadius": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4"] },
+    "baseSha": { "type": "string", "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "reviewedHeadSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "goal": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "acceptedFindings": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 64 },
+    "openFindings": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 64 },
+    "targetSymbols": { "type": "array", "items": { "type": "string", "pattern": "^[A-Za-z0-9_.$-]{1,200}$" }, "maxItems": 32 },
+    "frozenInvariants": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 64 },
+    "requiredProofs": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 200 }, "maxItems": 32 },
+    "budgets": { "$ref": "#/$defs/budgets" },
+    "stopConditions": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 300 }, "maxItems": 32 },
+    "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxRepositorySearches", "maxExtraFilesOpened", "maxSourceFilesChanged", "maxTestFilesChanged", "maxSemanticLOC", "retryBudget"],
+      "properties": {
+        "maxRepositorySearches": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "maxExtraFilesOpened": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "maxSourceFilesChanged": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "maxTestFilesChanged": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "maxSemanticLOC": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "retryBudget": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "targetInputTokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "targetOutputTokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "targetActiveSeconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 86400 }
+      }
+    }
+  }
+}

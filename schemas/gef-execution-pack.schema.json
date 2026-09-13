@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-execution-pack.schema.json",
+  "title": "GEF Execution Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "taskId", "executor", "compilerVersion", "mode", "upir", "upirDigest", "contextDigest", "promptDigest", "packDigest", "prompt", "stopConditions", "frozenInvariants"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "executor": { "type": "string", "enum": ["codex", "generic", "cursor"] },
+    "compilerVersion": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "mode": { "type": "string", "enum": ["correction", "feature"] },
+    "upir": { "type": "object" },
+    "upirDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "contextDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "promptDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "packDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "prompt": { "type": "string", "minLength": 1, "maxLength": 60000 },
+    "stopConditions": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 300 }, "maxItems": 32 },
+    "frozenInvariants": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 64 }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-decision-capsule.schema.json",
+  "title": "GEF Decision Capsule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "taskId", "rootCause", "chosenDecision", "invariants", "forbiddenAlternatives", "expectedPostconditions", "negativeCases", "sourceRefs"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "rootCause": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "chosenDecision": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "invariants": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 64 },
+    "forbiddenAlternatives": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 32 },
+    "expectedPostconditions": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 32 },
+    "negativeCases": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 32 },
+    "sourceRefs": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "symbol": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    }
+  }
+}
