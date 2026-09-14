@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-patch-recipe.schema.json",
+  "title": "GEF Patch Recipe",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "taskId", "targets", "structuralAnchors", "preconditions", "transforms", "preserve", "prove", "expectedPatchBudget"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "symbol"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "symbol": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      }
+    },
+    "structuralAnchors": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 300 }, "maxItems": 32 },
+    "preconditions": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "path", "description"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["FILE_EXISTS", "SYMBOL_EXISTS", "CONTENT_DIGEST_MATCH", "NO_SOURCE_CONFLICT"] },
+          "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "symbol": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "expectedDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "description": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      }
+    },
+    "transforms": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "path", "description"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["EDIT_SYMBOL", "ADD_SYMBOL", "REMOVE_SYMBOL", "EDIT_FILE"] },
+          "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "symbol": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "operation": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    },
+    "preserve": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 32 },
+    "prove": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "maxItems": 32 },
+    "expectedPatchBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxSourceFilesChanged", "maxTestFilesChanged", "maxSemanticLOC"],
+      "properties": {
+        "maxSourceFilesChanged": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "maxTestFilesChanged": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "maxSemanticLOC": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    }
+  }
+}

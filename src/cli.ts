@@ -49,7 +49,7 @@ import {
   runAdaptersStatusCommand,
   runAdaptersUninstallCommand,
 } from "./commands/adapters.js";
-import { runGefAdopt, runGefDoctor, runGefProfileShow, runGefStatus } from "./commands/gef.js";
+import { runGefAdopt, runGefContextPrepare, runGefDoctor, runGefPackBuild, runGefProfileShow, runGefPromptCompile, runGefStatus, runGefTaskCompile } from "./commands/gef.js";
 
 const program = new Command();
 
@@ -587,6 +587,42 @@ gef
   .option("--json", "JSON output")
   .action((options: { json?: boolean }) => {
     process.stdout.write(runGefDoctor({ json: options.json }));
+  });
+const gefTask = gef.command("task").description("GEF W1 task plane");
+gefTask
+  .command("compile <manifest>")
+  .description("Compile a W1 task manifest into a digest-bound UPIR (global sidecar, zero project footprint)")
+  .option("--json", "JSON output")
+  .action((manifest: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefTaskCompile(manifest, { json: options.json }));
+  });
+const gefContext = gef.command("context").description("GEF W1 context plane");
+gefContext
+  .command("prepare <task-id>")
+  .description("Prepare a symbol-scoped context slice for a compiled W1 task")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefContextPrepare(taskId, { json: options.json }));
+  });
+const gefPrompt = gef.command("prompt").description("GEF W1 prompt plane");
+gefPrompt
+  .command("compile <task-id>")
+  .description("Compile a deterministic executor prompt for a W1 task")
+  .option("--executor <executor>", "executor adapter (codex|generic)", "codex")
+  .option("--mode <mode>", "pack mode (correction|feature)", "correction")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { executor?: string; mode?: string; json?: boolean }) => {
+    process.stdout.write(runGefPromptCompile(taskId, { executor: options.executor, mode: options.mode, json: options.json }));
+  });
+const gefPack = gef.command("pack").description("GEF W1 execution pack plane");
+gefPack
+  .command("build <task-id>")
+  .description("Build a deterministic execution pack (machine JSON + human prompt)")
+  .option("--executor <executor>", "executor adapter (codex|generic|cursor)", "codex")
+  .option("--mode <mode>", "pack mode (correction|feature)", "correction")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { executor?: string; mode?: string; json?: boolean }) => {
+    process.stdout.write(runGefPackBuild(taskId, { executor: options.executor, mode: options.mode, json: options.json }));
   });
 
 program

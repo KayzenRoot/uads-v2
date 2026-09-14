@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-budget.schema.json",
+  "title": "GEF Budget Governor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "budgets", "usage", "status", "reasons"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxRepositorySearches", "maxExtraFilesOpened", "maxSourceFilesChanged", "maxTestFilesChanged", "maxSemanticLOC", "retryBudget"],
+      "properties": {
+        "maxRepositorySearches": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "maxExtraFilesOpened": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "maxSourceFilesChanged": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "maxTestFilesChanged": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "maxSemanticLOC": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "retryBudget": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "targetInputTokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "targetOutputTokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000 },
+        "targetActiveSeconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 86400 }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["searches", "extraFilesOpened", "sourceFilesChanged", "testFilesChanged", "semanticLOC", "retries"],
+      "properties": {
+        "searches": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "extraFilesOpened": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "sourceFilesChanged": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "testFilesChanged": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "semanticLOC": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "retries": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "inputTokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 10000000 },
+        "outputTokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 10000000 },
+        "activeSeconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 864000 }
+      }
+    },
+    "status": { "type": "string", "enum": ["OK", "SEARCH_BUDGET_EXPANSION_REQUIRED", "PATCH_BUDGET_EXPANSION_REQUIRED", "RETRY_BUDGET_EXHAUSTED", "TOKEN_BUDGET_EXPANSION_REQUIRED"] },
+    "reasons": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 300 }, "maxItems": 16 }
+  }
+}
