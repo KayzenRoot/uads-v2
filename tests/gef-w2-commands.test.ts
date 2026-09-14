@@ -64,6 +64,20 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     expect(second.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
   });
 
+  it("rebinds cross-task cache HIT receipts to the current task with a valid digest", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-cross-a", commandId: "gef.test.probe", facts, uadsHome: home, allowTestOnly: true });
+    expect(first.cacheStatus).toBe("MISS");
+    expect(first.receipt.source).toBe("EXECUTED");
+    const second = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-cross-b", commandId: "gef.test.probe", facts, uadsHome: home, allowTestOnly: true });
+    expect(second.cacheStatus).toBe("HIT");
+    expect(second.receipt.source).toBe("CACHE_HIT");
+    expect(second.receipt.taskId).toBe("w2-cross-b");
+    expect(second.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
+    expect(verifyWorkReceipt(second.receipt).ok).toBe(true);
+  });
+
   it("invalidates on changed source bytes through the worktree digest", () => {
     const { repo, home, fingerprint } = tempRepo();
     const before = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-drift", commandId: "gef.test.probe", facts: collectDiffFacts(repo, fingerprint), uadsHome: home, allowTestOnly: true });
@@ -80,10 +94,10 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     const contract = getCommandContract("gef.test.probe", { allowTestOnly: true });
     const receipt = buildWorkReceipt({ projectFingerprint: fingerprint, taskId: "w2-basis", contract, validityFingerprint: computeValidityFingerprint(basis), source: "EXECUTED", result: runCommandContract(contract, { repoRoot: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-run-")) }) });
     commandCacheStore(receipt, home);
-    expect(commandCacheLookup(basis, fingerprint, home).status).toBe("HIT");
-    expect(commandCacheLookup(validityFor(fingerprint, "clean:abc", { lockDigest: "0".repeat(64) }), fingerprint, home).status).toBe("MISS");
-    expect(commandCacheLookup(validityFor(fingerprint, "clean:abc", { toolchain: "node@v20" }), fingerprint, home).status).toBe("MISS");
-    expect(commandCacheLookup(validityFor(fingerprint, "clean:changed"), fingerprint, home).status).toBe("MISS");
+    expect(commandCacheLookup(basis, fingerprint, "w2-basis", home).status).toBe("HIT");
+    expect(commandCacheLookup(validityFor(fingerprint, "clean:abc", { lockDigest: "0".repeat(64) }), fingerprint, "w2-basis", home).status).toBe("MISS");
+    expect(commandCacheLookup(validityFor(fingerprint, "clean:abc", { toolchain: "node@v20" }), fingerprint, "w2-basis", home).status).toBe("MISS");
+    expect(commandCacheLookup(validityFor(fingerprint, "clean:changed"), fingerprint, "w2-basis", home).status).toBe("MISS");
   });
 
   it("rejects cross-project receipt replay", () => {
@@ -92,7 +106,7 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     const contract = getCommandContract("gef.test.probe", { allowTestOnly: true });
     const receipt = buildWorkReceipt({ projectFingerprint: fingerprint, taskId: "w2-xproj", contract, validityFingerprint: computeValidityFingerprint(basis), source: "EXECUTED", result: runCommandContract(contract, { repoRoot: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-run-")) }) });
     commandCacheStore(receipt, home);
-    const replay = commandCacheLookup(basis, "0".repeat(64), home);
+    const replay = commandCacheLookup(basis, "0".repeat(64), "w2-xproj", home);
     expect(replay.status).toBe("MISS");
     if (replay.status === "MISS") expect(replay.reason).toBe("CACHE_PROJECT_MISMATCH");
   });
@@ -113,7 +127,7 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     raw.exitCode = 0;
     raw.outcome = "PASS";
     fs.writeFileSync(cached, `${JSON.stringify(raw)}\n`);
-    expect(commandCacheLookup(basis, fingerprint, home).status).toBe("MISS");
+    expect(commandCacheLookup(basis, fingerprint, "w2-tamper", home).status).toBe("MISS");
   });
 
   it("keeps nonzero exits visible as FAIL", () => {

@@ -7,7 +7,7 @@ import { buildUpir } from "../src/gef/upir.js";
 import { sha256Hex } from "../src/lib/hash.js";
 import { collectDiffFacts, posixChangedPaths } from "../src/gef/git-facts.js";
 import { normalizeRepoRelativePath } from "../src/gef/upir.js";
-import { buildWorkReceipt } from "../src/gef/command-receipt.js";
+import { buildWorkReceipt, verifyWorkReceipt } from "../src/gef/command-receipt.js";
 import { getCommandContract } from "../src/gef/command-contract.js";
 import { buildMachineEvidence, evidenceDigestMaterial, verifyMachineEvidence } from "../src/gef/machine-evidence.js";
 import { canonicalDigest } from "../src/gef/upir.js";
@@ -40,6 +40,38 @@ function committedFixture(): { repo: string; home: string } {
   execFileSync("git", ["add", "."], { cwd: repo });
   execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
   return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-committed-home-")) };
+}
+
+function committedRenameFixture(): { repo: string; home: string; baseA: string; headB: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-rename-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-rename.git"], { cwd: repo });
+  const body = Array.from({ length: 30 }, (_, index) => `export const v${index} = ${index};\n`).join("");
+  fs.writeFileSync(path.join(repo, "before.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "A"], { cwd: repo });
+  const baseA = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  execFileSync("git", ["mv", "before.ts", "after.ts"], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+  const headB = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-rename-home-")), baseA, headB };
+}
+
+function committedCopyFixture(): { repo: string; home: string; baseA: string; headB: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-copy-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-copy.git"], { cwd: repo });
+  const body = Array.from({ length: 60 }, (_, index) => `export const c${index} = ${index};\n`).join("");
+  fs.writeFileSync(path.join(repo, "orig.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "A"], { cwd: repo });
+  const baseA = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  fs.writeFileSync(path.join(repo, "orig.ts"), `${body}export const extra = 1;\n`);
+  fs.writeFileSync(path.join(repo, "copy-of-orig.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+  const headB = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-copy-home-")), baseA, headB };
 }
 
 function packUpir(taskId: string, baseSha?: string) {
@@ -110,6 +142,49 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     expect(facts.baseSha).toBe(baseA);
     expect(facts.worktreeDigest).toBe(null);
     expect(facts.changedFiles.map((item) => `${item.path}:${item.status}`)).toEqual(["added.ts:added", "change.ts:modified"]);
+  });
+
+  it("reports committed renames with the destination path and source previousPath", () => {
+    const { repo, baseA, headB } = committedRenameFixture();
+    const facts = collectDiffFacts(repo, FINGERPRINT, baseA);
+    expect(facts.dirty).toBe(false);
+    expect(facts.headSha).toBe(headB);
+    expect(facts.baseSha).toBe(baseA);
+    expect(facts.worktreeDigest).toBe(null);
+    expect(facts.changedFiles).toHaveLength(1);
+    const renamed = facts.changedFiles[0];
+    expect(renamed?.path).toBe("after.ts");
+    expect(renamed?.status).toBe("renamed");
+    expect(renamed?.previousPath).toBe("before.ts");
+    expect(facts.changedFiles.some((item) => item.path === "before.ts")).toBe(false);
+    expect(renamed?.digest).toBe(sha256Hex(fs.readFileSync(path.join(repo, "after.ts"))));
+  });
+
+  it("reports committed copies with the destination path and source previousPath", () => {
+    const { repo, baseA } = committedCopyFixture();
+    const facts = collectDiffFacts(repo, FINGERPRINT, baseA);
+    expect(facts.dirty).toBe(false);
+    const copied = facts.changedFiles.find((item) => item.path === "copy-of-orig.ts");
+    expect(copied?.status).toBe("copied");
+    expect(copied?.previousPath).toBe("orig.ts");
+    expect(facts.changedFiles.some((item) => item.path === "orig.ts" && item.status === "copied")).toBe(false);
+    expect(facts.changedFiles).toHaveLength(2);
+    expect(copied?.digest).toBe(sha256Hex(fs.readFileSync(path.join(repo, "copy-of-orig.ts"))));
+  });
+
+  it("verifies task-B machine evidence built from a rebound cache HIT receipt", () => {
+    const { repo, home } = tempRepo();
+    const first = runWorkPlane({ taskId: "w2-plane-a", workOrder: "GEF-W2", commandIds: ["gef.test.probe"], cwd: repo, uadsHome: home, allowTestOnly: true });
+    expect(first.receipts[0]?.source).toBe("EXECUTED");
+    const second = runWorkPlane({ taskId: "w2-plane-b", workOrder: "GEF-W2", commandIds: ["gef.test.probe"], cwd: repo, uadsHome: home, allowTestOnly: true });
+    const hit = second.receipts[0];
+    expect(second.receipts).toHaveLength(1);
+    expect(hit?.source).toBe("CACHE_HIT");
+    expect(hit?.taskId).toBe("w2-plane-b");
+    expect(verifyWorkReceipt(hit).ok).toBe(true);
+    expect(verifyMachineEvidence(second.evidence, second.evidence.projectFingerprint, "w2-plane-b").ok).toBe(true);
+    expect(second.report).toContain("w2-plane-b");
+    expect(second.terminalState).toBe("COMPLETE_CANDIDATE");
   });
 
   it("preserves the committed delta under a dirty overlay with its own digest", () => {

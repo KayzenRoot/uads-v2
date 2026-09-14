@@ -83,7 +83,7 @@ export function runWorkCommand(input: {
     platform: process.platform,
     envClass: computeEnvClass(resolvedEnv.semantic),
   };
-  const lookup = commandCacheLookup(basis, input.projectFingerprint, input.uadsHome);
+  const lookup = commandCacheLookup(basis, input.projectFingerprint, input.taskId, input.uadsHome);
   if (lookup.status === "HIT") return { receipt: lookup.receipt, cacheStatus: "HIT", cacheReason: null };
   const result = runCommandContract(contract, { repoRoot: input.repoRoot, env: input.env });
   const receipt = buildWorkReceipt({

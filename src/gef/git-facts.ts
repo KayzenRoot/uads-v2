@@ -146,25 +146,29 @@ function parsePorcelainZ(fields: string[]): ParsedPath[] {
 }
 
 function parseNameStatusZ(fields: string[]): ParsedPath[] {
-  // diff --name-status -z truth: <status> NUL <path> NUL, where renames and
-  // copies carry a similarity score (R100/C100) plus a third NUL field with
-  // the source path: R100 NUL destination NUL source NUL.
+  // diff --name-status -z truth: <status> NUL <source> NUL <destination> NUL
+  // for renames/copies (e.g. R100 NUL old NUL new NUL); plain add/modify/
+  // delete records are <status> NUL <path> NUL. path is the destination for
+  // R/C and previousPath is the source.
   const parsed: ParsedPath[] = [];
   let cursor = 0;
   while (cursor + 1 < fields.length) {
     const statusToken = fields[cursor] ?? "";
-    const destToken = fields[cursor + 1] ?? "";
+    const sourceToken = fields[cursor + 1] ?? "";
     cursor += 2;
     const code = statusToken[0] ?? " ";
+    let destToken = sourceToken;
     let previousPath: string | undefined;
-    if ((code === "R" || code === "C") && cursor < fields.length) {
-      const source = fields[cursor] ?? "";
+    if (code === "R" || code === "C") {
+      if (cursor >= fields.length) continue;
+      const destination = fields[cursor] ?? "";
       cursor += 1;
       try {
-        previousPath = normalizeRepoRelativePath(source);
+        previousPath = normalizeRepoRelativePath(sourceToken);
       } catch {
         previousPath = undefined;
       }
+      destToken = destination;
     }
     let normalized: string;
     try {

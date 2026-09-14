@@ -24,7 +24,7 @@ export function commandCachePath(validityFingerprint: string, uadsHome?: string)
   return target;
 }
 
-export function commandCacheLookup(basis: ValidityBasis, projectFingerprint: string, uadsHome?: string): CacheLookup {
+export function commandCacheLookup(basis: ValidityBasis, projectFingerprint: string, taskId: string, uadsHome?: string): CacheLookup {
   const key = computeValidityFingerprint(basis);
   let target: string;
   try {
@@ -39,7 +39,7 @@ export function commandCacheLookup(basis: ValidityBasis, projectFingerprint: str
   const stored = verified.receipt;
   if (stored.projectFingerprint !== projectFingerprint) return { status: "MISS", reason: "CACHE_PROJECT_MISMATCH" };
   if (stored.validityFingerprint !== key) return { status: "MISS", reason: "CACHE_BASIS_MISMATCH" };
-  return { status: "HIT", receipt: reissueCacheHit(stored) };
+  return { status: "HIT", receipt: reissueCacheHit(stored, taskId) };
 }
 
 export function commandCacheStore(receipt: WorkReceipt, uadsHome?: string): string {

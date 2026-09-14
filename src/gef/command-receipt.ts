@@ -88,10 +88,13 @@ export function buildWorkReceipt(input: {
   return receipt;
 }
 
-export function reissueCacheHit(stored: WorkReceipt): WorkReceipt {
-  const { receiptDigest: _dropped, ...rest } = stored;
+export function reissueCacheHit(stored: WorkReceipt, taskId: string): WorkReceipt {
+  // Cross-task reuse: the deterministic command result (validityFingerprint)
+  // stays reusable, but receipt attribution is rebound to the current task.
+  const { receiptDigest: _dropped, taskId: _previousTask, ...rest } = stored;
   void _dropped;
-  const hit = { ...rest, source: "CACHE_HIT" as const };
+  void _previousTask;
+  const hit = { ...rest, taskId, source: "CACHE_HIT" as const };
   return { ...hit, receiptDigest: computeReceiptDigest(hit) };
 }
 
