@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-work-receipt.schema.json",
+  "title": "GEF W2 Work Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectFingerprint", "taskId", "commandId", "commandVersion", "contractDigest", "validityFingerprint", "source", "outcome", "exitCode", "durationMs", "stdoutBytes", "stderrBytes", "stdoutTruncated", "stderrTruncated", "summaryDigest", "receiptDigest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "commandId": { "type": "string", "pattern": "^gef\\.[A-Za-z0-9._-]{1,80}$" },
+    "commandVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "contractDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "validityFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "source": { "type": "string", "enum": ["EXECUTED", "CACHE_HIT"] },
+    "outcome": { "type": "string", "enum": ["PASS", "FAIL", "TIMEOUT", "ERROR"] },
+    "exitCode": { "type": ["integer", "null"], "minimum": -9999, "maximum": 9999 },
+    "durationMs": { "type": "integer", "minimum": 0, "maximum": 3600000 },
+    "stdoutBytes": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+    "stderrBytes": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+    "stdoutTruncated": { "type": "boolean" },
+    "stderrTruncated": { "type": "boolean" },
+    "summary": { "type": "string", "maxLength": 2048 },
+    "summaryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "receiptDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

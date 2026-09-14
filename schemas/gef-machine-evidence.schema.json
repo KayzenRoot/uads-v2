@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-machine-evidence.schema.json",
+  "title": "GEF W2 Machine Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectFingerprint", "taskId", "workOrder", "baseSha", "headSha", "workingTreeDigest", "changedFiles", "commandReceipts", "localValidation", "budgets", "telemetry", "knownDebt", "terminalState", "evidenceDigest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "workOrder": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "baseSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "headSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "workingTreeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "changedFiles": { "type": "array", "maxItems": 2000, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+    "commandReceipts": { "type": "array", "maxItems": 64, "items": { "type": "object" } },
+    "localValidation": { "type": "object", "maxProperties": 64 },
+    "budgets": { "type": "object", "maxProperties": 32 },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commandsRun", "cacheHits", "cacheMisses", "totalDurationMs", "totalStdoutBytes", "evidenceGeneratedMs"],
+      "properties": {
+        "commandsRun": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "cacheHits": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "cacheMisses": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "totalDurationMs": { "type": "integer", "minimum": 0, "maximum": 36000000 },
+        "totalStdoutBytes": { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+        "evidenceGeneratedMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+      }
+    },
+    "knownDebt": { "type": "array", "maxItems": 32, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+    "terminalState": { "type": "string", "enum": ["COMPLETE_CANDIDATE", "BLOCKED", "SOURCE_CONFLICT"] },
+    "evidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

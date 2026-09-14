@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-diff-facts.schema.json",
+  "title": "GEF W2 Diff Facts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectFingerprint", "baseSha", "headSha", "dirty", "changedFiles", "stats", "worktreeDigest", "factsDigest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "baseSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "headSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "dirty": { "type": "boolean" },
+    "changedFiles": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "status", "digest", "binary", "insertions", "deletions"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "status": { "type": "string", "enum": ["added", "modified", "deleted", "renamed", "untracked", "typechange"] },
+          "previousPath": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "digest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+          "binary": { "type": "boolean" },
+          "insertions": { "type": "integer", "minimum": 0, "maximum": 10000000 },
+          "deletions": { "type": "integer", "minimum": 0, "maximum": 10000000 }
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "insertions", "deletions"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0, "maximum": 2000 },
+        "insertions": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+        "deletions": { "type": "integer", "minimum": 0, "maximum": 100000000 }
+      }
+    },
+    "worktreeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "factsDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

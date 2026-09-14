@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-command-contract.schema.json",
+  "title": "GEF W2 Command Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "version", "executable", "args", "cwdMode", "timeoutMs", "maxStdoutBytes", "maxStderrBytes", "envAllowlist", "platforms", "relevantFiles", "contractDigest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "id": { "type": "string", "pattern": "^gef\\.[A-Za-z0-9._-]{1,80}$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "executable": { "type": "string", "enum": ["npm", "node", "git"] },
+    "args": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 300 }, "maxItems": 32 },
+    "cwdMode": { "const": "PROJECT_ROOT" },
+    "timeoutMs": { "type": "integer", "minimum": 100, "maximum": 600000 },
+    "maxStdoutBytes": { "type": "integer", "minimum": 64, "maximum": 1048576 },
+    "maxStderrBytes": { "type": "integer", "minimum": 64, "maximum": 1048576 },
+    "envAllowlist": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z0-9_]{1,80}$" }, "maxItems": 16 },
+    "platforms": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "enum": ["win32", "linux", "darwin"] } },
+    "relevantFiles": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 200 }, "maxItems": 16 },
+    "testOnly": { "type": "boolean" },
+    "contractDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}
