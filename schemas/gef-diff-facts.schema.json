@@ -20,7 +20,7 @@
         "required": ["path", "status", "digest", "binary", "insertions", "deletions"],
         "properties": {
           "path": { "type": "string", "minLength": 1, "maxLength": 500 },
-          "status": { "type": "string", "enum": ["added", "modified", "deleted", "renamed", "untracked", "typechange"] },
+          "status": { "type": "string", "enum": ["added", "modified", "deleted", "renamed", "copied", "untracked", "typechange"] },
           "previousPath": { "type": "string", "minLength": 1, "maxLength": 500 },
           "digest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
           "binary": { "type": "boolean" },

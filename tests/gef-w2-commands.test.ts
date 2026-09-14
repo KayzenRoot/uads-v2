@@ -171,4 +171,34 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     expect(fs.existsSync(path.join(repo, ".uads"))).toBe(false);
     expect(fs.existsSync(path.join(home, "gef", "command-cache"))).toBe(true);
   });
+
+  it("keeps non-allowlisted injected keys out of the child environment", () => {
+    const { repo } = tempRepo();
+    const contract = getCommandContract("gef.test.env.probe", { allowTestOnly: true });
+    const result = runCommandContract(contract, { repoRoot: repo, env: { GEF_TEST_VALUE: "ok", GEF_TEST_INJECTED: "evil" } });
+    expect(result.outcome).toBe("PASS");
+    expect(JSON.parse(result.stdoutHead)).toEqual({ v: "ok", e: null });
+  });
+
+  it("changes validity on allowed env drift and reuses on stable values", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-env", commandId: "gef.test.env.probe", facts, uadsHome: home, allowTestOnly: true, env: { GEF_TEST_VALUE: "A" } });
+    expect(first.cacheStatus).toBe("MISS");
+    const same = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-env", commandId: "gef.test.env.probe", facts, uadsHome: home, allowTestOnly: true, env: { GEF_TEST_VALUE: "A" } });
+    expect(same.cacheStatus).toBe("HIT");
+    expect(same.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
+    const drifted = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-env", commandId: "gef.test.env.probe", facts, uadsHome: home, allowTestOnly: true, env: { GEF_TEST_VALUE: "B" } });
+    expect(drifted.cacheStatus).toBe("MISS");
+    expect(drifted.receipt.validityFingerprint).not.toBe(first.receipt.validityFingerprint);
+  });
+
+  it("fails closed on secret-like allowlisted values without cache reuse", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    expect(() => runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-env-secret", commandId: "gef.test.env.probe", facts, uadsHome: home, allowTestOnly: true, env: { GEF_TEST_VALUE: SECRET_FIXTURE } })).toThrow("COMMAND_ENV_SECRET_REJECTED:GEF_TEST_VALUE");
+    const safe = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-env-secret", commandId: "gef.test.env.probe", facts, uadsHome: home, allowTestOnly: true, env: { GEF_TEST_VALUE: "safe-value" } });
+    expect(safe.cacheStatus).toBe("MISS");
+    expect(JSON.stringify(safe.receipt)).not.toContain(SECRET_FIXTURE);
+  });
 });

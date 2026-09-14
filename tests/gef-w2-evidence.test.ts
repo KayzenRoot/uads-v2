@@ -4,9 +4,12 @@ import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { buildUpir } from "../src/gef/upir.js";
+import { sha256Hex } from "../src/lib/hash.js";
 import { collectDiffFacts, posixChangedPaths } from "../src/gef/git-facts.js";
 import { normalizeRepoRelativePath } from "../src/gef/upir.js";
-import { buildMachineEvidence } from "../src/gef/machine-evidence.js";
+import { buildWorkReceipt } from "../src/gef/command-receipt.js";
+import { getCommandContract } from "../src/gef/command-contract.js";
+import { buildMachineEvidence, verifyMachineEvidence } from "../src/gef/machine-evidence.js";
 import { renderEvidenceReport } from "../src/gef/evidence-report.js";
 import { runWorkForPack, runWorkPlane } from "../src/gef/work-plane.js";
 import { runGefCacheInspect, runGefCachePrune, runGefCommandList, runGefCommandRun, runGefEvidenceBuild, runGefEvidenceReport, runGefReceiptShow, runGefWorkFacts } from "../src/commands/gef-work.js";
@@ -66,6 +69,11 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     expect(binary?.digest).toMatch(/^[a-f0-9]{64}$/);
     const renamed = first.changedFiles.find((item) => item.path === "renamed-a.ts");
     expect(renamed?.status).toBe("renamed");
+    expect(renamed?.previousPath).toBe("a.ts");
+    expect(first.changedFiles).toHaveLength(4);
+    expect(first.changedFiles.some((item) => item.path === "a.ts")).toBe(false);
+    const renamedBytes = fs.readFileSync(path.join(repo, "renamed-a.ts"));
+    expect(renamed?.digest).toBe(sha256Hex(renamedBytes));
   });
 
   it("distinguishes clean committed heads from dirty trees", () => {
@@ -100,6 +108,53 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     expect(evidence.localValidation.hostedA3).toBe("NOT_RUN");
     expect(evidence.headSha).toBe(null);
     expect(renderEvidenceReport(evidence)).toContain("NOT_RUN");
+  });
+
+  it("rejects every tampered machine evidence field", () => {
+    const { repo } = tempRepo();
+    const evidence = buildMachineEvidence({ projectFingerprint: FINGERPRINT, taskId: "w2-tamper-ev", workOrder: "GEF-W2", facts: collectDiffFacts(repo, FINGERPRINT), receipts: [], localValidation: { typecheck: "PASS" }, knownDebt: ["debt-a"] });
+    expect(verifyMachineEvidence(evidence, FINGERPRINT, "w2-tamper-ev").ok).toBe(true);
+    expect(verifyMachineEvidence({ ...evidence, terminalState: "BLOCKED" }).ok).toBe(false);
+    expect(verifyMachineEvidence({ ...evidence, localValidation: { typecheck: "FAIL" } }).ok).toBe(false);
+    expect(verifyMachineEvidence({ ...evidence, changedFiles: [...evidence.changedFiles, "forged.ts"] }).ok).toBe(false);
+    expect(verifyMachineEvidence({ ...evidence, knownDebt: [] }).ok).toBe(false);
+    expect(verifyMachineEvidence({ ...evidence, evidenceDigest: "0".repeat(64) }).ok).toBe(false);
+    expect(verifyMachineEvidence(evidence, "1".repeat(64), "w2-tamper-ev").ok).toBe(false);
+    expect(verifyMachineEvidence(evidence, FINGERPRINT, "other-task").ok).toBe(false);
+    expect(verifyMachineEvidence({ ...evidence, commandReceipts: [{ forged: true }] }).ok).toBe(false);
+  });
+
+  it("rejects receipt outcome tampering inside machine evidence", () => {
+    const contract = getCommandContract("gef.test.probe", { allowTestOnly: true });
+    const receipt = buildWorkReceipt({
+      projectFingerprint: FINGERPRINT,
+      taskId: "w2-tamper-rcpt",
+      contract,
+      validityFingerprint: "a".repeat(64),
+      source: "EXECUTED",
+      result: { exitCode: 0, signal: null, timedOut: false, durationMs: 5, stdoutBytes: 12, stderrBytes: 0, stdoutTruncated: false, stderrTruncated: false, stdoutHead: "gef-probe-ok", stderrHead: "", outcome: "PASS" },
+    });
+    const evidence = buildMachineEvidence({ projectFingerprint: FINGERPRINT, taskId: "w2-tamper-rcpt", workOrder: "GEF-W2", facts: null, receipts: [receipt], localValidation: {}, knownDebt: [] });
+    expect(verifyMachineEvidence(evidence, FINGERPRINT, "w2-tamper-rcpt").ok).toBe(true);
+    expect(verifyMachineEvidence({ ...evidence, commandReceipts: [{ ...receipt, outcome: "FAIL" as const }] }).ok).toBe(false);
+  });
+
+  it("fails closed when persisted evidence is tampered before report", () => {
+    const { repo, home } = tempRepo();
+    process.env.UADS_HOME = home;
+    try {
+      JSON.parse(runGefEvidenceBuild("w2-ev-tamper", { cwd: repo, json: true, commands: "" }));
+      const projects = path.join(home, "gef", "projects");
+      const projectDir = fs.readdirSync(projects).map((name) => path.join(projects, name)).find((candidate) => fs.existsSync(path.join(candidate, "w2-evidence", "w2-ev-tamper.json")));
+      expect(projectDir).toBeDefined();
+      const target = path.join(projectDir as string, "w2-evidence", "w2-ev-tamper.json");
+      const stored = JSON.parse(fs.readFileSync(target, "utf8")) as Record<string, unknown>;
+      stored.terminalState = "BLOCKED";
+      fs.writeFileSync(target, `${JSON.stringify(stored)}\n`);
+      expect(() => runGefEvidenceReport("w2-ev-tamper", { cwd: repo, format: "md" })).toThrow("W2_EVIDENCE_CORRUPT");
+    } finally {
+      delete process.env.UADS_HOME;
+    }
   });
 
   it("lets W1 packs invoke only registered deterministic command IDs", () => {

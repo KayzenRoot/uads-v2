@@ -9,7 +9,7 @@ import { collectDiffFacts } from "../gef/git-facts.js";
 import { getCommandContract, listCommandContracts } from "../gef/command-contract.js";
 import { loadWorkReceipt, persistWorkReceipt } from "../gef/command-receipt.js";
 import { inspectCommandCache, pruneCommandCache } from "../gef/command-cache.js";
-import { buildMachineEvidence, type CheckState, type MachineEvidence } from "../gef/machine-evidence.js";
+import { buildMachineEvidence, verifyMachineEvidence, type CheckState, type MachineEvidence } from "../gef/machine-evidence.js";
 import { renderEvidenceReport } from "../gef/evidence-report.js";
 import { resolveWorkIdentity, runWorkCommand, runWorkPlane } from "../gef/work-plane.js";
 import { recordGefTelemetry } from "../gef/telemetry.js";
@@ -30,10 +30,16 @@ function evidenceFile(projectId: string, paths: ReturnType<typeof getUadsPaths>,
   return target;
 }
 
-function readEvidence(projectId: string, paths: ReturnType<typeof getUadsPaths>, taskId: string): MachineEvidence {
-  const raw = JSON.parse(fs.readFileSync(evidenceFile(projectId, paths, taskId), "utf8")) as MachineEvidence;
-  if (!raw || raw.taskId !== taskId) throw new Error("W2_EVIDENCE_CORRUPT");
-  return raw;
+function readEvidence(fingerprint: string, paths: ReturnType<typeof getUadsPaths>, projectId: string, taskId: string): MachineEvidence {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(fs.readFileSync(evidenceFile(projectId, paths, taskId), "utf8")) as MachineEvidence;
+  } catch {
+    throw new Error("W2_EVIDENCE_CORRUPT");
+  }
+  const bound = verifyMachineEvidence(raw, fingerprint, taskId);
+  if (!bound.ok) throw new Error(`W2_EVIDENCE_CORRUPT:${bound.reason}`);
+  return bound.evidence;
 }
 
 export function runGefWorkFacts(taskId: string | undefined, options: WorkOptions = {}): string {
@@ -127,7 +133,7 @@ export function runGefEvidenceBuild(taskId: string, options: WorkOptions & { com
 export function runGefEvidenceReport(taskId: string, options: WorkOptions & { format?: string } = {}): string {
   const cwd = options.cwd ?? process.cwd();
   const current = identity(cwd);
-  const evidence = readEvidence(current.projectId, current.paths, taskId);
+  const evidence = readEvidence(current.fingerprint, current.paths, current.projectId, taskId);
   if ((options.format ?? "md") !== "md") throw new Error("EVIDENCE_FORMAT_UNSUPPORTED");
   return `${renderEvidenceReport(evidence)}`;
 }

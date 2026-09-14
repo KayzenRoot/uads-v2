@@ -182,6 +182,21 @@ const REGISTRY: CommandContract[] = [
     relevantFiles: [],
     testOnly: true,
   }),
+  defineContract({
+    schemaVersion: "0.1.0",
+    id: "gef.test.env.probe",
+    version: "1.0.0",
+    executable: "node",
+    args: ["-e", "process.stdout.write(JSON.stringify({v:process.env.GEF_TEST_VALUE??null,e:process.env.GEF_TEST_INJECTED??null}))"],
+    cwdMode: "PROJECT_ROOT",
+    timeoutMs: 30000,
+    maxStdoutBytes: 4096,
+    maxStderrBytes: 4096,
+    envAllowlist: ["GEF_TEST_VALUE"],
+    platforms: ["win32", "linux", "darwin"],
+    relevantFiles: [],
+    testOnly: true,
+  }),
 ];
 
 export function listCommandContracts(includeTestOnly = false): CommandContract[] {

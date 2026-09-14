@@ -72,7 +72,7 @@ export function buildMachineEvidence(input: BuildEvidenceInput): MachineEvidence
   // The digest binds a zeroed evidenceGeneratedMs so identical inputs always
   // produce the identical digest; the measured duration stays on the record.
   const measuredMs = Date.now() - started;
-  const withoutDigest = {
+  const provisional: MachineEvidence = {
     schemaVersion: MACHINE_EVIDENCE_SCHEMA_VERSION,
     projectFingerprint: input.projectFingerprint,
     taskId: input.taskId,
@@ -84,17 +84,60 @@ export function buildMachineEvidence(input: BuildEvidenceInput): MachineEvidence
     commandReceipts: receipts,
     localValidation: Object.fromEntries(Object.entries(input.localValidation ?? {}).sort(([left], [right]) => (left < right ? -1 : 1))),
     budgets: Object.fromEntries(Object.entries(input.budgets ?? {}).sort(([left], [right]) => (left < right ? -1 : 1))),
-    telemetry: { ...telemetry, evidenceGeneratedMs: 0 },
+    telemetry: { ...telemetry, evidenceGeneratedMs: measuredMs },
     knownDebt: [...(input.knownDebt ?? [])].sort(),
     terminalState: input.terminalState ?? "COMPLETE_CANDIDATE",
+    evidenceDigest: "0".repeat(64),
   };
-  const evidence: MachineEvidence = { ...withoutDigest, telemetry: { ...withoutDigest.telemetry, evidenceGeneratedMs: measuredMs }, evidenceDigest: canonicalDigest(withoutDigest) };
+  const evidence: MachineEvidence = { ...provisional, evidenceDigest: canonicalDigest(evidenceDigestMaterial(provisional)) };
   assertSchema(MACHINE_EVIDENCE_SCHEMA_FILE, evidence, findPackageRoot());
   return evidence;
 }
 
 export function validateMachineEvidence(data: unknown, schemaRoot?: string): string[] {
   return validateAgainstSchema(MACHINE_EVIDENCE_SCHEMA_FILE, data, schemaRoot ?? findPackageRoot());
+}
+
+export function evidenceDigestMaterial(evidence: MachineEvidence): Omit<MachineEvidence, "evidenceDigest"> {
+  const receipts = [...evidence.commandReceipts].sort((left, right) =>
+    left.commandId < right.commandId ? -1 : left.commandId > right.commandId ? 1 : left.receiptDigest < right.receiptDigest ? -1 : 1,
+  );
+  return {
+    schemaVersion: evidence.schemaVersion,
+    projectFingerprint: evidence.projectFingerprint,
+    taskId: evidence.taskId,
+    workOrder: evidence.workOrder,
+    baseSha: evidence.baseSha,
+    headSha: evidence.headSha,
+    workingTreeDigest: evidence.workingTreeDigest,
+    changedFiles: [...evidence.changedFiles].sort(),
+    commandReceipts: receipts,
+    localValidation: Object.fromEntries(Object.entries(evidence.localValidation).sort(([left], [right]) => (left < right ? -1 : 1))),
+    budgets: Object.fromEntries(Object.entries(evidence.budgets).sort(([left], [right]) => (left < right ? -1 : 1))),
+    telemetry: { ...evidence.telemetry, evidenceGeneratedMs: 0 },
+    knownDebt: [...evidence.knownDebt].sort(),
+    terminalState: evidence.terminalState,
+  };
+}
+
+export function verifyMachineEvidence(
+  data: unknown,
+  expectedProjectFingerprint?: string,
+  expectedTaskId?: string,
+): { ok: true; evidence: MachineEvidence } | { ok: false; reason: string } {
+  const errors = validateMachineEvidence(data);
+  if (errors.length > 0) return { ok: false, reason: `EVIDENCE_SCHEMA_INVALID:${errors[0] ?? "unknown"}` };
+  const evidence = data as MachineEvidence;
+  if (expectedTaskId !== undefined && evidence.taskId !== expectedTaskId) {
+    return { ok: false, reason: "EVIDENCE_TASK_MISMATCH" };
+  }
+  if (expectedProjectFingerprint !== undefined && evidence.projectFingerprint !== expectedProjectFingerprint) {
+    return { ok: false, reason: "EVIDENCE_PROJECT_MISMATCH" };
+  }
+  if (canonicalDigest(evidenceDigestMaterial(evidence)) !== evidence.evidenceDigest) {
+    return { ok: false, reason: "EVIDENCE_DIGEST_MISMATCH" };
+  }
+  return { ok: true, evidence };
 }
 
 export function summarizeValidation(evidence: MachineEvidence): { pass: number; fail: number; notRun: number } {

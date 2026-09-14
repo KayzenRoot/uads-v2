@@ -6,7 +6,7 @@ import { sha256Hex } from "../lib/hash.js";
 import { canonicalDigest } from "./upir.js";
 import { collectDiffFacts, type DiffFacts } from "./git-facts.js";
 import { getCommandContract, validatePackCommandIds } from "./command-contract.js";
-import { runCommandContract } from "./command-runner.js";
+import { computeEnvClass, resolveCommandEnv, runCommandContract } from "./command-runner.js";
 import { buildWorkReceipt, computeValidityFingerprint, type ValidityBasis, type WorkReceipt } from "./command-receipt.js";
 import { commandCacheLookup, commandCacheStore } from "./command-cache.js";
 import { buildMachineEvidence, type CheckState, type EvidenceTerminalState, type MachineEvidence } from "./machine-evidence.js";
@@ -71,8 +71,12 @@ export function runWorkCommand(input: {
   facts: DiffFacts;
   uadsHome?: string;
   allowTestOnly?: boolean;
+  env?: Record<string, string>;
 }): { receipt: WorkReceipt; cacheStatus: "HIT" | "MISS"; cacheReason: string | null } {
   const contract = getCommandContract(input.commandId, { allowTestOnly: input.allowTestOnly });
+  // Fail closed before any cache lookup: a secret-like allowlisted value
+  // throws here, so no stale basis can authorize the run.
+  const resolvedEnv = resolveCommandEnv(contract, input.env);
   const worktreeDigest = input.facts.worktreeDigest ?? `clean:${input.facts.headSha ?? "unknown"}`;
   const basis: ValidityBasis = {
     projectFingerprint: input.projectFingerprint,
@@ -81,11 +85,11 @@ export function runWorkCommand(input: {
     lockDigest: lockDigestFor(input.repoRoot, contract.relevantFiles),
     toolchain: toolchainFingerprint(),
     platform: process.platform,
-    envClass: canonicalDigest({ allowlist: [...contract.envAllowlist].sort() }),
+    envClass: computeEnvClass(resolvedEnv.semantic),
   };
   const lookup = commandCacheLookup(basis, input.projectFingerprint, input.uadsHome);
   if (lookup.status === "HIT") return { receipt: lookup.receipt, cacheStatus: "HIT", cacheReason: null };
-  const result = runCommandContract(contract, { repoRoot: input.repoRoot });
+  const result = runCommandContract(contract, { repoRoot: input.repoRoot, env: input.env });
   const receipt = buildWorkReceipt({
     projectFingerprint: input.projectFingerprint,
     taskId: input.taskId,

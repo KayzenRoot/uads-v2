@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { resolveNpmInvocation } from "../lib/exec.js";
 import { redactSecrets } from "../lib/secrets.js";
 import { sha256Hex } from "../lib/hash.js";
+import { canonicalDigest } from "./upir.js";
 import type { CommandContract } from "./command-contract.js";
 
 export type RunnerOutcome = "PASS" | "FAIL" | "TIMEOUT" | "ERROR";
@@ -33,24 +34,45 @@ function resolveExecutable(contract: CommandContract): { command: string; args: 
   return { command: contract.executable, args: [...contract.args] };
 }
 
-function buildEnv(allowlist: string[], extra?: Record<string, string>): Record<string, string> {
-  const env: Record<string, string> = {};
-  const names = new Set([...allowlist, ...Object.keys(extra ?? {})]);
-  for (const name of names) {
+export type CommandEnvPair = { name: string; value: string };
+
+export type ResolvedCommandEnv = {
+  childEnv: Record<string, string>;
+  semantic: CommandEnvPair[];
+};
+
+const OS_LAUNCH_VARS: Record<string, string[]> = {
+  win32: ["SystemRoot", "windir", "PATH", "PATHEXT", "TEMP", "TMP"],
+  linux: ["PATH"],
+  darwin: ["PATH"],
+};
+
+export function resolveCommandEnv(contract: CommandContract, extra?: Record<string, string>): ResolvedCommandEnv {
+  // The contract allowlist is the only key source: injected keys outside it
+  // never reach the child, even when explicitly supplied via options.
+  const semantic: CommandEnvPair[] = [];
+  for (const name of [...contract.envAllowlist].sort()) {
     if (!/^[A-Z0-9_]{1,80}$/.test(name)) continue;
     const value = extra?.[name] ?? process.env[name];
-    if (typeof value !== "string") continue;
-    if (redactSecrets(value).redactionCount > 0) continue;
-    env[name] = value;
-  }
-  if (process.platform === "win32") {
-    for (const name of ["SystemRoot", "windir", "PATH", "PATHEXT", "TEMP", "TMP"]) {
-      if (typeof process.env[name] === "string" && env[name] === undefined) env[name] = process.env[name] as string;
+    if (value === undefined || typeof value !== "string") continue;
+    if (redactSecrets(value).redactionCount > 0) {
+      throw new Error(`COMMAND_ENV_SECRET_REJECTED:${name}`);
     }
-  } else {
-    if (typeof process.env.PATH === "string" && env.PATH === undefined) env.PATH = process.env.PATH;
+    semantic.push({ name, value });
   }
-  return env;
+  const childEnv: Record<string, string> = Object.fromEntries(semantic.map((pair) => [pair.name, pair.value]));
+  // Minimal OS launch variables stay launch-only: required to spawn the
+  // executable on some platforms, excluded from semantic classification.
+  for (const name of OS_LAUNCH_VARS[process.platform] ?? OS_LAUNCH_VARS.linux ?? []) {
+    if (typeof process.env[name] === "string" && childEnv[name] === undefined) {
+      childEnv[name] = process.env[name] as string;
+    }
+  }
+  return { childEnv, semantic };
+}
+
+export function computeEnvClass(semantic: CommandEnvPair[]): string {
+  return canonicalDigest([...semantic].sort((left, right) => (left.name < right.name ? -1 : 1)));
 }
 
 function capOutput(output: string, maxBytes: number): { head: string; totalBytes: number; truncated: boolean } {
@@ -63,11 +85,15 @@ function capOutput(output: string, maxBytes: number): { head: string; totalBytes
 export function runCommandContract(contract: CommandContract, options: RunOptions): RunnerResult {
   const started = Date.now();
   const { command, args } = resolveExecutable(contract);
+  // Secret-like allowlisted values fail closed here before any spawn, and the
+  // work plane resolves the same basis before any cache lookup, so no stale
+  // cache entry can ever authorize the run.
+  const { childEnv } = resolveCommandEnv(contract, options.env);
   let result: RunnerResult;
   try {
     const spawned = spawnSync(command, args, {
       cwd: options.repoRoot,
-      env: buildEnv(contract.envAllowlist, options.env),
+      env: childEnv,
       shell: false,
       windowsHide: true,
       timeout: contract.timeoutMs,
