@@ -4,7 +4,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { afterEach, describe, expect, it } from "vitest";
 import { getCommandContract, listCommandContracts } from "../src/gef/command-contract.js";
-import { runCommandContract } from "../src/gef/command-runner.js";
+import { resolveToolchainBasis, runCommandContract } from "../src/gef/command-runner.js";
 import { buildWorkReceipt, computeValidityFingerprint, verifyWorkReceipt, type ValidityBasis } from "../src/gef/command-receipt.js";
 import { commandCacheLookup, commandCacheStore } from "../src/gef/command-cache.js";
 import { collectDiffFacts } from "../src/gef/git-facts.js";
@@ -200,5 +200,51 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     const safe = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-env-secret", commandId: "gef.test.env.probe", facts, uadsHome: home, allowTestOnly: true, env: { GEF_TEST_VALUE: "safe-value" } });
     expect(safe.cacheStatus).toBe("MISS");
     expect(JSON.stringify(safe.receipt)).not.toContain(SECRET_FIXTURE);
+  });
+
+  it("binds cache validity to the effective toolchain and resolution basis", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    const nodeContract = getCommandContract("gef.test.probe", { allowTestOnly: true });
+    const gitContract = getCommandContract("gef.work.git.facts");
+    expect(resolveToolchainBasis(nodeContract)).toMatch(/^[a-f0-9]{64}$/);
+    expect(resolveToolchainBasis(nodeContract)).toBe(resolveToolchainBasis(nodeContract));
+    expect(resolveToolchainBasis(gitContract)).not.toBe(resolveToolchainBasis(nodeContract));
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-toolchain", commandId: "gef.work.git.facts", facts, uadsHome: home });
+    expect(first.cacheStatus).toBe("MISS");
+    const stable = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-toolchain", commandId: "gef.work.git.facts", facts, uadsHome: home });
+    expect(stable.cacheStatus).toBe("HIT");
+    const previousPath = process.env.PATH ?? "";
+    const driftDir = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-path-"));
+    try {
+      process.env.PATH = `${driftDir}${path.delimiter}${previousPath}`;
+      const drifted = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-toolchain", commandId: "gef.work.git.facts", facts, uadsHome: home });
+      expect(drifted.cacheStatus).toBe("MISS");
+      expect(drifted.receipt.validityFingerprint).not.toBe(first.receipt.validityFingerprint);
+      const redrift = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-toolchain", commandId: "gef.work.git.facts", facts, uadsHome: home });
+      expect(redrift.cacheStatus).toBe("HIT");
+    } finally {
+      process.env.PATH = previousPath;
+    }
+    const restored = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-toolchain", commandId: "gef.work.git.facts", facts, uadsHome: home });
+    expect(restored.cacheStatus).toBe("HIT");
+    expect(restored.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
+  });
+
+  it("refuses optimistic reuse when the toolchain probe fails", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    const previousPath = process.env.PATH;
+    const previousPathext = process.env.PATHEXT;
+    try {
+      process.env.PATH = "";
+      delete process.env.PATHEXT;
+      expect(() => runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-toolchain-fail", commandId: "gef.work.git.facts", facts, uadsHome: home })).toThrow("TOOLCHAIN_PROBE_FAILED");
+    } finally {
+      if (previousPath === undefined) delete process.env.PATH;
+      else process.env.PATH = previousPath;
+      if (previousPathext === undefined) delete process.env.PATHEXT;
+      else process.env.PATHEXT = previousPathext;
+    }
   });
 });

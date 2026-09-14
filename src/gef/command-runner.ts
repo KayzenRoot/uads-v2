@@ -34,6 +34,55 @@ function resolveExecutable(contract: CommandContract): { command: string; args: 
   return { command: contract.executable, args: [...contract.args] };
 }
 
+function probeVersion(command: string, args: string[], kind: string): string {
+  const spawned = spawnSync(command, args, {
+    shell: false,
+    windowsHide: true,
+    timeout: 15000,
+    maxBuffer: 65536,
+    encoding: "utf8",
+  });
+  const output = typeof spawned.stdout === "string" ? spawned.stdout.trim() : "";
+  const failed = spawned.error !== undefined || (spawned.status ?? 1) !== 0 || output.length === 0;
+  if (failed) {
+    throw new Error(`TOOLCHAIN_PROBE_FAILED:${kind}`);
+  }
+  return output.slice(0, 200);
+}
+
+function launchResolutionDigest(): string {
+  // Resolution-sensitive launch basis only (PATH/PATHEXT select bare executables).
+  // Values are hashed; raw host paths never persist in evidence.
+  const names = process.platform === "win32" ? ["PATH", "PATHEXT"] : ["PATH"];
+  return sha256Hex(names.map((name) => `${name}=${process.env[name] ?? ""}`).join("\n"));
+}
+
+export function resolveToolchainBasis(contract: CommandContract): string {
+  if (contract.executable === "node") {
+    return canonicalDigest({
+      kind: "node",
+      nodeVersion: process.version,
+      execPathDigest: sha256Hex(process.execPath),
+    });
+  }
+  if (contract.executable === "npm") {
+    const npm = resolveNpmInvocation();
+    const pathSensitive = npm.command === "npm";
+    return canonicalDigest({
+      kind: "npm",
+      nodeVersion: process.version,
+      invocationDigest: sha256Hex([npm.command, ...npm.argsPrefix].join("\n")),
+      npmVersion: probeVersion(npm.command, [...npm.argsPrefix, "--version"], "npm"),
+      ...(pathSensitive ? { launchDigest: launchResolutionDigest() } : {}),
+    });
+  }
+  return canonicalDigest({
+    kind: "git",
+    gitVersion: probeVersion("git", ["--version"], "git"),
+    launchDigest: launchResolutionDigest(),
+  });
+}
+
 export type CommandEnvPair = { name: string; value: string };
 
 export type ResolvedCommandEnv = {

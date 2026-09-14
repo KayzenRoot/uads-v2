@@ -9,7 +9,8 @@ import { collectDiffFacts, posixChangedPaths } from "../src/gef/git-facts.js";
 import { normalizeRepoRelativePath } from "../src/gef/upir.js";
 import { buildWorkReceipt } from "../src/gef/command-receipt.js";
 import { getCommandContract } from "../src/gef/command-contract.js";
-import { buildMachineEvidence, verifyMachineEvidence } from "../src/gef/machine-evidence.js";
+import { buildMachineEvidence, evidenceDigestMaterial, verifyMachineEvidence } from "../src/gef/machine-evidence.js";
+import { canonicalDigest } from "../src/gef/upir.js";
 import { renderEvidenceReport } from "../src/gef/evidence-report.js";
 import { runWorkForPack, runWorkPlane } from "../src/gef/work-plane.js";
 import { runGefCacheInspect, runGefCachePrune, runGefCommandList, runGefCommandRun, runGefEvidenceBuild, runGefEvidenceReport, runGefReceiptShow, runGefWorkFacts } from "../src/commands/gef-work.js";
@@ -26,7 +27,22 @@ function tempRepo(): { repo: string; home: string } {
   return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-ev-home-")) };
 }
 
-function packUpir(taskId: string) {
+function committedFixture(): { repo: string; home: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-committed-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-committed.git"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "keep.ts"), `export const k = 1;\n`);
+  fs.writeFileSync(path.join(repo, "change.ts"), `export const c = 1;\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "A"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "change.ts"), `export const c = 2;\n`);
+  fs.writeFileSync(path.join(repo, "added.ts"), `export const n = 1;\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-committed-home-")) };
+}
+
+function packUpir(taskId: string, baseSha?: string) {
   return buildUpir({
     schemaVersion: "0.1.0",
     taskId,
@@ -34,7 +50,7 @@ function packUpir(taskId: string) {
     workOrder: "GEF-W2",
     taskClass: "T1",
     contextRadius: "C1",
-    baseSha: "0".repeat(40),
+    baseSha: baseSha ?? "0".repeat(40),
     reviewedHeadSha: null,
     goal: "evidence pack check",
     acceptedFindings: [],
@@ -82,6 +98,34 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     expect(clean.dirty).toBe(false);
     expect(clean.worktreeDigest).toBe(null);
     expect(clean.changedFiles).toEqual([]);
+  });
+
+  it("reports the exact committed base-to-head delta on a clean candidate", () => {
+    const { repo } = committedFixture();
+    const headB = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+    const baseA = execFileSync("git", ["rev-parse", "HEAD~1"], { cwd: repo, encoding: "utf8" }).trim();
+    const facts = collectDiffFacts(repo, FINGERPRINT, baseA);
+    expect(facts.dirty).toBe(false);
+    expect(facts.headSha).toBe(headB);
+    expect(facts.baseSha).toBe(baseA);
+    expect(facts.worktreeDigest).toBe(null);
+    expect(facts.changedFiles.map((item) => `${item.path}:${item.status}`)).toEqual(["added.ts:added", "change.ts:modified"]);
+  });
+
+  it("preserves the committed delta under a dirty overlay with its own digest", () => {
+    const { repo } = committedFixture();
+    const baseA = execFileSync("git", ["rev-parse", "HEAD~1"], { cwd: repo, encoding: "utf8" }).trim();
+    fs.writeFileSync(path.join(repo, "local.ts"), `export const l = 1;\n`);
+    const facts = collectDiffFacts(repo, FINGERPRINT, baseA);
+    expect(facts.dirty).toBe(true);
+    expect(facts.worktreeDigest).not.toBe(null);
+    expect(facts.changedFiles.map((item) => item.path)).toEqual(["added.ts", "change.ts", "local.ts"]);
+  });
+
+  it("fails closed on invalid or unreachable base without HEAD substitution", () => {
+    const { repo } = committedFixture();
+    expect(() => collectDiffFacts(repo, FINGERPRINT, "0".repeat(40))).toThrow("DIFF_BASE_UNAVAILABLE");
+    expect(() => collectDiffFacts(repo, FINGERPRINT, "not-a-sha")).toThrow("DIFF_BASE_UNAVAILABLE");
   });
 
   it("builds deterministic machine evidence digests", () => {
@@ -139,6 +183,37 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     expect(verifyMachineEvidence({ ...evidence, commandReceipts: [{ ...receipt, outcome: "FAIL" as const }] }).ok).toBe(false);
   });
 
+  it("rejects nested tampering even when the outer digest is recomputed", () => {
+    const contract = getCommandContract("gef.test.probe", { allowTestOnly: true });
+    const receipt = buildWorkReceipt({
+      projectFingerprint: FINGERPRINT,
+      taskId: "w2-nested-recompute",
+      contract,
+      validityFingerprint: "b".repeat(64),
+      source: "EXECUTED",
+      result: { exitCode: 0, signal: null, timedOut: false, durationMs: 5, stdoutBytes: 12, stderrBytes: 0, stdoutTruncated: false, stderrTruncated: false, stdoutHead: "gef-probe-ok", stderrHead: "", outcome: "PASS" },
+    });
+    const evidence = buildMachineEvidence({ projectFingerprint: FINGERPRINT, taskId: "w2-nested-recompute", workOrder: "GEF-W2", facts: null, receipts: [receipt], localValidation: {}, knownDebt: [] });
+    const tampered = { ...evidence, commandReceipts: [{ ...receipt, outcome: "FAIL" as const }] };
+    const repackaged = { ...tampered, evidenceDigest: canonicalDigest(evidenceDigestMaterial(tampered)) };
+    expect(verifyMachineEvidence(repackaged, FINGERPRINT, "w2-nested-recompute").ok).toBe(false);
+    expect(verifyMachineEvidence(repackaged).ok).toBe(false);
+  });
+
+  it("rejects nested receipts bound to another project or task", () => {
+    const contract = getCommandContract("gef.test.probe", { allowTestOnly: true });
+    const foreign = buildWorkReceipt({
+      projectFingerprint: "1".repeat(64),
+      taskId: "foreign-task",
+      contract,
+      validityFingerprint: "c".repeat(64),
+      source: "EXECUTED",
+      result: { exitCode: 0, signal: null, timedOut: false, durationMs: 5, stdoutBytes: 12, stderrBytes: 0, stdoutTruncated: false, stderrTruncated: false, stdoutHead: "gef-probe-ok", stderrHead: "", outcome: "PASS" },
+    });
+    const evidence = buildMachineEvidence({ projectFingerprint: FINGERPRINT, taskId: "w2-nested-bind", workOrder: "GEF-W2", facts: null, receipts: [foreign], localValidation: {}, knownDebt: [] });
+    expect(verifyMachineEvidence(evidence, FINGERPRINT, "w2-nested-bind").ok).toBe(false);
+  });
+
   it("fails closed when persisted evidence is tampered before report", () => {
     const { repo, home } = tempRepo();
     process.env.UADS_HOME = home;
@@ -159,7 +234,8 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
 
   it("lets W1 packs invoke only registered deterministic command IDs", () => {
     const { repo } = tempRepo();
-    const upir = packUpir("w2-pack-ok");
+    const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+    const upir = packUpir("w2-pack-ok", head);
     const result = runWorkForPack({ upir, commandIds: ["gef.work.git.facts"], cwd: repo, uadsHome: tempRepo().home });
     expect(result.receipts).toHaveLength(1);
     expect(result.receipts[0]?.outcome).toBe("PASS");

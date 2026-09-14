@@ -6,7 +6,7 @@ import { sha256Hex } from "../lib/hash.js";
 import { canonicalDigest } from "./upir.js";
 import { collectDiffFacts, type DiffFacts } from "./git-facts.js";
 import { getCommandContract, validatePackCommandIds } from "./command-contract.js";
-import { computeEnvClass, resolveCommandEnv, runCommandContract } from "./command-runner.js";
+import { computeEnvClass, resolveCommandEnv, resolveToolchainBasis, runCommandContract } from "./command-runner.js";
 import { buildWorkReceipt, computeValidityFingerprint, type ValidityBasis, type WorkReceipt } from "./command-receipt.js";
 import { commandCacheLookup, commandCacheStore } from "./command-cache.js";
 import { buildMachineEvidence, type CheckState, type EvidenceTerminalState, type MachineEvidence } from "./machine-evidence.js";
@@ -59,10 +59,6 @@ function lockDigestFor(repoRoot: string, relevantFiles: string[]): string {
   return canonicalDigest(parts);
 }
 
-function toolchainFingerprint(): string {
-  return canonicalDigest({ node: process.version, platform: process.platform });
-}
-
 export function runWorkCommand(input: {
   repoRoot: string;
   projectFingerprint: string;
@@ -83,7 +79,7 @@ export function runWorkCommand(input: {
     contractDigest: contract.contractDigest,
     worktreeDigest,
     lockDigest: lockDigestFor(input.repoRoot, contract.relevantFiles),
-    toolchain: toolchainFingerprint(),
+    toolchain: resolveToolchainBasis(contract),
     platform: process.platform,
     envClass: computeEnvClass(resolvedEnv.semantic),
   };

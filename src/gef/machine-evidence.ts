@@ -1,6 +1,7 @@
 import { assertSchema, validateAgainstSchema } from "../lib/json-schema.js";
 import { findPackageRoot } from "../lib/version.js";
 import { canonicalDigest } from "./upir.js";
+import { verifyWorkReceipt } from "./command-receipt.js";
 import type { DiffFacts } from "./git-facts.js";
 import type { WorkReceipt } from "./command-receipt.js";
 
@@ -133,6 +134,16 @@ export function verifyMachineEvidence(
   }
   if (expectedProjectFingerprint !== undefined && evidence.projectFingerprint !== expectedProjectFingerprint) {
     return { ok: false, reason: "EVIDENCE_PROJECT_MISMATCH" };
+  }
+  for (const receipt of evidence.commandReceipts) {
+    const nested = verifyWorkReceipt(receipt);
+    if (!nested.ok) return { ok: false, reason: `EVIDENCE_RECEIPT_INVALID:${nested.reason}` };
+    if (nested.receipt.projectFingerprint !== evidence.projectFingerprint) {
+      return { ok: false, reason: "EVIDENCE_RECEIPT_PROJECT_MISMATCH" };
+    }
+    if (nested.receipt.taskId !== evidence.taskId) {
+      return { ok: false, reason: "EVIDENCE_RECEIPT_TASK_MISMATCH" };
+    }
   }
   if (canonicalDigest(evidenceDigestMaterial(evidence)) !== evidence.evidenceDigest) {
     return { ok: false, reason: "EVIDENCE_DIGEST_MISMATCH" };

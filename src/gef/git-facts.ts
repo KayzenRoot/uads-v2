@@ -97,42 +97,19 @@ function splitNul(output: Buffer): string[] {
   return output.toString("utf8").split("\x00").filter((part) => part.length > 0);
 }
 
-export function collectDiffFacts(repoRoot: string, projectFingerprint: string, baseSha?: string): DiffFacts {
-  const headSha = gitText(repoRoot, ["rev-parse", "HEAD"]);
-  const base = baseSha ?? headSha;
-  const statusEntries = splitNul(runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout);
+type ParsedPath = { path: string; status: ChangedFileStatus; previousPath?: string };
 
-  // numstat without -z: one LF-terminated record per file. Quoted C-style paths
-  // are unquoted deterministically; rename destinations are extracted from
-  // the "old => new" / "{a => b}c" forms. -z is intentionally not used
-  // here because numstat -z rename token order is version-fragile.
-  const numstat = new Map<string, { insertions: number; deletions: number; binary: boolean }>();
-  for (const line of gitText(repoRoot, ["diff", "--numstat", "HEAD", "--"]).split("\n")) {
-    const match = /^(\d+|-)\t(\d+|-)\t(.*)$/.exec(line);
-    if (!match) continue;
-    const clean = unquoteGitPath(match[3] ?? "");
-    const destination = extractNumstatDestination(clean);
-    try {
-      const normalized = normalizeRepoRelativePath(destination);
-      const binary = match[1] === "-" || match[2] === "-";
-      numstat.set(normalized, {
-        insertions: binary ? 0 : Number.parseInt(match[1] ?? "0", 10) || 0,
-        deletions: binary ? 0 : Number.parseInt(match[2] ?? "0", 10) || 0,
-        binary,
-      });
-    } catch {
-      continue;
-    }
-  }
+type PathCounts = { insertions: number; deletions: number; binary: boolean };
 
-  // Porcelain v1 -z truth: each record is XY SP destination NUL, and rename/copy
-  // records carry a second NUL field (source) with no arrow token. The cursor
-  // consumes that second field as previousPath instead of treating it as a
-  // separate status record. -z paths are never C-quoted.
-  const changed: ChangedFileFact[] = [];
+// Porcelain v1 -z truth: each record is XY SP destination NUL, and rename/copy
+// records carry a second NUL field (source) with no arrow token. The cursor
+// consumes that second field as previousPath instead of treating it as a
+// separate status record. -z paths are never C-quoted.
+function parsePorcelainZ(fields: string[]): ParsedPath[] {
+  const parsed: ParsedPath[] = [];
   let cursor = 0;
-  while (cursor < statusEntries.length) {
-    const entry = statusEntries[cursor] ?? "";
+  while (cursor < fields.length) {
+    const entry = fields[cursor] ?? "";
     cursor += 1;
     if (entry.length < 4) continue;
     const indexStatus = entry[0] ?? " ";
@@ -140,8 +117,8 @@ export function collectDiffFacts(repoRoot: string, projectFingerprint: string, b
     const code = indexStatus !== " " && indexStatus !== "?" ? indexStatus : worktreeStatus;
     const isRenameOrCopy = code === "R" || code === "C";
     let previousPath: string | undefined;
-    if (isRenameOrCopy && cursor < statusEntries.length) {
-      const source = statusEntries[cursor] ?? "";
+    if (isRenameOrCopy && cursor < fields.length) {
+      const source = fields[cursor] ?? "";
       cursor += 1;
       try {
         previousPath = normalizeRepoRelativePath(source);
@@ -162,39 +139,165 @@ export function collectDiffFacts(repoRoot: string, projectFingerprint: string, b
     else if (code === "C") status = "copied";
     else if (code === "T") status = "typechange";
     else if (code === "?") status = "untracked";
-    const counts = numstat.get(normalized) ?? { insertions: 0, deletions: 0, binary: false };
-    let digest: string | null = null;
-    let binary = counts.binary;
-    // digest is the SHA-256 of raw working-tree file bytes (not the Git blob
-    // identity, which mixes in a header). Deleted or unreadable files bind null.
-    if (status !== "deleted") {
+    parsed.push({ path: normalized, status, ...(previousPath ? { previousPath } : {}) });
+    if (parsed.length >= 2000) break;
+  }
+  return parsed;
+}
+
+function parseNameStatusZ(fields: string[]): ParsedPath[] {
+  // diff --name-status -z truth: <status> NUL <path> NUL, where renames and
+  // copies carry a similarity score (R100/C100) plus a third NUL field with
+  // the source path: R100 NUL destination NUL source NUL.
+  const parsed: ParsedPath[] = [];
+  let cursor = 0;
+  while (cursor + 1 < fields.length) {
+    const statusToken = fields[cursor] ?? "";
+    const destToken = fields[cursor + 1] ?? "";
+    cursor += 2;
+    const code = statusToken[0] ?? " ";
+    let previousPath: string | undefined;
+    if ((code === "R" || code === "C") && cursor < fields.length) {
+      const source = fields[cursor] ?? "";
+      cursor += 1;
       try {
-        digest = sha256Hex(fsSync.readFileSync(path.join(repoRoot, ...normalized.split("/"))));
+        previousPath = normalizeRepoRelativePath(source);
       } catch {
-        digest = null;
-      }
-      if (!binary && status === "untracked") {
-        try {
-          const probe = Buffer.alloc(8192);
-          const descriptor = fsSync.openSync(path.join(repoRoot, normalized), "r");
-          try {
-            const read = fsSync.readSync(descriptor, probe, 0, 8192, 0);
-            binary = probe.subarray(0, read).includes(0);
-          } finally {
-            fsSync.closeSync(descriptor);
-          }
-        } catch {
-          binary = false;
-        }
+        previousPath = undefined;
       }
     }
-    changed.push({ path: normalized, status, ...(previousPath ? { previousPath } : {}), digest, binary, insertions: counts.insertions, deletions: counts.deletions });
-    if (changed.length >= 2000) break;
+    let normalized: string;
+    try {
+      normalized = normalizeRepoRelativePath(destToken);
+    } catch {
+      continue;
+    }
+    let status: ChangedFileStatus = "modified";
+    if (code === "A") status = "added";
+    else if (code === "D") status = "deleted";
+    else if (code === "R") status = "renamed";
+    else if (code === "C") status = "copied";
+    else if (code === "T") status = "typechange";
+    else if (code === "U") status = "modified";
+    parsed.push({ path: normalized, status, ...(previousPath ? { previousPath } : {}) });
+    if (parsed.length >= 2000) break;
   }
-  changed.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
+  return parsed;
+}
 
-  const dirty = changed.length > 0;
-  const worktreeDigest = dirty ? canonicalDigest(changed.map((item) => ({ path: item.path, status: item.status, digest: item.digest }))) : null;
+function parseNumstat(text: string): Map<string, PathCounts> {
+  const numstat = new Map<string, PathCounts>();
+  for (const line of text.split("\n")) {
+    const match = /^(\d+|-)\t(\d+|-)\t(.*)$/.exec(line);
+    if (!match) continue;
+    const clean = unquoteGitPath(match[3] ?? "");
+    const destination = extractNumstatDestination(clean);
+    try {
+      const normalized = normalizeRepoRelativePath(destination);
+      const binary = match[1] === "-" || match[2] === "-";
+      numstat.set(normalized, {
+        insertions: binary ? 0 : Number.parseInt(match[1] ?? "0", 10) || 0,
+        deletions: binary ? 0 : Number.parseInt(match[2] ?? "0", 10) || 0,
+        binary,
+      });
+    } catch {
+      continue;
+    }
+  }
+  return numstat;
+}
+
+function probeUntrackedBinary(repoRoot: string, normalized: string): boolean {
+  try {
+    const probe = Buffer.alloc(8192);
+    const descriptor = fsSync.openSync(path.join(repoRoot, normalized), "r");
+    try {
+      const read = fsSync.readSync(descriptor, probe, 0, 8192, 0);
+      return probe.subarray(0, read).includes(0);
+    } finally {
+      fsSync.closeSync(descriptor);
+    }
+  } catch {
+    return false;
+  }
+}
+
+function toFact(repoRoot: string, parsed: ParsedPath, counts: Map<string, PathCounts>): ChangedFileFact {
+  const known = counts.get(parsed.path) ?? { insertions: 0, deletions: 0, binary: false };
+  // digest is the SHA-256 of raw working-tree file bytes (not the Git blob
+  // identity, which mixes in a header). Deleted or unreadable files bind null.
+  let digest: string | null = null;
+  let binary = known.binary;
+  if (parsed.status !== "deleted") {
+    try {
+      digest = sha256Hex(fsSync.readFileSync(path.join(repoRoot, ...parsed.path.split("/"))));
+    } catch {
+      digest = null;
+    }
+    if (!binary && parsed.status === "untracked") {
+      binary = probeUntrackedBinary(repoRoot, parsed.path);
+    }
+  }
+  return {
+    path: parsed.path,
+    status: parsed.status,
+    ...(parsed.previousPath ? { previousPath: parsed.previousPath } : {}),
+    digest,
+    binary,
+    insertions: known.insertions,
+    deletions: known.deletions,
+  };
+}
+
+function assertBaseUsable(repoRoot: string, base: string): void {
+  const result = spawnSync("git", ["cat-file", "-e", `${base}^{commit}`], { cwd: repoRoot, shell: false, windowsHide: true });
+  if (result.error ?? (result.status ?? 1) !== 0) {
+    throw new Error(`DIFF_BASE_UNAVAILABLE:${base.slice(0, 100)}`);
+  }
+}
+
+export function collectDiffFacts(repoRoot: string, projectFingerprint: string, baseSha?: string): DiffFacts {
+  const headSha = gitText(repoRoot, ["rev-parse", "HEAD"]);
+  const base = baseSha ?? headSha;
+
+  // Committed candidate truth: deterministic base-to-HEAD delta. A clean
+  // checkout at HEAD still reports these files while dirty stays false.
+  const committed: ChangedFileFact[] = [];
+  if (base !== headSha) {
+    assertBaseUsable(repoRoot, base);
+    const rangeStatus = splitNul(runGit(repoRoot, ["diff", "--name-status", "-z", "-M", "-C", base, headSha, "--"]).stdout);
+    const rangeNumstat = parseNumstat(gitText(repoRoot, ["diff", "--numstat", "-M", "-C", base, headSha, "--"]));
+    for (const parsed of parseNameStatusZ(rangeStatus)) {
+      committed.push(toFact(repoRoot, parsed, rangeNumstat));
+      if (committed.length >= 2000) break;
+    }
+  }
+
+  // Dirty working-tree truth: local mutations overlaid on the candidate.
+  const statusEntries = splitNul(runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout);
+
+  // numstat without -z: one LF-terminated record per file. Quoted C-style paths
+  // are unquoted deterministically; rename destinations are extracted from
+  // the "old => new" / "{a => b}c" forms. -z is intentionally not used
+  // here because numstat -z rename token order is version-fragile.
+  const numstat = parseNumstat(gitText(repoRoot, ["diff", "--numstat", "HEAD", "--"]));
+  const dirtyParsed = parsePorcelainZ(statusEntries);
+  const dirty: ChangedFileFact[] = dirtyParsed.map((parsed) => toFact(repoRoot, parsed, numstat));
+
+  // One flattened candidate collection: committed delta first, dirty overlay
+  // wins per path without losing a committed previousPath. dirty and
+  // worktreeDigest stay separate so the head candidate is never confused
+  // with local mutations.
+  const merged = new Map<string, ChangedFileFact>();
+  for (const entry of committed) merged.set(entry.path, entry);
+  for (const entry of dirty) {
+    const prior = merged.get(entry.path);
+    merged.set(entry.path, prior ? { ...prior, ...entry, previousPath: entry.previousPath ?? prior.previousPath } : entry);
+  }
+  const changed = [...merged.values()].sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0)).slice(0, 2000);
+
+  const isDirty = dirty.length > 0;
+  const worktreeDigest = isDirty ? canonicalDigest(dirty.map((item) => ({ path: item.path, status: item.status, digest: item.digest }))) : null;
   const stats = {
     files: changed.length,
     insertions: changed.reduce((total, item) => total + item.insertions, 0),
@@ -205,7 +308,7 @@ export function collectDiffFacts(repoRoot: string, projectFingerprint: string, b
     projectFingerprint,
     baseSha: base,
     headSha,
-    dirty,
+    dirty: isDirty,
     changedFiles: changed,
     stats,
     worktreeDigest,

@@ -1,18 +1,18 @@
 # UADS GEF V1 W2 - PR #88 Correction Evidence Bundle
 
-Status: `COMPLETE_CANDIDATE` after CR-W2-01 through CR-W2-04; exact-head hosted gates (CI, CodeQL, Dependency Review, Cross-Platform) and independent HEDS remain pending on the newly published head. No merge.
+Status: `COMPLETE_CANDIDATE` after CR-W2-01 through CR-W2-07; exact-head hosted gates (CI, CodeQL, Dependency Review, Cross-Platform) and independent HEDS remain pending on the newly published head. No merge.
 
 Work Order: `GEF-W2`
 Wave: `W2 - Deterministic Evidence / Work Plane`
-Correction Pack: `CR-W2-01 through CR-W2-04`
+Correction Pack: `CR-W2-01 through CR-W2-07`
 PR: `#88`
 Base SHA: `e24dd3ab03440dc222a8e3995259a68ed13d4484`
-Rejected head: `76fb334a8fa087c52719c02483bf2c629f9c7905`
+Rejected head: `6ab78b1647ab772633599330f7b926500f7eee8b`
 Candidate head: exact final head is recorded in PR #88 after the final push; this report is committed before hosted receipts and does not receive an evidence-only follow-up commit.
 
 ## Candidate-head binding strategy
 
-One correction commit on the existing PR #88 branch `feat/gef-v1-w2-work-plane`, created from the exact W1 merge baseline. No rebase, no squash, no merge commit. The branch advances `76fb334` -> new head with only the four bounded corrections below. PR #77 and PR #81 are untouched. No W3-W8 scope.
+One correction commit on the existing PR #88 branch `feat/gef-v1-w2-work-plane`, created from the exact W1 merge baseline. No rebase, no squash, no merge commit. The branch advances `6ab78b1` -> new head with only the three bounded corrections below (CR-W2-01..04 remain frozen as previously accepted). PR #77 and PR #81 are untouched. No W3-W8 scope.
 
 ## Correction findings
 
@@ -20,27 +20,28 @@ One correction commit on the existing PR #88 branch `feat/gef-v1-w2-work-plane`,
 - `CR-W2-02 PASS` — `verifyMachineEvidence(data, expectedProjectFingerprint?, expectedTaskId?)` validates schema first, recomputes `evidenceDigest` over the canonical creation basis with `evidenceGeneratedMs` normalized to zero, and binds task/project identity. `readEvidence()` and `runGefEvidenceReport()` fail closed on schema/digest/task/project mismatch.
 - `CR-W2-03 PASS` — the contract allowlist is the only environment key source; injected non-allowlisted keys never reach the child. Cache `envClass` digests effective allowlisted non-secret values, so value drift invalidates and stable values hit. Secret-like allowlisted values throw `COMMAND_ENV_SECRET_REJECTED` before spawn and before any cache lookup; OS launch variables stay launch-only outside semantic classification.
 - `CR-W2-04 PASS` — this canonical Evidence Bundle records exact base/rejected identity, binding strategy, scope, validations, security/privacy/fail-closed checks, cache behavior, hosted-gate state and known debt.
+- `CR-W2-05 PASS` — committed base-to-HEAD deltas are collected via range diff plumbing; clean candidates report committed files with `dirty=false`, dirty overlays merge deterministically with separate `worktreeDigest`, and invalid bases fail closed with `DIFF_BASE_UNAVAILABLE`.
+- `CR-W2-06 PASS` — every nested `commandReceipt` is verified as a real `WorkReceipt` with project/task binding; the machine-evidence schema embeds the closed receipt shape and tampered-plus-recomputed evidence is still rejected.
+- `CR-W2-07 PASS` — cache validity binds the effective executable/toolchain basis (node runtime + execPath digest, npm invocation + version, git version + launch-resolution digest); PATH drift causes real `MISS`, stable basis `HIT`, probe failure refuses optimistic reuse.
 
 ## Scope and changed files
 
-Correction-only. Changed on this head:
+Correction-only. Changed on this head (CR-W2-01..04 scope above remains frozen; only correction truth is extended):
 
-- `.engineering/reports/EVIDENCE-UADS-GEF-V1-W2-PR88.md` - this canonical Evidence Bundle.
-- `schemas/gef-diff-facts.schema.json` - `copied` status added to the closed enum.
-- `src/commands/gef-work.ts` - verified evidence read/report binding task and project identity.
-- `src/gef/command-contract.ts` - `gef.test.env.probe` test-only contract with `GEF_TEST_VALUE` allowlist.
-- `src/gef/command-runner.ts` - strict allowlist env resolution, value-based env class, fail-closed secret rejection.
-- `src/gef/git-facts.ts` - truthful `-z` rename/copy cursor parsing, raw-byte digests, C-style unquoting for numstat.
-- `src/gef/machine-evidence.ts` - shared canonical digest material plus `verifyMachineEvidence`.
-- `src/gef/work-plane.ts` - env-aware validity basis construction.
-- `tests/gef-w2-commands.test.ts` - env allowlist/drift/HIT/secret proofs.
-- `tests/gef-w2-evidence.test.ts` - rename cardinality/previousPath/raw-digest proofs plus evidence tamper matrix.
+- `.engineering/reports/EVIDENCE-UADS-GEF-V1-W2-PR88.md` - this canonical Evidence Bundle (CR-W2-05..07 truth).
+- `schemas/gef-machine-evidence.schema.json` - closed nested WorkReceipt shape (`$defs/workReceipt`).
+- `src/gef/command-runner.ts` - effective executable/toolchain basis probes (node/npm/git), hashed launch resolution.
+- `src/gef/git-facts.ts` - committed base-to-HEAD range collection merged with the dirty overlay; `DIFF_BASE_UNAVAILABLE` fail-closed.
+- `src/gef/machine-evidence.ts` - nested receipt verification with project/task binding.
+- `src/gef/work-plane.ts` - toolchain-bound validity basis.
+- `tests/gef-w2-commands.test.ts` - real toolchain drift/MISS/HIT and probe-failure proofs.
+- `tests/gef-w2-evidence.test.ts` - committed delta, dirty overlay, invalid base, nested tamper/binding proofs.
 
-No schema expansion beyond the one `copied` enum value. No new dependencies.
+No new dependencies.
 
 ## Validation
 
-- Focused W2: `npx vitest run --maxWorkers=1 tests/gef-w2-commands.test.ts tests/gef-w2-evidence.test.ts` — 27/27 green.
+- Focused W2: `npx vitest run --maxWorkers=1 tests/gef-w2-commands.test.ts tests/gef-w2-evidence.test.ts` — 34/34 green.
 - W1 regression: `tests/gef-w1-upir.test.ts tests/gef-w1-context.test.ts tests/gef-w1-compile.test.ts` — 41/41 green.
 - W0 regression: `tests/gef-w0.test.ts` — 7/7 green.
 - `npm run lint` / `npm run typecheck`: PASS.
