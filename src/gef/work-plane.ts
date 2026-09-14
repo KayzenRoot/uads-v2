@@ -59,6 +59,14 @@ function lockDigestFor(repoRoot: string, relevantFiles: string[]): string {
   return canonicalDigest(parts);
 }
 
+export function isPositiveCacheOutcome(outcome: WorkReceipt["outcome"]): boolean {
+  // Only deterministic terminal results are reusable: TIMEOUT and ERROR are
+  // transient observations, so they return as evidence receipts but are never
+  // stored as normal positive cache entries. FAIL stays cached explicitly: a
+  // deterministic failure on the exact same basis needs no re-execution.
+  return outcome === "PASS" || outcome === "FAIL";
+}
+
 export function runWorkCommand(input: {
   repoRoot: string;
   projectFingerprint: string;
@@ -73,11 +81,14 @@ export function runWorkCommand(input: {
   // Fail closed before any cache lookup: a secret-like allowlisted value
   // throws here, so no stale basis can authorize the run.
   const resolvedEnv = resolveCommandEnv(contract, input.env);
-  const worktreeDigest = input.facts.worktreeDigest ?? `clean:${input.facts.headSha ?? "unknown"}`;
+  // Candidate identity is never replaced by dirty-overlay identity: the basis
+  // binds the exact headSha and, separately, the dirty worktreeDigest/dirty
+  // flag, so identical overlays on different heads never share validity.
+  const sourceDigest = canonicalDigest({ headSha: input.facts.headSha, dirty: input.facts.dirty, worktreeDigest: input.facts.worktreeDigest });
   const basis: ValidityBasis = {
     projectFingerprint: input.projectFingerprint,
     contractDigest: contract.contractDigest,
-    worktreeDigest,
+    worktreeDigest: sourceDigest,
     lockDigest: lockDigestFor(input.repoRoot, contract.relevantFiles),
     toolchain: resolveToolchainBasis(contract),
     platform: process.platform,
@@ -94,7 +105,9 @@ export function runWorkCommand(input: {
     source: "EXECUTED",
     result,
   });
-  commandCacheStore(receipt, input.uadsHome);
+  if (isPositiveCacheOutcome(receipt.outcome)) {
+    commandCacheStore(receipt, input.uadsHome);
+  }
   return { receipt, cacheStatus: "MISS", cacheReason: lookup.status === "MISS" ? lookup.reason : null };
 }
 

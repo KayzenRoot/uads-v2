@@ -4,11 +4,11 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { afterEach, describe, expect, it } from "vitest";
 import { getCommandContract, listCommandContracts } from "../src/gef/command-contract.js";
-import { resolveToolchainBasis, runCommandContract } from "../src/gef/command-runner.js";
+import { resolveToolchainBasis, runCommandContract, timeoutTreeCleanupKind } from "../src/gef/command-runner.js";
 import { buildWorkReceipt, computeValidityFingerprint, verifyWorkReceipt, type ValidityBasis } from "../src/gef/command-receipt.js";
 import { commandCacheLookup, commandCacheStore } from "../src/gef/command-cache.js";
 import { collectDiffFacts } from "../src/gef/git-facts.js";
-import { runWorkCommand } from "../src/gef/work-plane.js";
+import { runWorkCommand, isPositiveCacheOutcome } from "../src/gef/work-plane.js";
 import { sha256Hex } from "../src/lib/hash.js";
 
 const SECRET_FIXTURE = `ghp_${"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcd"}`;
@@ -76,6 +76,77 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     expect(second.receipt.taskId).toBe("w2-cross-b");
     expect(second.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
     expect(verifyWorkReceipt(second.receipt).ok).toBe(true);
+  });
+
+  it("binds cache validity to HEAD plus the dirty overlay, not the overlay alone", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    fs.writeFileSync(path.join(repo, "overlay.txt"), "overlay\n");
+    const factsA = collectDiffFacts(repo, fingerprint);
+    expect(factsA.dirty).toBe(true);
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-dirty-a", commandId: "gef.test.probe", facts: factsA, uadsHome: home, allowTestOnly: true });
+    expect(first.cacheStatus).toBe("MISS");
+    fs.writeFileSync(path.join(repo, "a.ts"), `export const a = 2;\n`);
+    execFileSync("git", ["add", "a.ts"], { cwd: repo });
+    execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+    const factsB = collectDiffFacts(repo, fingerprint);
+    expect(factsB.dirty).toBe(true);
+    expect(factsB.worktreeDigest).toBe(factsA.worktreeDigest);
+    const second = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-dirty-b", commandId: "gef.test.probe", facts: factsB, uadsHome: home, allowTestOnly: true });
+    expect(second.cacheStatus).toBe("MISS");
+    expect(second.receipt.validityFingerprint).not.toBe(first.receipt.validityFingerprint);
+    const third = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-dirty-b2", commandId: "gef.test.probe", facts: factsB, uadsHome: home, allowTestOnly: true });
+    expect(third.cacheStatus).toBe("HIT");
+    expect(third.receipt.validityFingerprint).toBe(second.receipt.validityFingerprint);
+  });
+
+  it("keeps Node execution and toolchain basis aligned under PATH shadowing", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-node-shadow", commandId: "gef.test.probe", facts, uadsHome: home, allowTestOnly: true });
+    expect(first.cacheStatus).toBe("MISS");
+    expect(first.receipt.outcome).toBe("PASS");
+    const shadowDir = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-shadow-"));
+    fs.writeFileSync(path.join(shadowDir, "node"), "not a real node binary\n");
+    const shadowHome = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-shadow-home-"));
+    const previousPath = process.env.PATH ?? "";
+    try {
+      process.env.PATH = `${shadowDir}${path.delimiter}${previousPath}`;
+      const rerun = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-node-shadow-2", commandId: "gef.test.probe", facts, uadsHome: home, allowTestOnly: true });
+      expect(rerun.cacheStatus).toBe("HIT");
+      expect(rerun.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
+      const forced = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-node-shadow-3", commandId: "gef.test.probe", facts, uadsHome: shadowHome, allowTestOnly: true });
+      expect(forced.cacheStatus).toBe("MISS");
+      expect(forced.receipt.outcome).toBe("PASS");
+      expect(forced.receipt.validityFingerprint).toBe(first.receipt.validityFingerprint);
+    } finally {
+      process.env.PATH = previousPath;
+    }
+  });
+
+  it("leaves no surviving grandchild marker after a timeout", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const marker = path.join(repo, "gef-timeout-grandchild.marker");
+    expect(timeoutTreeCleanupKind()).toMatch(/^(process-group|taskkill-tree)$/);
+    const ran = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-timeout-tree", commandId: "gef.test.timeout.tree", facts: collectDiffFacts(repo, fingerprint), uadsHome: home, allowTestOnly: true });
+    expect(ran.receipt.outcome).toBe("TIMEOUT");
+    expect(ran.cacheStatus).toBe("MISS");
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 4000);
+    expect(fs.existsSync(marker)).toBe(false);
+  }, 25000);
+
+  it("does not replay TIMEOUT receipts as positive cache HITs", () => {
+    const { repo, home, fingerprint } = tempRepo();
+    const facts = collectDiffFacts(repo, fingerprint);
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-timeout-nocache", commandId: "gef.test.hang", facts, uadsHome: home, allowTestOnly: true });
+    expect(first.receipt.outcome).toBe("TIMEOUT");
+    expect(first.cacheStatus).toBe("MISS");
+    const second = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-timeout-nocache-2", commandId: "gef.test.hang", facts, uadsHome: home, allowTestOnly: true });
+    expect(second.receipt.outcome).toBe("TIMEOUT");
+    expect(second.cacheStatus).toBe("MISS");
+    expect(isPositiveCacheOutcome("TIMEOUT")).toBe(false);
+    expect(isPositiveCacheOutcome("ERROR")).toBe(false);
+    expect(isPositiveCacheOutcome("PASS")).toBe(true);
+    expect(isPositiveCacheOutcome("FAIL")).toBe(true);
   });
 
   it("invalidates on changed source bytes through the worktree digest", () => {

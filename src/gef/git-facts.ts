@@ -8,6 +8,9 @@ import { canonicalDigest, normalizeRepoRelativePath } from "./upir.js";
 
 export const DIFF_FACTS_SCHEMA_VERSION = "0.1.0" as const;
 export const DIFF_FACTS_SCHEMA_FILE = "gef-diff-facts.schema.json" as const;
+export const DIFF_FACTS_MAX_FILES = 2000 as const;
+
+export type DiffFactsLimits = { maxFiles?: number };
 
 export type ChangedFileStatus = "added" | "modified" | "deleted" | "renamed" | "copied" | "untracked" | "typechange";
 
@@ -45,54 +48,6 @@ function gitText(repoRoot: string, args: string[]): string {
   return ((result.stdout ?? "") as string).trim();
 }
 
-function extractNumstatDestination(clean: string): string {
-  if (!clean.includes(" => ")) return clean;
-  const after = clean.split(" => ").pop() ?? clean;
-  if (clean.includes("{") && !after.includes("/")) {
-    return clean.replace(/\{[^}]* => [^}]*\}/, after);
-  }
-  return after;
-}
-
-function unquoteGitPath(raw: string): string {
-  const quoted = raw.startsWith('"') && raw.endsWith('"') && raw.length >= 2 ? raw.slice(1, -1) : raw;
-  if (!quoted.includes("\\")) return quoted;
-  const bytes: number[] = [];
-  let text = "";
-  const flush = (): void => {
-    if (bytes.length > 0) {
-      text += Buffer.from(bytes).toString("utf8");
-      bytes.length = 0;
-    }
-  };
-  for (let index = 0; index < quoted.length; index += 1) {
-    const char = quoted[index] ?? "";
-    if (char !== "\\" || index + 1 >= quoted.length) {
-      if (char === "\\") {
-        flush();
-        text += "\\";
-      } else {
-        bytes.push(...Buffer.from(char, "utf8"));
-      }
-      continue;
-    }
-    const next = quoted[index + 1] ?? "";
-    const octal = quoted.slice(index + 1, index + 4);
-    if (next >= "0" && next <= "7" && /^[0-7]{3}$/.test(octal)) {
-      bytes.push(Number.parseInt(octal, 8));
-      index += 3;
-      continue;
-    }
-    flush();
-    if (next === "n") text += "\n";
-    else if (next === "t") text += "\t";
-    else text += next;
-    index += 1;
-  }
-  flush();
-  return text;
-}
-
 function splitNul(output: Buffer): string[] {
   return output.toString("utf8").split("\x00").filter((part) => part.length > 0);
 }
@@ -105,10 +60,13 @@ type PathCounts = { insertions: number; deletions: number; binary: boolean };
 // records carry a second NUL field (source) with no arrow token. The cursor
 // consumes that second field as previousPath instead of treating it as a
 // separate status record. -z paths are never C-quoted.
-function parsePorcelainZ(fields: string[]): ParsedPath[] {
+function parsePorcelainZ(fields: string[], maxFiles: number): ParsedPath[] {
   const parsed: ParsedPath[] = [];
   let cursor = 0;
   while (cursor < fields.length) {
+    // The file cap never silently truncates authoritative facts: reaching it
+    // with input still unconsumed fails closed for expansion.
+    if (parsed.length >= maxFiles) throw new Error("DIFF_FILE_LIMIT_EXCEEDED");
     const entry = fields[cursor] ?? "";
     cursor += 1;
     if (entry.length < 4) continue;
@@ -140,12 +98,11 @@ function parsePorcelainZ(fields: string[]): ParsedPath[] {
     else if (code === "T") status = "typechange";
     else if (code === "?") status = "untracked";
     parsed.push({ path: normalized, status, ...(previousPath ? { previousPath } : {}) });
-    if (parsed.length >= 2000) break;
   }
   return parsed;
 }
 
-function parseNameStatusZ(fields: string[]): ParsedPath[] {
+function parseNameStatusZ(fields: string[], maxFiles: number): ParsedPath[] {
   // diff --name-status -z truth: <status> NUL <source> NUL <destination> NUL
   // for renames/copies (e.g. R100 NUL old NUL new NUL); plain add/modify/
   // delete records are <status> NUL <path> NUL. path is the destination for
@@ -153,6 +110,7 @@ function parseNameStatusZ(fields: string[]): ParsedPath[] {
   const parsed: ParsedPath[] = [];
   let cursor = 0;
   while (cursor + 1 < fields.length) {
+    if (parsed.length >= maxFiles) throw new Error("DIFF_FILE_LIMIT_EXCEEDED");
     const statusToken = fields[cursor] ?? "";
     const sourceToken = fields[cursor + 1] ?? "";
     cursor += 2;
@@ -184,20 +142,33 @@ function parseNameStatusZ(fields: string[]): ParsedPath[] {
     else if (code === "T") status = "typechange";
     else if (code === "U") status = "modified";
     parsed.push({ path: normalized, status, ...(previousPath ? { previousPath } : {}) });
-    if (parsed.length >= 2000) break;
   }
   return parsed;
 }
 
-function parseNumstat(text: string): Map<string, PathCounts> {
+// numstat -z truth: one NUL record per file, `<added> TAB <deleted> TAB <path>`,
+// where -z paths are never C-quoted. Rename/copy records carry an empty path
+// field followed by two more NUL fields (source, destination), so nested
+// forms like src/{old => new}/file.ts resolve to src/new/file.ts exactly
+// without brace-string reconstruction.
+function parseNumstatZ(fields: string[]): Map<string, PathCounts> {
   const numstat = new Map<string, PathCounts>();
-  for (const line of text.split("\n")) {
-    const match = /^(\d+|-)\t(\d+|-)\t(.*)$/.exec(line);
+  let cursor = 0;
+  while (cursor < fields.length) {
+    const field = fields[cursor] ?? "";
+    cursor += 1;
+    const match = /^(\d+|-)\t(\d+|-)\t(.*)$/.exec(field);
     if (!match) continue;
-    const clean = unquoteGitPath(match[3] ?? "");
-    const destination = extractNumstatDestination(clean);
+    let target = match[3] ?? "";
+    if (target.length === 0) {
+      if (cursor + 1 >= fields.length) continue;
+      cursor += 1;
+      target = fields[cursor] ?? "";
+      cursor += 1;
+    }
+    if (target.length === 0) continue;
     try {
-      const normalized = normalizeRepoRelativePath(destination);
+      const normalized = normalizeRepoRelativePath(target);
       const binary = match[1] === "-" || match[2] === "-";
       numstat.set(normalized, {
         insertions: binary ? 0 : Number.parseInt(match[1] ?? "0", 10) || 0,
@@ -260,32 +231,40 @@ function assertBaseUsable(repoRoot: string, base: string): void {
   }
 }
 
-export function collectDiffFacts(repoRoot: string, projectFingerprint: string, baseSha?: string): DiffFacts {
+function assertBaseAncestor(repoRoot: string, base: string, head: string): void {
+  if (base === head) return;
+  const result = spawnSync("git", ["merge-base", "--is-ancestor", base, head], { cwd: repoRoot, shell: false, windowsHide: true });
+  if (result.error) throw new Error(`GIT_FACTS_UNAVAILABLE:${(result.error as Error).message}`);
+  if ((result.status ?? 1) !== 0) throw new Error(`DIFF_BASE_NOT_ANCESTOR:${base.slice(0, 100)}`);
+}
+
+export function collectDiffFacts(repoRoot: string, projectFingerprint: string, baseSha?: string, limits?: DiffFactsLimits): DiffFacts {
   const headSha = gitText(repoRoot, ["rev-parse", "HEAD"]);
   const base = baseSha ?? headSha;
+  const maxFiles = limits?.maxFiles ?? DIFF_FACTS_MAX_FILES;
 
   // Committed candidate truth: deterministic base-to-HEAD delta. A clean
   // checkout at HEAD still reports these files while dirty stays false.
+  // The base must be an ancestor of HEAD: an existing but divergent base
+  // fails closed instead of producing an arbitrary divergent-tree diff.
   const committed: ChangedFileFact[] = [];
   if (base !== headSha) {
     assertBaseUsable(repoRoot, base);
+    assertBaseAncestor(repoRoot, base, headSha);
     const rangeStatus = splitNul(runGit(repoRoot, ["diff", "--name-status", "-z", "-M", "-C", base, headSha, "--"]).stdout);
-    const rangeNumstat = parseNumstat(gitText(repoRoot, ["diff", "--numstat", "-M", "-C", base, headSha, "--"]));
-    for (const parsed of parseNameStatusZ(rangeStatus)) {
+    const rangeNumstat = parseNumstatZ(splitNul(runGit(repoRoot, ["diff", "--numstat", "-z", "-M", "-C", base, headSha, "--"]).stdout));
+    for (const parsed of parseNameStatusZ(rangeStatus, maxFiles)) {
       committed.push(toFact(repoRoot, parsed, rangeNumstat));
-      if (committed.length >= 2000) break;
     }
   }
 
   // Dirty working-tree truth: local mutations overlaid on the candidate.
   const statusEntries = splitNul(runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout);
 
-  // numstat without -z: one LF-terminated record per file. Quoted C-style paths
-  // are unquoted deterministically; rename destinations are extracted from
-  // the "old => new" / "{a => b}c" forms. -z is intentionally not used
-  // here because numstat -z rename token order is version-fragile.
-  const numstat = parseNumstat(gitText(repoRoot, ["diff", "--numstat", "HEAD", "--"]));
-  const dirtyParsed = parsePorcelainZ(statusEntries);
+  // numstat -z: one NUL record per file with rename/copy destination tokens,
+  // so nested-brace forms map to the destination path exactly.
+  const numstat = parseNumstatZ(splitNul(runGit(repoRoot, ["diff", "--numstat", "-z", "HEAD", "--"]).stdout));
+  const dirtyParsed = parsePorcelainZ(statusEntries, maxFiles);
   const dirty: ChangedFileFact[] = dirtyParsed.map((parsed) => toFact(repoRoot, parsed, numstat));
 
   // One flattened candidate collection: committed delta first, dirty overlay
@@ -298,7 +277,8 @@ export function collectDiffFacts(repoRoot: string, projectFingerprint: string, b
     const prior = merged.get(entry.path);
     merged.set(entry.path, prior ? { ...prior, ...entry, previousPath: entry.previousPath ?? prior.previousPath } : entry);
   }
-  const changed = [...merged.values()].sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0)).slice(0, 2000);
+  if (merged.size > maxFiles) throw new Error("DIFF_FILE_LIMIT_EXCEEDED");
+  const changed = [...merged.values()].sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
 
   const isDirty = dirty.length > 0;
   const worktreeDigest = isDirty ? canonicalDigest(dirty.map((item) => ({ path: item.path, status: item.status, digest: item.digest }))) : null;

@@ -31,6 +31,13 @@ function resolveExecutable(contract: CommandContract): { command: string; args: 
     const npm = resolveNpmInvocation();
     return { command: npm.command, args: [...npm.argsPrefix, ...contract.args] };
   }
+  // Node contracts execute with the current runtime binary, never a bare
+  // PATH-resolved `node`, so the executed identity always matches the
+  // toolchain basis (process.version + execPath digest) even under PATH
+  // shadowing.
+  if (contract.executable === "node") {
+    return { command: process.execPath, args: [...contract.args] };
+  }
   return { command: contract.executable, args: [...contract.args] };
 }
 
@@ -124,11 +131,80 @@ export function computeEnvClass(semantic: CommandEnvPair[]): string {
   return canonicalDigest([...semantic].sort((left, right) => (left.name < right.name ? -1 : 1)));
 }
 
-function capOutput(output: string, maxBytes: number): { head: string; totalBytes: number; truncated: boolean } {
-  const bytes = Buffer.byteLength(output, "utf8");
-  if (bytes <= maxBytes) return { head: output, totalBytes: bytes, truncated: false };
-  const buffer = Buffer.from(output, "utf8").subarray(0, maxBytes);
-  return { head: buffer.toString("utf8"), totalBytes: bytes, truncated: true };
+export function timeoutTreeCleanupKind(): "process-group" | "taskkill-tree" {
+  // Bounded platform strategy without arbitrary shell: POSIX terminates the
+  // dedicated process group the supervised child leads, Windows uses native
+  // taskkill tree termination. Both paths are argv-only; no model-generated
+  // shell text is ever involved.
+  return process.platform === "win32" ? "taskkill-tree" : "process-group";
+}
+
+// Supervision runs in a child Node process so runCommandContract can stay
+// synchronous: the supervisor owns the live event loop (no pipe deadlock on
+// large output), enforces the contract timeout, and cleans up the whole
+// process tree. The outer spawnSync carries a generous backstop timeout and
+// only ever kills the supervisor itself.
+const SUPERVISOR_REAP_GRACE_MS = 2000 as const;
+const SUPERVISOR_OUTER_SLACK_MS = 30000 as const;
+
+function supervisorScript(): string {
+  return [
+    "const { spawn, spawnSync } = require('node:child_process');",
+    "const payload = JSON.parse(process.argv[1]);",
+    "const child = spawn(payload.command, payload.args, { cwd: payload.cwd, env: payload.env, shell: false, windowsHide: true, detached: process.platform !== 'win32' });",
+    "const started = Date.now();",
+    "let stdoutHead = '', stderrHead = '', stdoutBytes = 0, stderrBytes = 0, stdoutTruncated = false, stderrTruncated = false, done = false;",
+    "function cap(current, chunk, total, max) {",
+    "  const text = chunk.toString('utf8');",
+    "  const grown = total + Buffer.byteLength(text);",
+    "  if (Buffer.byteLength(current) < max) {",
+    "    current = Buffer.concat([Buffer.from(current, 'utf8'), Buffer.from(text, 'utf8')]).subarray(0, max).toString('utf8');",
+    "  }",
+    "  return [current, grown, grown > max];",
+    "}",
+    "if (child.stdout) child.stdout.on('data', (c) => { const next = cap(stdoutHead, c, stdoutBytes, payload.maxStdoutBytes); stdoutHead = next[0]; stdoutBytes = next[1]; stdoutTruncated = stdoutTruncated || next[2]; });",
+    "if (child.stderr) child.stderr.on('data', (c) => { const next = cap(stderrHead, c, stderrBytes, payload.maxStderrBytes); stderrHead = next[0]; stderrBytes = next[1]; stderrTruncated = stderrTruncated || next[2]; });",
+    "function snapshot() {",
+    "  return { durationMs: Date.now() - started,",
+    "    stdoutHead: Buffer.from(stdoutHead, 'utf8').toString('base64'), stdoutBytes: stdoutBytes, stdoutTruncated: stdoutTruncated,",
+    "    stderrHead: Buffer.from(stderrHead, 'utf8').toString('base64'), stderrBytes: stderrBytes, stderrTruncated: stderrTruncated };",
+    "}",
+    "function finish(envelope) { if (done) return; done = true; process.stdout.write(JSON.stringify(envelope)); }",
+    "let killFired = false;",
+    "const timer = setTimeout(() => {",
+    "  killFired = true;",
+    "  try {",
+    "    if (process.platform === 'win32') spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { shell: false, windowsHide: true, timeout: 10000 });",
+    "    else process.kill(-child.pid, 'SIGKILL');",
+    "  } catch (ignored) { try { child.kill('SIGKILL'); } catch (alsoIgnored) { void alsoIgnored; } }",
+    "  setTimeout(() => finish(Object.assign(snapshot(), { timedOut: true, exitCode: null, signal: 'SIGKILL' })), " + String(SUPERVISOR_REAP_GRACE_MS) + ");",
+    "}, payload.timeoutMs);",
+    "child.on('exit', (code, signal) => { if (killFired) return; clearTimeout(timer); finish(Object.assign(snapshot(), { timedOut: false, exitCode: code, signal: signal || null })); });",
+    "child.on('error', (err) => { if (killFired) return; clearTimeout(timer); finish({ spawnError: String((err && err.message) || err) }); });",
+  ].join("\n");
+}
+
+type SupervisorEnvelope = {
+  timedOut: boolean;
+  exitCode: number | null;
+  signal: string | null;
+  stdoutHead: string;
+  stdoutBytes: number;
+  stdoutTruncated: boolean;
+  stderrHead: string;
+  stderrBytes: number;
+  stderrTruncated: boolean;
+  spawnError?: string;
+};
+
+function parseSupervisorEnvelope(output: string): SupervisorEnvelope | null {
+  try {
+    const parsed = JSON.parse(output.trim()) as SupervisorEnvelope;
+    if (typeof parsed !== "object" || parsed === null || typeof parsed.timedOut !== "boolean") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 export function runCommandContract(contract: CommandContract, options: RunOptions): RunnerResult {
@@ -140,37 +216,46 @@ export function runCommandContract(contract: CommandContract, options: RunOption
   const { childEnv } = resolveCommandEnv(contract, options.env);
   let result: RunnerResult;
   try {
-    const spawned = spawnSync(command, args, {
+    const payload = JSON.stringify({
+      command,
+      args,
+      cwd: options.repoRoot,
+      env: childEnv,
+      timeoutMs: contract.timeoutMs,
+      maxStdoutBytes: contract.maxStdoutBytes,
+      maxStderrBytes: contract.maxStderrBytes,
+    });
+    const spawned = spawnSync(process.execPath, ["-e", supervisorScript(), payload], {
       cwd: options.repoRoot,
       env: childEnv,
       shell: false,
       windowsHide: true,
-      timeout: contract.timeoutMs,
+      timeout: contract.timeoutMs + SUPERVISOR_OUTER_SLACK_MS,
       maxBuffer: 8 * 1024 * 1024,
       encoding: "utf8",
     });
     const durationMs = Date.now() - started;
-    const timedOut = (spawned.error as NodeJS.ErrnoException | undefined)?.code === "ETIMEDOUT" || spawned.signal === "SIGTERM";
-    const stdout = typeof spawned.stdout === "string" ? spawned.stdout : "";
-    const stderr = typeof spawned.stderr === "string" ? spawned.stderr : "";
-    const out = capOutput(stdout, contract.maxStdoutBytes);
-    const err = capOutput(stderr, contract.maxStderrBytes);
-    const exitCode = typeof spawned.status === "number" ? spawned.status : null;
+    const outerTimedOut = (spawned.error as NodeJS.ErrnoException | undefined)?.code === "ETIMEDOUT" || spawned.signal === "SIGTERM";
+    const envelope = outerTimedOut ? null : parseSupervisorEnvelope(typeof spawned.stdout === "string" ? spawned.stdout : "");
+    const stdout = envelope ? Buffer.from(envelope.stdoutHead, "base64").toString("utf8") : "";
+    const stderr = envelope ? Buffer.from(envelope.stderrHead, "base64").toString("utf8") : "";
+    const exitCode = envelope?.exitCode ?? (typeof spawned.status === "number" ? spawned.status : null);
     let outcome: RunnerOutcome;
-    if (timedOut) outcome = "TIMEOUT";
-    else if (spawned.error) outcome = "ERROR";
+    if (outerTimedOut) outcome = "TIMEOUT";
+    else if (!envelope || envelope.spawnError) outcome = "ERROR";
+    else if (envelope.timedOut) outcome = "TIMEOUT";
     else outcome = exitCode === 0 ? "PASS" : "FAIL";
     result = {
       exitCode,
-      signal: typeof spawned.signal === "string" ? spawned.signal : null,
-      timedOut,
+      signal: envelope?.signal ?? (typeof spawned.signal === "string" ? spawned.signal : null),
+      timedOut: outcome === "TIMEOUT",
       durationMs,
-      stdoutBytes: out.totalBytes,
-      stderrBytes: err.totalBytes,
-      stdoutTruncated: out.truncated,
-      stderrTruncated: err.truncated,
-      stdoutHead: out.head,
-      stderrHead: err.head,
+      stdoutBytes: envelope?.stdoutBytes ?? 0,
+      stderrBytes: envelope?.stderrBytes ?? 0,
+      stdoutTruncated: envelope?.stdoutTruncated ?? false,
+      stderrTruncated: envelope?.stderrTruncated ?? false,
+      stdoutHead: stdout,
+      stderrHead: envelope?.spawnError ?? stderr,
       outcome,
     };
   } catch (error) {

@@ -74,6 +74,63 @@ function committedCopyFixture(): { repo: string; home: string; baseA: string; he
   return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-copy-home-")), baseA, headB };
 }
 
+function divergentHistoryFixture(): { repo: string; home: string; siblingBase: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-divergent-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-divergent.git"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "root.ts"), `export const r = 1;\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "A"], { cwd: repo });
+  execFileSync("git", ["checkout", "-b", "sibling"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "sib.ts"), `export const s = 1;\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "S"], { cwd: repo });
+  const siblingBase = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  execFileSync("git", ["checkout", "main"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "root.ts"), `export const r = 2;\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-divergent-home-")), siblingBase };
+}
+
+function nestedRenameFixture(): { repo: string; home: string; baseA: string; headB: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-nested-rename-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-nested-rename.git"], { cwd: repo });
+  fs.mkdirSync(path.join(repo, "src", "old"), { recursive: true });
+  const body = Array.from({ length: 24 }, (_, index) => `line${index + 1}\n`).join("");
+  fs.writeFileSync(path.join(repo, "src", "old", "file.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "A"], { cwd: repo });
+  const baseA = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  fs.mkdirSync(path.join(repo, "src", "new"), { recursive: true });
+  execFileSync("git", ["mv", "src/old/file.ts", "src/new/file.ts"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "src", "new", "file.ts"), `${body}extra1\nextra2\nextra3\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+  const headB = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-nested-rename-home-")), baseA, headB };
+}
+
+function nestedCopyFixture(): { repo: string; home: string; baseA: string; headB: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-nested-copy-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-nested-copy.git"], { cwd: repo });
+  fs.mkdirSync(path.join(repo, "src", "orig"), { recursive: true });
+  const body = Array.from({ length: 60 }, (_, index) => `export const c${index} = ${index};\n`).join("");
+  fs.writeFileSync(path.join(repo, "src", "orig", "big.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "A"], { cwd: repo });
+  const baseA = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  fs.writeFileSync(path.join(repo, "src", "orig", "big.ts"), `${body}export const extra = 1;\n`);
+  fs.mkdirSync(path.join(repo, "src", "copy"), { recursive: true });
+  fs.writeFileSync(path.join(repo, "src", "copy", "big.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
+  const headB = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-nested-copy-home-")), baseA, headB };
+}
+
 function packUpir(taskId: string, baseSha?: string) {
   return buildUpir({
     schemaVersion: "0.1.0",
@@ -170,6 +227,65 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     expect(facts.changedFiles.some((item) => item.path === "orig.ts" && item.status === "copied")).toBe(false);
     expect(facts.changedFiles).toHaveLength(2);
     expect(copied?.digest).toBe(sha256Hex(fs.readFileSync(path.join(repo, "copy-of-orig.ts"))));
+  });
+
+  it("fails closed on an existing but divergent base that is not an ancestor of HEAD", () => {
+    const { repo, siblingBase } = divergentHistoryFixture();
+    expect(() => collectDiffFacts(repo, FINGERPRINT, siblingBase)).toThrow("DIFF_BASE_NOT_ANCESTOR");
+  });
+
+  it("maps nested-directory rename numstat to the destination path exactly", () => {
+    const { repo, baseA, headB } = nestedRenameFixture();
+    const facts = collectDiffFacts(repo, FINGERPRINT, baseA);
+    expect(facts.dirty).toBe(false);
+    expect(facts.headSha).toBe(headB);
+    expect(facts.changedFiles).toHaveLength(1);
+    const renamed = facts.changedFiles[0];
+    expect(renamed?.path).toBe("src/new/file.ts");
+    expect(renamed?.status).toBe("renamed");
+    expect(renamed?.previousPath).toBe("src/old/file.ts");
+    expect(facts.changedFiles.some((item) => item.path === "src/old/file.ts")).toBe(false);
+    expect(renamed?.insertions).toBe(3);
+    expect(renamed?.deletions).toBe(0);
+    expect(renamed?.binary).toBe(false);
+    expect(renamed?.digest).toBe(sha256Hex(fs.readFileSync(path.join(repo, "src", "new", "file.ts"))));
+  });
+
+  it("maps nested-directory copy numstat to the destination path exactly", () => {
+    const { repo, baseA } = nestedCopyFixture();
+    const facts = collectDiffFacts(repo, FINGERPRINT, baseA);
+    expect(facts.dirty).toBe(false);
+    expect(facts.changedFiles).toHaveLength(2);
+    const copied = facts.changedFiles.find((item) => item.path === "src/copy/big.ts");
+    expect(copied?.status).toBe("copied");
+    expect(copied?.previousPath).toBe("src/orig/big.ts");
+    expect(copied?.insertions).toBe(0);
+    expect(copied?.deletions).toBe(0);
+    expect(copied?.binary).toBe(false);
+    expect(copied?.digest).toBe(sha256Hex(fs.readFileSync(path.join(repo, "src", "copy", "big.ts"))));
+    const modified = facts.changedFiles.find((item) => item.path === "src/orig/big.ts");
+    expect(modified?.status).toBe("modified");
+    expect(modified?.insertions).toBe(1);
+    expect(facts.changedFiles.some((item) => item.path === "src/orig/big.ts" && item.status === "copied")).toBe(false);
+  });
+
+  it("fails closed instead of silently truncating facts past the file limit", () => {
+    const { repo } = tempRepo();
+    fs.writeFileSync(path.join(repo, "extra-a.ts"), `export const ea = 1;\n`);
+    fs.writeFileSync(path.join(repo, "extra-b.ts"), `export const eb = 1;\n`);
+    fs.writeFileSync(path.join(repo, "extra-c.ts"), `export const ec = 1;\n`);
+    expect(() => collectDiffFacts(repo, FINGERPRINT, undefined, { maxFiles: 2 })).toThrow("DIFF_FILE_LIMIT_EXCEEDED");
+    const facts = collectDiffFacts(repo, FINGERPRINT, undefined, { maxFiles: 50 });
+    expect(facts.changedFiles.map((item) => item.path)).toEqual(["extra-a.ts", "extra-b.ts", "extra-c.ts"]);
+  });
+
+  it("fails closed when committed and dirty sets jointly exceed the file limit", () => {
+    const { repo } = committedFixture();
+    const baseA = execFileSync("git", ["rev-parse", "HEAD~1"], { cwd: repo, encoding: "utf8" }).trim();
+    fs.writeFileSync(path.join(repo, "local-a.ts"), `export const la = 1;\n`);
+    fs.writeFileSync(path.join(repo, "local-b.ts"), `export const lb = 1;\n`);
+    fs.writeFileSync(path.join(repo, "local-c.ts"), `export const lc = 1;\n`);
+    expect(() => collectDiffFacts(repo, FINGERPRINT, baseA, { maxFiles: 4 })).toThrow("DIFF_FILE_LIMIT_EXCEEDED");
   });
 
   it("verifies task-B machine evidence built from a rebound cache HIT receipt", () => {
