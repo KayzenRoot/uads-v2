@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { execFileSync, execSync } from "node:child_process";
+import { execFileSync, execSync, spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { buildUpir } from "../src/gef/upir.js";
 import { sha256Hex } from "../src/lib/hash.js";
-import { collectDiffFacts, posixChangedPaths } from "../src/gef/git-facts.js";
+import { collectDiffFacts, posixChangedPaths, type GitRunner } from "../src/gef/git-facts.js";
 import { normalizeRepoRelativePath } from "../src/gef/upir.js";
 import { buildWorkReceipt, verifyWorkReceipt } from "../src/gef/command-receipt.js";
 import { getCommandContract } from "../src/gef/command-contract.js";
@@ -129,6 +129,40 @@ function nestedCopyFixture(): { repo: string; home: string; baseA: string; headB
   execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "B"], { cwd: repo });
   const headB = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo, encoding: "utf8" }).trim();
   return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-nested-copy-home-")), baseA, headB };
+}
+
+function corruptIndexFixture(): { repo: string; home: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-corrupt-index-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-corrupt-index.git"], { cwd: repo });
+  fs.writeFileSync(path.join(repo, "a.ts"), `export const a = 1;\n`);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "fixture"], { cwd: repo });
+  // A real non-zero `git status`/`git diff` without shell tricks: Git refuses to
+  // read a corrupt index (exit 128) while `rev-parse HEAD` still succeeds.
+  fs.writeFileSync(path.join(repo, ".git", "index"), "corrupt-index-not-a-real-index");
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-corrupt-index-home-")) };
+}
+
+// Delegate the injected seam to the real Git binary so only the targeted
+// subcommand is forced to fail.
+const delegateGitRunner: GitRunner = (repoRoot, args) => {
+  const result = spawnSync("git", args, { cwd: repoRoot, shell: false, windowsHide: true, maxBuffer: 16 * 1024 * 1024 });
+  if (result.error) throw result.error;
+  return { stdout: (result.stdout ?? Buffer.alloc(0)) as Buffer, status: result.status ?? 1 };
+};
+
+function failingGitSubcommand(subcommand: string): GitRunner {
+  return (repoRoot, args) => (args[0] === subcommand ? { stdout: Buffer.alloc(0), status: 128 } : delegateGitRunner(repoRoot, args));
+}
+
+function captureGitFailure(run: () => unknown): string {
+  try {
+    run();
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+  throw new Error("expected a Git fact failure");
 }
 
 function packUpir(taskId: string, baseSha?: string) {
@@ -317,6 +351,57 @@ describe("GEF W2 git facts, evidence and pack integration", () => {
     const { repo } = committedFixture();
     expect(() => collectDiffFacts(repo, FINGERPRINT, "0".repeat(40))).toThrow("DIFF_BASE_UNAVAILABLE");
     expect(() => collectDiffFacts(repo, FINGERPRINT, "not-a-sha")).toThrow("DIFF_BASE_UNAVAILABLE");
+  });
+
+  it("fails closed on a non-zero authoritative Git command without producing facts", () => {
+    const { repo, home } = corruptIndexFixture();
+    let facts: unknown;
+    const message = captureGitFailure(() => {
+      facts = collectDiffFacts(repo, FINGERPRINT);
+      return facts;
+    });
+    // Bounded identity: no raw stderr, no host path, no arbitrary command text.
+    expect(message).toBe("GIT_FACTS_COMMAND_FAILED:status");
+    expect(message).not.toContain(os.tmpdir());
+    expect(message).not.toContain(repo);
+    expect(facts).toBeUndefined();
+
+    let evidence: unknown;
+    const planeFailure = captureGitFailure(() => {
+      evidence = runWorkPlane({ taskId: "w2-git-failure", cwd: repo, uadsHome: home, commandIds: ["gef.work.git.facts"] });
+      return evidence;
+    });
+    expect(planeFailure).toBe("GIT_FACTS_COMMAND_FAILED:status");
+    expect(evidence).toBeUndefined();
+  });
+
+  it("fails closed when a committed or dirty diff command exits non-zero", () => {
+    const { repo: renameRepo, baseA } = committedRenameFixture();
+    // Control: the same basis with the real runner yields committed facts.
+    const control = collectDiffFacts(renameRepo, FINGERPRINT, baseA);
+    expect(control.headSha).toBeTruthy();
+    expect(control.changedFiles.map((item) => item.path)).toEqual(["after.ts"]);
+    expect(captureGitFailure(() => collectDiffFacts(renameRepo, FINGERPRINT, baseA, { gitRunner: failingGitSubcommand("diff") }))).toBe(
+      "GIT_FACTS_COMMAND_FAILED:diff",
+    );
+
+    const { repo: dirtyRepo } = tempRepo();
+    fs.writeFileSync(path.join(dirtyRepo, "a.ts"), `export const a = 2;\n`);
+    expect(collectDiffFacts(dirtyRepo, FINGERPRINT).dirty).toBe(true);
+    expect(captureGitFailure(() => collectDiffFacts(dirtyRepo, FINGERPRINT, undefined, { gitRunner: failingGitSubcommand("diff") }))).toBe(
+      "GIT_FACTS_COMMAND_FAILED:diff",
+    );
+    expect(captureGitFailure(() => collectDiffFacts(dirtyRepo, FINGERPRINT, undefined, { gitRunner: failingGitSubcommand("status") }))).toBe(
+      "GIT_FACTS_COMMAND_FAILED:status",
+    );
+  });
+
+  it("keeps operational Git errors distinguishable from the NOT_ANCESTOR semantic", () => {
+    const { repo, siblingBase } = divergentHistoryFixture();
+    expect(captureGitFailure(() => collectDiffFacts(repo, FINGERPRINT, siblingBase))).toMatch(/^DIFF_BASE_NOT_ANCESTOR:/);
+    expect(captureGitFailure(() => collectDiffFacts(repo, FINGERPRINT, siblingBase, { gitRunner: failingGitSubcommand("merge-base") }))).toBe(
+      "GIT_FACTS_COMMAND_FAILED:merge-base",
+    );
   });
 
   it("builds deterministic machine evidence digests", () => {

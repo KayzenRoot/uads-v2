@@ -30,6 +30,34 @@ function tempRepo(): { repo: string; home: string; fingerprint: string } {
   return { repo, home, fingerprint: "c".repeat(64) };
 }
 
+function renameIdentityFixture(): { repo: string; home: string; fingerprint: string } {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-rename-identity-"));
+  execFileSync("git", ["init", "-b", "main"], { cwd: repo });
+  execFileSync("git", ["remote", "add", "origin", "https://github.com/example/gef-w2-rename-identity.git"], { cwd: repo });
+  const body = `export const shared = 1;\n`;
+  fs.writeFileSync(path.join(repo, "a.ts"), body);
+  fs.writeFileSync(path.join(repo, "c.ts"), body);
+  execFileSync("git", ["add", "."], { cwd: repo });
+  execFileSync("git", ["-c", "user.name=GEF Test", "-c", "user.email=gef@example.invalid", "commit", "-m", "fixture"], { cwd: repo });
+  return { repo, home: fs.mkdtempSync(path.join(os.tmpdir(), "uads-gef-w2-rename-identity-home-")), fingerprint: "c".repeat(64) };
+}
+
+// Staged renames are the only dirty form Git reports as `R <destination>` with
+// a source field: an unstaged move appears as delete + untracked instead.
+function stageRename(repo: string, from: string, to: string): void {
+  if (fs.existsSync(path.join(repo, to))) fs.rmSync(path.join(repo, to));
+  execFileSync("git", ["mv", from, to], { cwd: repo });
+}
+
+function resetWorktree(repo: string): void {
+  execFileSync("git", ["reset", "-q"], { cwd: repo });
+  execFileSync("git", ["checkout", "-q", "--", "."], { cwd: repo });
+  const untracked = execFileSync("git", ["ls-files", "--others", "--exclude-standard"], { cwd: repo, encoding: "utf8" })
+    .split("\n")
+    .filter((entry) => entry.length > 0);
+  for (const entry of untracked) fs.rmSync(path.join(repo, entry), { force: true });
+}
+
 function validityFor(fingerprint: string, worktreeDigest: string, extra: Partial<ValidityBasis> = {}): ValidityBasis {
   return {
     projectFingerprint: fingerprint,
@@ -95,6 +123,42 @@ describe("GEF W2 commands, runner, receipts and cache", () => {
     expect(second.cacheStatus).toBe("MISS");
     expect(second.receipt.validityFingerprint).not.toBe(first.receipt.validityFingerprint);
     const third = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-dirty-b2", commandId: "gef.test.probe", facts: factsB, uadsHome: home, allowTestOnly: true });
+    expect(third.cacheStatus).toBe("HIT");
+    expect(third.receipt.validityFingerprint).toBe(second.receipt.validityFingerprint);
+  });
+
+  it("binds dirty rename source identity into the overlay digest and cache validity", () => {
+    const { repo, home, fingerprint } = renameIdentityFixture();
+    // State 1 renames a.ts -> b.ts; state 2 renames c.ts -> b.ts. Destination
+    // path, status and content bytes are identical on purpose, so only
+    // previousPath can separate the two observed states.
+    stageRename(repo, "a.ts", "b.ts");
+    const factsA = collectDiffFacts(repo, fingerprint);
+    const renamedA = factsA.changedFiles.find((item) => item.path === "b.ts");
+    expect(renamedA?.status).toBe("renamed");
+    expect(renamedA?.previousPath).toBe("a.ts");
+    const first = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-rename-a", commandId: "gef.test.probe", facts: factsA, uadsHome: home, allowTestOnly: true });
+    expect(first.cacheStatus).toBe("MISS");
+    expect(first.receipt.outcome).toBe("PASS");
+
+    resetWorktree(repo);
+    stageRename(repo, "c.ts", "b.ts");
+    const factsB = collectDiffFacts(repo, fingerprint);
+    const renamedB = factsB.changedFiles.find((item) => item.path === "b.ts");
+    expect(renamedB?.status).toBe("renamed");
+    expect(renamedB?.previousPath).toBe("c.ts");
+
+    expect(factsB.headSha).toBe(factsA.headSha);
+    expect(renamedB?.path).toBe(renamedA?.path);
+    expect(renamedB?.status).toBe(renamedA?.status);
+    expect(renamedB?.digest).toBe(renamedA?.digest);
+    expect(factsB.worktreeDigest).not.toBe(factsA.worktreeDigest);
+
+    const second = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-rename-b", commandId: "gef.test.probe", facts: factsB, uadsHome: home, allowTestOnly: true });
+    expect(second.cacheStatus).toBe("MISS");
+    expect(second.receipt.validityFingerprint).not.toBe(first.receipt.validityFingerprint);
+
+    const third = runWorkCommand({ repoRoot: repo, projectFingerprint: fingerprint, taskId: "w2-rename-b2", commandId: "gef.test.probe", facts: factsB, uadsHome: home, allowTestOnly: true });
     expect(third.cacheStatus).toBe("HIT");
     expect(third.receipt.validityFingerprint).toBe(second.receipt.validityFingerprint);
   });

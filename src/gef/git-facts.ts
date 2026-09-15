@@ -10,7 +10,10 @@ export const DIFF_FACTS_SCHEMA_VERSION = "0.1.0" as const;
 export const DIFF_FACTS_SCHEMA_FILE = "gef-diff-facts.schema.json" as const;
 export const DIFF_FACTS_MAX_FILES = 2000 as const;
 
-export type DiffFactsLimits = { maxFiles?: number };
+export type GitRunResult = { stdout: Buffer; status: number };
+export type GitRunner = (repoRoot: string, args: string[]) => GitRunResult;
+
+export type DiffFactsLimits = { maxFiles?: number; gitRunner?: GitRunner };
 
 export type ChangedFileStatus = "added" | "modified" | "deleted" | "renamed" | "copied" | "untracked" | "typechange";
 
@@ -36,16 +39,35 @@ export type DiffFacts = {
   factsDigest: string;
 };
 
-function runGit(repoRoot: string, args: string[]): { stdout: Buffer; status: number } {
-  const result = spawnSync("git", args, { cwd: repoRoot, shell: false, windowsHide: true, maxBuffer: 16 * 1024 * 1024 });
-  if (result.error) throw new Error(`GIT_FACTS_UNAVAILABLE:${(result.error as Error).message}`);
-  return { stdout: (result.stdout ?? Buffer.alloc(0)) as Buffer, status: result.status ?? 1 };
+// Bounded Git identity: only a validated subcommand token may reach an error
+// code, so raw stderr, absolute host paths, credentials or arbitrary command
+// text never persist in evidence or diagnostics.
+function boundedGitToken(value: string | undefined, fallback: string): string {
+  return value !== undefined && /^[a-z][a-z0-9-]{0,19}$/.test(value) ? value : fallback;
 }
 
-function gitText(repoRoot: string, args: string[]): string {
-  const result = spawnSync("git", args, { cwd: repoRoot, shell: false, windowsHide: true, encoding: "utf8" });
-  if (result.error ?? (result.status ?? 1) !== 0) throw new Error("GIT_FACTS_UNAVAILABLE");
-  return ((result.stdout ?? "") as string).trim();
+function spawnErrorLabel(error: unknown): string {
+  const code = (error as NodeJS.ErrnoException | undefined)?.code;
+  return typeof code === "string" && /^[A-Z0-9_]{1,40}$/.test(code) ? code : "SPAWN_ERROR";
+}
+
+const defaultGitRunner: GitRunner = (repoRoot, args) => {
+  const result = spawnSync("git", args, { cwd: repoRoot, shell: false, windowsHide: true, maxBuffer: 16 * 1024 * 1024 });
+  if (result.error) throw new Error(`GIT_FACTS_UNAVAILABLE:${spawnErrorLabel(result.error)}`);
+  return { stdout: (result.stdout ?? Buffer.alloc(0)) as Buffer, status: result.status ?? 1 };
+};
+
+// Authoritative facts are never produced from a failed subprocess: every
+// non-zero exit status fails closed here, so no caller can forget to inspect
+// status and publish partial facts from a command that did not succeed.
+function runGit(repoRoot: string, args: string[], runner: GitRunner): Buffer {
+  const { stdout, status } = runner(repoRoot, args);
+  if (status !== 0) throw new Error(`GIT_FACTS_COMMAND_FAILED:${boundedGitToken(args[0], "command")}`);
+  return stdout;
+}
+
+function gitText(repoRoot: string, args: string[], runner: GitRunner): string {
+  return runGit(repoRoot, args, runner).toString("utf8").trim();
 }
 
 function splitNul(output: Buffer): string[] {
@@ -224,22 +246,26 @@ function toFact(repoRoot: string, parsed: ParsedPath, counts: Map<string, PathCo
   };
 }
 
-function assertBaseUsable(repoRoot: string, base: string): void {
-  const result = spawnSync("git", ["cat-file", "-e", `${base}^{commit}`], { cwd: repoRoot, shell: false, windowsHide: true });
-  if (result.error ?? (result.status ?? 1) !== 0) {
+function assertBaseUsable(repoRoot: string, base: string, runner: GitRunner): void {
+  const { status } = runner(repoRoot, ["cat-file", "-e", `${base}^{commit}`]);
+  if (status !== 0) {
     throw new Error(`DIFF_BASE_UNAVAILABLE:${base.slice(0, 100)}`);
   }
 }
 
-function assertBaseAncestor(repoRoot: string, base: string, head: string): void {
+function assertBaseAncestor(repoRoot: string, base: string, head: string, runner: GitRunner): void {
   if (base === head) return;
-  const result = spawnSync("git", ["merge-base", "--is-ancestor", base, head], { cwd: repoRoot, shell: false, windowsHide: true });
-  if (result.error) throw new Error(`GIT_FACTS_UNAVAILABLE:${(result.error as Error).message}`);
-  if ((result.status ?? 1) !== 0) throw new Error(`DIFF_BASE_NOT_ANCESTOR:${base.slice(0, 100)}`);
+  const { status } = runner(repoRoot, ["merge-base", "--is-ancestor", base, head]);
+  // Git reserves exit status 1 for the explicit NOT_ANCESTOR semantic; every
+  // other non-zero status is an operational failure that stays distinguishable
+  // from it and fails closed.
+  if (status === 1) throw new Error(`DIFF_BASE_NOT_ANCESTOR:${base.slice(0, 100)}`);
+  if (status !== 0) throw new Error("GIT_FACTS_COMMAND_FAILED:merge-base");
 }
 
 export function collectDiffFacts(repoRoot: string, projectFingerprint: string, baseSha?: string, limits?: DiffFactsLimits): DiffFacts {
-  const headSha = gitText(repoRoot, ["rev-parse", "HEAD"]);
+  const runner = limits?.gitRunner ?? defaultGitRunner;
+  const headSha = gitText(repoRoot, ["rev-parse", "HEAD"], runner);
   const base = baseSha ?? headSha;
   const maxFiles = limits?.maxFiles ?? DIFF_FACTS_MAX_FILES;
 
@@ -249,21 +275,21 @@ export function collectDiffFacts(repoRoot: string, projectFingerprint: string, b
   // fails closed instead of producing an arbitrary divergent-tree diff.
   const committed: ChangedFileFact[] = [];
   if (base !== headSha) {
-    assertBaseUsable(repoRoot, base);
-    assertBaseAncestor(repoRoot, base, headSha);
-    const rangeStatus = splitNul(runGit(repoRoot, ["diff", "--name-status", "-z", "-M", "-C", base, headSha, "--"]).stdout);
-    const rangeNumstat = parseNumstatZ(splitNul(runGit(repoRoot, ["diff", "--numstat", "-z", "-M", "-C", base, headSha, "--"]).stdout));
+    assertBaseUsable(repoRoot, base, runner);
+    assertBaseAncestor(repoRoot, base, headSha, runner);
+    const rangeStatus = splitNul(runGit(repoRoot, ["diff", "--name-status", "-z", "-M", "-C", base, headSha, "--"], runner));
+    const rangeNumstat = parseNumstatZ(splitNul(runGit(repoRoot, ["diff", "--numstat", "-z", "-M", "-C", base, headSha, "--"], runner)));
     for (const parsed of parseNameStatusZ(rangeStatus, maxFiles)) {
       committed.push(toFact(repoRoot, parsed, rangeNumstat));
     }
   }
 
   // Dirty working-tree truth: local mutations overlaid on the candidate.
-  const statusEntries = splitNul(runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout);
+  const statusEntries = splitNul(runGit(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"], runner));
 
   // numstat -z: one NUL record per file with rename/copy destination tokens,
   // so nested-brace forms map to the destination path exactly.
-  const numstat = parseNumstatZ(splitNul(runGit(repoRoot, ["diff", "--numstat", "-z", "HEAD", "--"]).stdout));
+  const numstat = parseNumstatZ(splitNul(runGit(repoRoot, ["diff", "--numstat", "-z", "HEAD", "--"], runner)));
   const dirtyParsed = parsePorcelainZ(statusEntries, maxFiles);
   const dirty: ChangedFileFact[] = dirtyParsed.map((parsed) => toFact(repoRoot, parsed, numstat));
 
@@ -281,7 +307,17 @@ export function collectDiffFacts(repoRoot: string, projectFingerprint: string, b
   const changed = [...merged.values()].sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
 
   const isDirty = dirty.length > 0;
-  const worktreeDigest = isDirty ? canonicalDigest(dirty.map((item) => ({ path: item.path, status: item.status, digest: item.digest }))) : null;
+  // The dirty overlay digest binds the rename/copy source identity too: two
+  // overlays that agree on destination path, status and content bytes are still
+  // different observed states when they came from different previousPath
+  // sources, and must never share cache validity.
+  const worktreeDigest = isDirty
+    ? canonicalDigest(
+        [...dirty]
+          .sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0))
+          .map((item) => ({ path: item.path, status: item.status, previousPath: item.previousPath ?? null, digest: item.digest })),
+      )
+    : null;
   const stats = {
     files: changed.length,
     insertions: changed.reduce((total, item) => total + item.insertions, 0),
