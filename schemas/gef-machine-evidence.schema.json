@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-machine-evidence.schema.json",
+  "title": "GEF W2 Machine Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectFingerprint", "taskId", "workOrder", "baseSha", "headSha", "workingTreeDigest", "changedFiles", "commandReceipts", "localValidation", "budgets", "telemetry", "knownDebt", "terminalState", "evidenceDigest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+    "workOrder": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "baseSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "headSha": { "type": ["string", "null"], "pattern": "^([a-f0-9]{40}|[a-f0-9]{64})$" },
+    "workingTreeDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "changedFiles": { "type": "array", "maxItems": 2000, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+    "commandReceipts": {
+      "type": "array",
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/workReceipt" }
+    },
+    "localValidation": { "type": "object", "maxProperties": 64 },
+    "budgets": { "type": "object", "maxProperties": 32 },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commandsRun", "cacheHits", "cacheMisses", "totalDurationMs", "totalStdoutBytes", "evidenceGeneratedMs"],
+      "properties": {
+        "commandsRun": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "cacheHits": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "cacheMisses": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "totalDurationMs": { "type": "integer", "minimum": 0, "maximum": 36000000 },
+        "totalStdoutBytes": { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+        "evidenceGeneratedMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+      }
+    },
+    "knownDebt": { "type": "array", "maxItems": 32, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+    "terminalState": { "type": "string", "enum": ["COMPLETE_CANDIDATE", "BLOCKED", "SOURCE_CONFLICT"] },
+    "evidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "workReceipt": {
+      "title": "Closed WorkReceipt mirror (same authority as gef-work-receipt.schema.json; enforced in code by verifyWorkReceipt)",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "projectFingerprint", "taskId", "commandId", "commandVersion", "contractDigest", "validityFingerprint", "source", "outcome", "exitCode", "durationMs", "stdoutBytes", "stderrBytes", "stdoutTruncated", "stderrTruncated", "summaryDigest", "receiptDigest"],
+      "properties": {
+        "schemaVersion": { "const": "0.1.0" },
+        "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "taskId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,128}$" },
+        "commandId": { "type": "string", "pattern": "^gef\\.[A-Za-z0-9._-]{1,80}$" },
+        "commandVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "contractDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "validityFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "source": { "type": "string", "enum": ["EXECUTED", "CACHE_HIT"] },
+        "outcome": { "type": "string", "enum": ["PASS", "FAIL", "TIMEOUT", "ERROR"] },
+        "exitCode": { "type": ["integer", "null"], "minimum": -9999, "maximum": 9999 },
+        "durationMs": { "type": "integer", "minimum": 0, "maximum": 3600000 },
+        "stdoutBytes": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+        "stderrBytes": { "type": "integer", "minimum": 0, "maximum": 100000000 },
+        "stdoutTruncated": { "type": "boolean" },
+        "stderrTruncated": { "type": "boolean" },
+        "summary": { "type": "string", "maxLength": 2048 },
+        "summaryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "receiptDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

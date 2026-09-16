@@ -50,6 +50,7 @@ import {
   runAdaptersUninstallCommand,
 } from "./commands/adapters.js";
 import { runGefAdopt, runGefContextPrepare, runGefDoctor, runGefPackBuild, runGefProfileShow, runGefPromptCompile, runGefStatus, runGefTaskCompile } from "./commands/gef.js";
+import { runGefCacheInspect, runGefCachePrune, runGefCommandList, runGefCommandRun, runGefEvidenceBuild, runGefEvidenceReport, runGefReceiptShow, runGefWorkFacts } from "./commands/gef-work.js";
 
 const program = new Command();
 
@@ -623,6 +624,73 @@ gefPack
   .option("--json", "JSON output")
   .action((taskId: string, options: { executor?: string; mode?: string; json?: boolean }) => {
     process.stdout.write(runGefPackBuild(taskId, { executor: options.executor, mode: options.mode, json: options.json }));
+  });
+const gefWork = gef.command("work").description("GEF W2 deterministic work plane");
+gefWork
+  .command("facts")
+  .description("Collect deterministic Git/diff/hash facts for the current project")
+  .option("--task <task-id>", "task label bound into the facts output")
+  .option("--json", "JSON output")
+  .action((options: { task?: string; json?: boolean }) => {
+    process.stdout.write(runGefWorkFacts(options.task, { json: options.json }));
+  });
+const gefCommand = gef.command("command").description("GEF W2 validated command contracts");
+gefCommand
+  .command("list")
+  .description("List registered deterministic command contracts")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runGefCommandList({ json: options.json }));
+  });
+gefCommand
+  .command("run <command-id>")
+  .description("Run a registered command contract with cache-aware receipts")
+  .requiredOption("--task <task-id>", "task label bound into the receipt")
+  .option("--json", "JSON output")
+  .action((commandId: string, options: { task: string; json?: boolean }) => {
+    process.stdout.write(runGefCommandRun(commandId, options.task, { json: options.json }));
+  });
+const gefReceipt = gef.command("receipt").description("GEF W2 command receipts");
+gefReceipt
+  .command("show <receipt-id>")
+  .description("Show a persisted command receipt by digest")
+  .option("--json", "JSON output")
+  .action((receiptId: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefReceiptShow(receiptId, { json: options.json }));
+  });
+const gefEvidence = gef.command("evidence").description("GEF W2 machine evidence");
+gefEvidence
+  .command("build <task-id>")
+  .description("Build canonical machine evidence for a task")
+  .option("--commands <ids>", "comma-separated registered command IDs", "")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { commands?: string; json?: boolean }) => {
+    process.stdout.write(runGefEvidenceBuild(taskId, { commands: options.commands, json: options.json }));
+  });
+gefEvidence
+  .command("report <task-id>")
+  .description("Render the deterministic human report from machine evidence")
+  .option("--format <format>", "report format (md)", "md")
+  .action((taskId: string, options: { format?: string }) => {
+    process.stdout.write(runGefEvidenceReport(taskId, { format: options.format }));
+  });
+const gefCache = gef.command("cache").description("GEF W2 receipt cache");
+gefCache
+  .command("inspect")
+  .description("Inspect cached command receipts")
+  .option("--kind <kind>", "cache kind (command)", "command")
+  .option("--json", "JSON output")
+  .action((options: { kind?: string; json?: boolean }) => {
+    process.stdout.write(runGefCacheInspect({ kind: options.kind, json: options.json }));
+  });
+gefCache
+  .command("prune")
+  .description("Prune cached command receipts")
+  .option("--kind <kind>", "cache kind (command)", "command")
+  .option("--dry-run", "report without deleting")
+  .option("--json", "JSON output")
+  .action((options: { kind?: string; dryRun?: boolean; json?: boolean }) => {
+    process.stdout.write(runGefCachePrune({ kind: options.kind, dryRun: options.dryRun, json: options.json }));
   });
 
 program
