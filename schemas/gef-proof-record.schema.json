@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-proof-record.schema.json",
+  "title": "GEF W3 Proof Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "proofId",
+    "projectFingerprint",
+    "proofType",
+    "producerId",
+    "producerVersion",
+    "validityFingerprint",
+    "dependsOn",
+    "commandReceiptDigest",
+    "outcome",
+    "source",
+    "reasonCode",
+    "proofDigest"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "proofId": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "proofType": { "type": "string", "enum": ["TEST", "TYPECHECK", "BUILD", "SCHEMA", "EVAL", "STATIC"] },
+    "producerId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "producerVersion": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "validityFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "dependsOn": { "type": "array", "maxItems": 256, "items": { "type": "string", "pattern": "^[a-f0-9]{64}$" } },
+    "commandReceiptDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "outcome": { "type": "string", "enum": ["PASS", "FAIL", "TIMEOUT", "ERROR"] },
+    "source": { "type": "string", "enum": ["EXECUTED", "REUSED"] },
+    "reasonCode": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "proofDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

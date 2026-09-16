@@ -51,6 +51,7 @@ import {
 } from "./commands/adapters.js";
 import { runGefAdopt, runGefContextPrepare, runGefDoctor, runGefPackBuild, runGefProfileShow, runGefPromptCompile, runGefStatus, runGefTaskCompile } from "./commands/gef.js";
 import { runGefCacheInspect, runGefCachePrune, runGefCommandList, runGefCommandRun, runGefEvidenceBuild, runGefEvidenceReport, runGefReceiptShow, runGefWorkFacts } from "./commands/gef-work.js";
+import { runGefAssuranceDelta, runGefAssurancePlan, runGefAssuranceRun, runGefImpactBuild, runGefImpactExplain, runGefProofList, runGefProofPrune, runGefProofShow, runGefProofVerify } from "./commands/gef-assurance.js";
 
 const program = new Command();
 
@@ -691,6 +692,76 @@ gefCache
   .option("--json", "JSON output")
   .action((options: { kind?: string; dryRun?: boolean; json?: boolean }) => {
     process.stdout.write(runGefCachePrune({ kind: options.kind, dryRun: options.dryRun, json: options.json }));
+  });
+const gefImpact = gef.command("impact").description("GEF W3 impact graph and test impact");
+gefImpact
+  .command("build <task-id>")
+  .description("Assess the candidate change against the stored impact snapshot and refresh it")
+  .option("--base <sha>", "base commit for the committed delta")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { base?: string; json?: boolean }) => {
+    process.stdout.write(runGefImpactBuild(taskId, { baseSha: options.base, json: options.json }));
+  });
+gefImpact
+  .command("explain <task-id>")
+  .description("Explain why each proof was selected or skipped for the assessed change")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefImpactExplain(taskId, { json: options.json }));
+  });
+const gefProof = gef.command("proof").description("GEF W3 global proof store");
+gefProof
+  .command("list")
+  .description("Inspect the global proof store and index")
+  .option("--json", "JSON output")
+  .action((options: { json?: boolean }) => {
+    process.stdout.write(runGefProofList({ json: options.json }));
+  });
+gefProof
+  .command("show <proof-digest>")
+  .description("Show a stored proof record by digest")
+  .option("--json", "JSON output")
+  .action((proofDigest: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefProofShow(proofDigest, { json: options.json }));
+  });
+gefProof
+  .command("verify <proof-digest>")
+  .description("Verify a stored proof record schema and digest before trusting it")
+  .option("--json", "JSON output")
+  .action((proofDigest: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefProofVerify(proofDigest, { json: options.json }));
+  });
+gefProof
+  .command("prune")
+  .description("Prune unreferenced proof records (never removes an indexed proof)")
+  .option("--dry-run", "report without deleting")
+  .option("--max-entries <count>", "retention bound")
+  .option("--json", "JSON output")
+  .action((options: { dryRun?: boolean; maxEntries?: string; json?: boolean }) => {
+    process.stdout.write(runGefProofPrune({ dryRun: options.dryRun, maxEntries: options.maxEntries === undefined ? undefined : Number(options.maxEntries), json: options.json }));
+  });
+const gefAssurance = gef.command("assurance").description("GEF W3 assurance planner (A0-A2)");
+gefAssurance
+  .command("plan <task-id>")
+  .description("Plan reuse and execution for the assessed change with explicit reasons")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefAssurancePlan(taskId, { json: options.json }));
+  });
+gefAssurance
+  .command("run <task-id>")
+  .description("Execute only the proofs the plan requires and emit the proof delta")
+  .option("--base <sha>", "base commit for the committed delta")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { base?: string; json?: boolean }) => {
+    process.stdout.write(runGefAssuranceRun(taskId, { baseSha: options.base, json: options.json }));
+  });
+gefAssurance
+  .command("delta <task-id>")
+  .description("Show the machine-readable NEW/REUSED/INVALIDATED/NOT_APPLICABLE proof delta")
+  .option("--json", "JSON output")
+  .action((taskId: string, options: { json?: boolean }) => {
+    process.stdout.write(runGefAssuranceDelta(taskId, { json: options.json }));
   });
 
 program

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-impact-result.schema.json",
+  "title": "GEF W3 Impact Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectFingerprint",
+    "taskId",
+    "candidateDigest",
+    "graphDigest",
+    "graphState",
+    "changedPaths",
+    "impactedNodes",
+    "selected",
+    "skipped",
+    "uncertainty",
+    "expansionState",
+    "minimumAssurance",
+    "limitations",
+    "impactDigest"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "candidateDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "graphDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "graphState": { "type": "string", "enum": ["CURRENT", "MISSING", "STALE", "INCOMPLETE", "CORRUPT"] },
+    "changedPaths": { "type": "array", "maxItems": 2000, "items": { "type": "string", "minLength": 1, "maxLength": 500 } },
+    "impactedNodes": { "type": "array", "maxItems": 20000, "items": { "type": "string", "minLength": 1, "maxLength": 400 } },
+    "selected": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proofKey", "commandId", "proofType", "reason"],
+        "properties": {
+          "proofKey": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "commandId": { "type": "string", "pattern": "^gef\\.[A-Za-z0-9._-]{1,80}$" },
+          "proofType": { "type": "string", "enum": ["TEST", "TYPECHECK", "BUILD", "SCHEMA", "EVAL", "STATIC"] },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "DIRECT_SOURCE_CHANGE",
+              "DIRECT_TEST_CHANGE",
+              "INTERFACE_DEPENDENCY",
+              "SCHEMA_DEPENDENCY",
+              "CONFIG_DEPENDENCY",
+              "LOCKFILE_CHANGE",
+              "PREVIOUS_PATH_DEPENDENCY",
+              "GRAPH_EXPANSION",
+              "COLD_STORE"
+            ]
+          },
+          "via": { "type": "array", "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 200 } }
+        }
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proofKey", "reason"],
+        "properties": {
+          "proofKey": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 160 }
+        }
+      }
+    },
+    "uncertainty": { "type": "array", "maxItems": 256, "items": { "type": "string", "minLength": 1, "maxLength": 160 } },
+    "expansionState": { "type": "string", "enum": ["NONE", "IMPACT_EXPANSION_REQUIRED"] },
+    "minimumAssurance": { "type": "string", "enum": ["A0", "A1", "A2"] },
+    "limitations": { "type": "array", "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
+    "impactDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

@@ -7,6 +7,19 @@ export const COMMAND_CONTRACT_SCHEMA_FILE = "gef-command-contract.schema.json" a
 
 export type CommandExecutable = "npm" | "node" | "git";
 export type CommandPlatform = "win32" | "linux" | "darwin";
+export type CommandProofType = "TEST" | "TYPECHECK" | "BUILD" | "SCHEMA" | "EVAL" | "STATIC";
+
+// Proof classification is a property of the registered contract, so the impact
+// graph and the assurance planner derive it from one place instead of keeping
+// parallel id tables that could drift apart.
+export function proofTypeForContract(id: string): CommandProofType {
+  if (id.includes(".test.")) return "TEST";
+  if (id.includes(".typecheck")) return "TYPECHECK";
+  if (id.includes(".build")) return "BUILD";
+  if (id.includes(".schema")) return "SCHEMA";
+  if (id.includes(".eval.")) return "EVAL";
+  return "STATIC";
+}
 
 export type CommandContract = {
   schemaVersion: typeof COMMAND_CONTRACT_SCHEMA_VERSION;
@@ -91,6 +104,65 @@ const REGISTRY: CommandContract[] = [
     envAllowlist: [],
     platforms: ["win32", "linux", "darwin"],
     relevantFiles: [],
+  }),
+  // W3 focused test contracts. Source check: the registry previously exposed a
+  // single test contract pinned to one file, so no registered equivalent existed
+  // for focused per-file test selection and proof reuse.
+  defineContract({
+    schemaVersion: "0.1.0",
+    id: "gef.work.test.w3.impact",
+    version: "1.0.0",
+    executable: "npm",
+    args: ["run", "test", "--", "tests/gef-w3-impact.test.ts"],
+    cwdMode: "PROJECT_ROOT",
+    timeoutMs: 180000,
+    maxStdoutBytes: 65536,
+    maxStderrBytes: 65536,
+    envAllowlist: [],
+    platforms: ["win32", "linux", "darwin"],
+    relevantFiles: ["package.json", "package-lock.json", "vitest.config.ts"],
+  }),
+  defineContract({
+    schemaVersion: "0.1.0",
+    id: "gef.work.test.w3.proof",
+    version: "1.0.0",
+    executable: "npm",
+    args: ["run", "test", "--", "tests/gef-w3-proof.test.ts"],
+    cwdMode: "PROJECT_ROOT",
+    timeoutMs: 180000,
+    maxStdoutBytes: 65536,
+    maxStderrBytes: 65536,
+    envAllowlist: [],
+    platforms: ["win32", "linux", "darwin"],
+    relevantFiles: ["package.json", "package-lock.json", "vitest.config.ts"],
+  }),
+  defineContract({
+    schemaVersion: "0.1.0",
+    id: "gef.work.test.w3.assurance",
+    version: "1.0.0",
+    executable: "npm",
+    args: ["run", "test", "--", "tests/gef-w3-assurance.test.ts"],
+    cwdMode: "PROJECT_ROOT",
+    timeoutMs: 180000,
+    maxStdoutBytes: 65536,
+    maxStderrBytes: 65536,
+    envAllowlist: [],
+    platforms: ["win32", "linux", "darwin"],
+    relevantFiles: ["package.json", "package-lock.json", "vitest.config.ts"],
+  }),
+  defineContract({
+    schemaVersion: "0.1.0",
+    id: "gef.work.test.w3.surface",
+    version: "1.0.0",
+    executable: "npm",
+    args: ["run", "test", "--", "tests/gef-w3-surface.test.ts"],
+    cwdMode: "PROJECT_ROOT",
+    timeoutMs: 180000,
+    maxStdoutBytes: 65536,
+    maxStderrBytes: 65536,
+    envAllowlist: [],
+    platforms: ["win32", "linux", "darwin"],
+    relevantFiles: ["package.json", "package-lock.json", "vitest.config.ts"],
   }),
   defineContract({
     schemaVersion: "0.1.0",

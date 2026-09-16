@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-assurance-plan.schema.json",
+  "title": "GEF W3 Assurance Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectFingerprint",
+    "taskId",
+    "candidateDigest",
+    "graphDigest",
+    "graphState",
+    "required",
+    "invalidated",
+    "uncertainty",
+    "minimumAssurance",
+    "reusePolicy",
+    "limitations",
+    "metrics",
+    "planDigest"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "candidateDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "graphDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "graphState": { "type": "string", "enum": ["CURRENT", "MISSING", "STALE", "INCOMPLETE", "CORRUPT"] },
+    "required": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proof", "proofKey", "commandId", "proofType", "action", "reason"],
+        "properties": {
+          "proof": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "proofKey": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "commandId": { "type": "string", "pattern": "^gef\\.[A-Za-z0-9._-]{1,80}$" },
+          "proofType": { "type": "string", "enum": ["TEST", "TYPECHECK", "BUILD", "SCHEMA", "EVAL", "STATIC"] },
+          "action": { "type": "string", "enum": ["REUSE", "EXECUTE"] },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "proofDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+          "validityFingerprint": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+          "dependencyProofDigests": { "type": "array", "maxItems": 256, "items": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }
+        }
+      }
+    },
+    "invalidated": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proofKey", "reasonCode"],
+        "properties": {
+          "proofKey": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "reasonCode": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "via": { "type": "array", "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 200 } }
+        }
+      }
+    },
+    "uncertainty": { "type": "array", "maxItems": 256, "items": { "type": "string", "minLength": 1, "maxLength": 160 } },
+    "minimumAssurance": { "type": "string", "enum": ["A0", "A1", "A2", "A3", "A4"] },
+    "reusePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passReuse", "failReuse", "transientReuse"],
+      "properties": {
+        "passReuse": { "const": "EXACT_BASIS" },
+        "failReuse": { "const": "DISABLED" },
+        "transientReuse": { "const": "NEVER" }
+      }
+    },
+    "limitations": { "type": "array", "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selectedProofs", "reuseCandidates", "executeRequired", "planningDurationMs"],
+      "properties": {
+        "selectedProofs": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "reuseCandidates": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "executeRequired": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "planningDurationMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+      }
+    },
+    "planDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

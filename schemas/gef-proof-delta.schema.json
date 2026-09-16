@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-proof-delta.schema.json",
+  "title": "GEF W3 Proof Delta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectFingerprint", "taskId", "candidateDigest", "planDigest", "entries", "summary", "metrics", "deltaDigest"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "taskId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "candidateDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "planDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "entries": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["proof", "proofKey", "status", "reasonCode"],
+        "properties": {
+          "proof": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "proofKey": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "status": { "type": "string", "enum": ["NEW", "REUSED", "INVALIDATED", "NOT_APPLICABLE"] },
+          "reasonCode": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "proofDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+          "priorProofDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["new", "reused", "invalidated", "notApplicable"],
+      "properties": {
+        "new": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "reused": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "invalidated": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "notApplicable": { "type": "integer", "minimum": 0, "maximum": 512 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "impactedNodes",
+        "selectedProofs",
+        "reusedProofs",
+        "invalidatedProofs",
+        "executedProofs",
+        "planningDurationMs",
+        "executionDurationMs"
+      ],
+      "properties": {
+        "impactedNodes": { "type": "integer", "minimum": 0, "maximum": 20000 },
+        "selectedProofs": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "reusedProofs": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "invalidatedProofs": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "executedProofs": { "type": "integer", "minimum": 0, "maximum": 512 },
+        "planningDurationMs": { "type": "integer", "minimum": 0, "maximum": 3600000 },
+        "executionDurationMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+      }
+    },
+    "deltaDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}
