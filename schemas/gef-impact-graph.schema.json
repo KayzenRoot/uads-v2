@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uads.dev/schemas/gef-impact-graph.schema.json",
+  "title": "GEF W3 Impact Graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "projectFingerprint",
+    "graphVersion",
+    "producerVersion",
+    "nodes",
+    "edges",
+    "limits",
+    "truncated",
+    "uncertainty",
+    "graphDigest"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "projectFingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "graphVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "producerVersion": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "nodes": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "label"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "SOURCE_FILE",
+              "SYMBOL_OR_MODULE",
+              "CONFIG",
+              "LOCKFILE",
+              "SCHEMA",
+              "TEST",
+              "EVAL",
+              "COMMAND_CONTRACT",
+              "PROOF"
+            ]
+          },
+          "label": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "path": { "type": ["string", "null"], "maxLength": 500 },
+          "digest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 60000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "relation"],
+        "properties": {
+          "from": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "to": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "relation": {
+            "type": "string",
+            "enum": ["IMPORTS", "IMPLEMENTS", "VALIDATED_BY", "CONFIGURES", "GENERATED_FROM", "REQUIRES", "INVALIDATES_WITH"]
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxFiles", "maxEntities"],
+      "properties": {
+        "maxFiles": { "type": "integer", "minimum": 1, "maximum": 20000 },
+        "maxEntities": { "type": "integer", "minimum": 1, "maximum": 60000 }
+      }
+    },
+    "truncated": { "type": "boolean" },
+    "uncertainty": { "type": "array", "maxItems": 64, "items": { "type": "string", "minLength": 1, "maxLength": 160 } },
+    "graphDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}
