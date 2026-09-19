@@ -4,6 +4,10 @@ export type { CapabilityClass, RiskLevel, ScopeClass } from "./types.js";
 
 export const MODEL_ROUTING_SCHEMA_VERSION = "0.8.0" as const;
 export const MODEL_ROUTING_POLICY_VERSION = "0.8.0" as const;
+/** Dedicated Model Execution Plan schema version; plan evolution must not invalidate runtime/profile schemas. */
+export const MODEL_EXECUTION_PLAN_SCHEMA_VERSION = "0.9.0" as const;
+/** Governed routing-mode / Model Lock state schema version. */
+export const MODEL_ROUTING_STATE_SCHEMA_VERSION = "0.1.0" as const;
 
 export type ModelStatus = "enabled" | "disabled" | "experimental";
 export type ReasoningClass = "basic" | "standard" | "advanced" | "deep";
@@ -25,6 +29,45 @@ export type ModelCapability =
 export type ModelRole = "implementation" | "review" | "testing" | "assurance";
 export type ModelRoutingStatus = "SELECTED" | "BLOCKED";
 export type ModelSelectionMode = "router" | "host-managed";
+export type ModelRoutingMode = "MODEL_LOCK" | "CHEAPEST_QUALIFIED" | "QUALITY_FLOOR_AUTOROUTE";
+export type CapabilityTruthState = "SUPPORTED" | "UNSUPPORTED" | "UNKNOWN" | "BLOCKED";
+export type RoutingEnforcementState = "ENFORCED" | "VERIFIED_MATCH" | "HOST_FIXED" | "MISMATCH" | "UNKNOWN";
+
+export type CapabilityTruthCapabilities = Record<ModelCapability, CapabilityTruthState>;
+
+/**
+ * Bounded capability truth recorded on every routing decision.
+ *
+ * `provenanceConfidence` is always "unknown" in this slice: M05 consumes the passive
+ * host-capability projection, which cannot produce proven effective capability states.
+ * `subjectDigest`/`adapterContractDigest` are null on plans produced by `routeModel`
+ * because every plan field must stay reproducible from the routing inputs alone: the
+ * dispatch-time plan re-derivation compares plan content without those digests.
+ */
+export type CapabilityTruth = {
+  adapterId: string | null;
+  runtimeIdentityDigest: string;
+  subjectDigest: string | null;
+  adapterContractDigest: string | null;
+  provenanceConfidence: "unknown";
+  capabilities: CapabilityTruthCapabilities;
+  reasonCodes: string[];
+};
+
+export type ModelLockPlanBlock = {
+  active: boolean;
+  mode: ModelRoutingMode;
+  revision: number;
+  profileId: string | null;
+  providerId: string | null;
+  modelId: string | null;
+  reasonCodes: string[];
+};
+
+export type RoutingEnforcement = {
+  state: RoutingEnforcementState;
+  reasonCodes: string[];
+};
 
 export type ModelSupports = {
   toolCalling: boolean;
@@ -145,7 +188,7 @@ export type ModelExecutionStrategy = {
 
 export type ModelExecutionPlan = {
   schema: "uads.model-execution-plan";
-  schemaVersion: typeof MODEL_ROUTING_SCHEMA_VERSION;
+  schemaVersion: typeof MODEL_EXECUTION_PLAN_SCHEMA_VERSION;
   planId: string;
   projectId: string;
   workOrderId: string;
@@ -193,6 +236,10 @@ export type ModelExecutionPlan = {
   selectionMode: ModelSelectionMode;
   status: ModelRoutingStatus;
   blockedReason: string | null;
+  routingMode: ModelRoutingMode;
+  modelLock: ModelLockPlanBlock;
+  capabilityTruth: CapabilityTruth;
+  routingEnforcement: RoutingEnforcement;
 };
 
 export type ModelRoutingFailureSignals = {

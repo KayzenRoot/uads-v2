@@ -5,7 +5,7 @@ import { ensureWorkspace } from "../src/lib/workspace.js";
 import { validateAgainstSchema } from "../src/lib/json-schema.js";
 import { createModelProfileRegistry, addModelProfiles, normalizeModelProfile } from "../src/kernel/model-registry.js";
 import { computeWorkOrderRoutingDigest, routeModel } from "../src/kernel/model-router.js";
-import { conservativeRuntimeCapabilitySnapshot, computeRuntimeIdentityDigest } from "../src/kernel/model-runtime.js";
+import { RUNTIME_CAPABILITY_KEYS, conservativeRuntimeCapabilitySnapshot, computeRuntimeIdentityDigest } from "../src/kernel/model-runtime.js";
 import { isModelExecutionPlanCurrent } from "../src/kernel/model-persist.js";
 import { type ModelProfile, type RuntimeCapabilitySnapshot } from "../src/kernel/model-types.js";
 import type { ContextPack } from "../src/kernel/intelligence-types.js";
@@ -355,5 +355,196 @@ describe("provider-neutral model router and runtime negotiation", () => {
     const plan = route([experimental], order);
     expect(plan.status).toBe("BLOCKED");
     expect(plan.rejections[0]?.reasonCodes).toContain("PROFILE_EXPERIMENTAL_NOT_ALLOWED");
+  });
+
+  it("WO-025 keeps explicit-runtime callers on the legacy selection path with default routing metadata", () => {
+    const plan = route([profile("economy", "economy"), profile("balanced", "balanced")]);
+    expect(plan.selectedProfileId).toBe("economy");
+    expect(plan.routingMode).toBe("QUALITY_FLOOR_AUTOROUTE");
+    expect(plan.modelLock).toEqual({
+      active: false,
+      mode: "QUALITY_FLOOR_AUTOROUTE",
+      revision: 0,
+      profileId: null,
+      providerId: null,
+      modelId: null,
+      reasonCodes: [],
+    });
+    expect(plan.routingEnforcement).toEqual({ state: "UNKNOWN", reasonCodes: ["NO_ACTIVE_LOCK", "NO_HOST_EXECUTION_EVIDENCE"] });
+  });
+
+  it("WO-025 T2: an active Model Lock is a hard constraint that suppresses fallback substitution", () => {
+    const profiles = [profile("economy", "economy"), profile("balanced", "balanced", { relativeCostClass: "high" }), profile("strong", "strong")];
+    expect(route(profiles).selectedProfileId).toBe("economy");
+    const locked = route(profiles, workOrder(), capableRuntime(), {
+      lockState: {
+        status: "CURRENT",
+        mode: "MODEL_LOCK",
+        locked: { profileId: "balanced", providerId: "fixture-provider", modelId: "fixture-model-balanced" },
+        lockRevision: 3,
+      },
+    } as Parameters<typeof routeModel>[0]);
+    expect(locked.status).toBe("SELECTED");
+    expect(locked.selectedProfileId).toBe("balanced");
+    expect(locked.modelLock.active).toBe(true);
+    expect(locked.modelLock.revision).toBe(3);
+    expect(locked.modelLock.reasonCodes).toContain("MODEL_LOCK_FALLBACK_FORBIDDEN");
+    expect(locked.routingEnforcement.state).toBe("ENFORCED");
+    expect(locked.selectionReasonCodes).toContain("MODEL_LOCK_ENFORCED");
+    expect(locked.fallbackProfileIds).toEqual([]);
+  });
+
+  it("WO-025 T3: an unresolvable or inadmissible lock fails closed without substitution", () => {
+    const missing = route([profile("economy", "economy"), profile("balanced", "balanced")], workOrder(), capableRuntime(), {
+      lockState: {
+        status: "CURRENT",
+        mode: "MODEL_LOCK",
+        locked: { profileId: "absent", providerId: "fixture-provider", modelId: "fixture-model-absent" },
+        lockRevision: 5,
+      },
+    } as Parameters<typeof routeModel>[0]);
+    expect(missing.status).toBe("BLOCKED");
+    expect(missing.blockedReason).toBe("MODEL_LOCK_UNAVAILABLE");
+    expect(missing.selectedProfileId).toBeNull();
+    expect(missing.fallbackProfileIds).toEqual([]);
+    expect(missing.eligibleCandidates).toEqual([]);
+    expect(missing.modelLock.reasonCodes).toContain("MODEL_LOCK_ALIAS_UNSUPPORTED");
+    const inadmissible = route([profile("tiny", "economy", { contextWindowTokens: 1_000 }), profile("ok", "economy")], workOrder(), capableRuntime(), {
+      estimatedInputTokens: 600,
+      requiredOutputTokens: 600,
+      lockState: {
+        status: "CURRENT",
+        mode: "MODEL_LOCK",
+        locked: { profileId: "tiny", providerId: "fixture-provider", modelId: "fixture-model-tiny" },
+        lockRevision: 6,
+      },
+    } as Parameters<typeof routeModel>[0]);
+    expect(inadmissible.status).toBe("BLOCKED");
+    expect(inadmissible.blockedReason).toBe("MODEL_LOCK_UNAVAILABLE");
+    const lockRejection = inadmissible.rejections.find((item) => item.profileId === "tiny" && item.reasonCodes.includes("MODEL_LOCK_UNAVAILABLE"));
+    expect(lockRejection?.reasonCodes).toContain("CONTEXT_WINDOW_TOO_SMALL");
+    expect(inadmissible.modelLock.reasonCodes).toContain("MODEL_LOCK_UNAVAILABLE");
+    expect(inadmissible.modelLock.reasonCodes).toContain("CONTEXT_WINDOW_TOO_SMALL");
+    expect(inadmissible.routingEnforcement.state).toBe("UNKNOWN");
+    expect(inadmissible.routingEnforcement.reasonCodes).toContain("NO_HOST_EXECUTION_EVIDENCE");
+  });
+
+  it("WO-025 T7: enforcement projection only claims router-side provable states", () => {
+    const registries: ModelProfile[][] = [
+      [profile("economy", "economy")],
+      [profile("balanced", "balanced"), profile("strong", "strong")],
+      [],
+    ];
+    const lockStates = [
+      undefined,
+      { status: "CURRENT", mode: "QUALITY_FLOOR_AUTOROUTE", locked: null, lockRevision: 1 },
+      { status: "CURRENT", mode: "MODEL_LOCK", locked: { profileId: "economy", providerId: "fixture-provider", modelId: "fixture-model-economy" }, lockRevision: 2 },
+      { status: "CURRENT", mode: "MODEL_LOCK", locked: { profileId: "absent", providerId: "fixture-provider", modelId: "fixture-model-absent" }, lockRevision: 2 },
+      { status: "UNAVAILABLE", reasonCodes: ["ROUTING_STATE_CORRUPT"] },
+    ];
+    for (const profiles of registries) {
+      for (const lockState of lockStates) {
+        const plan = route(profiles, workOrder(), capableRuntime(), { lockState } as Parameters<typeof routeModel>[0]);
+        expect(["ENFORCED", "MISMATCH", "UNKNOWN"]).toContain(plan.routingEnforcement.state);
+        expect(plan.routingEnforcement.state).not.toBe("VERIFIED_MATCH");
+        expect(plan.routingEnforcement.state).not.toBe("HOST_FIXED");
+        if (!plan.modelLock.active && lockState?.status !== "UNAVAILABLE") {
+          expect(plan.routingEnforcement.state).toBe("UNKNOWN");
+          expect(plan.routingEnforcement.reasonCodes).toContain("NO_ACTIVE_LOCK");
+        }
+        if (plan.modelLock.active && plan.status === "SELECTED") {
+          expect(plan.selectedProfileId).toBe(plan.modelLock.profileId);
+          expect(plan.routingEnforcement.state).toBe("ENFORCED");
+        }
+        if (lockState?.status === "UNAVAILABLE") {
+          expect(plan.status).toBe("BLOCKED");
+          expect(plan.routingEnforcement.reasonCodes).toContain("ROUTING_STATE_UNAVAILABLE");
+        }
+      }
+    }
+  });
+
+  it("WO-025 T9: routing rejects ensemble/broadcast intents and emits one model target", () => {
+    const profiles = [profile("economy", "economy"), profile("balanced", "balanced")];
+    const broadcast = route(profiles, workOrder(), capableRuntime(), { requestedModelTargets: 2 } as Parameters<typeof routeModel>[0]);
+    expect(broadcast.status).toBe("BLOCKED");
+    expect(broadcast.blockedReason).toBe("ENSEMBLE_NOT_AUTHORIZED");
+    expect(broadcast.selectedProfileId).toBeNull();
+    expect(broadcast.eligibleCandidates).toEqual([]);
+    const zero = route(profiles, workOrder(), capableRuntime(), { requestedModelTargets: 0 } as Parameters<typeof routeModel>[0]);
+    expect(zero.status).toBe("BLOCKED");
+    expect(zero.blockedReason).toBe("ENSEMBLE_NOT_AUTHORIZED");
+    const single = route(profiles);
+    expect(single.status).toBe("SELECTED");
+    const modelTargets = new Set(single.roleSelections.map((item) => item.modelId).filter((value): value is string => Boolean(value)));
+    expect(modelTargets.size).toBe(1);
+  });
+
+  it("WO-025 T4: cheapest-qualified claims require objective price evidence", () => {
+    const order = workOrder({ tokenBudget: { ...workOrder().tokenBudget, capabilityClass: "balanced" } });
+    const priced = route(
+      [profile("cheap", "balanced", { relativeCostClass: "low" }), profile("mid", "balanced", { relativeCostClass: "medium" }), profile("high", "balanced", { relativeCostClass: "high" })],
+      order,
+      capableRuntime(),
+      { lockState: { status: "CURRENT", mode: "CHEAPEST_QUALIFIED", locked: null, lockRevision: 2 } } as Parameters<typeof routeModel>[0],
+    );
+    expect(priced.routingMode).toBe("CHEAPEST_QUALIFIED");
+    expect(priced.selectedProfileId).toBe("cheap");
+    expect(priced.selectionReasonCodes).toContain("CHEAPEST_QUALIFIED_SELECTED");
+    const unpriced = route(
+      [profile("opaque-a", "balanced", { relativeCostClass: "unknown" }), profile("opaque-b", "balanced", { relativeCostClass: "unknown" })],
+      order,
+      capableRuntime(),
+      { lockState: { status: "CURRENT", mode: "CHEAPEST_QUALIFIED", locked: null, lockRevision: 2 } } as Parameters<typeof routeModel>[0],
+    );
+    expect(unpriced.status).toBe("SELECTED");
+    expect(unpriced.selectionReasonCodes).not.toContain("CHEAPEST_QUALIFIED_SELECTED");
+    expect(unpriced.selectionReasonCodes).toContain("CHEAPEST_QUALIFIED_COST_EVIDENCE_UNKNOWN");
+  });
+
+  it("WO-025 T5: the quality floor survives cheapest mode", () => {
+    const order = workOrder({ riskLevel: "HIGH", tokenBudget: { ...workOrder().tokenBudget, capabilityClass: "strong" } });
+    const plan = route(
+      [profile("cheap-economy", "economy", { relativeCostClass: "low" }), profile("strong", "strong", { relativeCostClass: "high" })],
+      order,
+      capableRuntime(),
+      { lockState: { status: "CURRENT", mode: "CHEAPEST_QUALIFIED", locked: null, lockRevision: 4 } } as Parameters<typeof routeModel>[0],
+    );
+    expect(plan.requiredCapabilityClass).toBe("strong");
+    expect(plan.selectedProfileId).toBe("strong");
+  });
+
+  it("WO-025 T6: an unproven successor model is rejected like any other candidate", () => {
+    const order = workOrder({ objective: "Execute a shell command and report the result." });
+    const plan = route([profile("model-v1", "balanced"), profile("model-v2", "balanced", { supports: { ...profile("nested", "balanced").supports, toolCalling: false } })], order);
+    expect(plan.selectedProfileId).toBe("model-v1");
+    expect(plan.rejections.find((item) => item.profileId === "model-v2")?.reasonCodes).toContain("RUNTIME_CAPABILITY_UNAVAILABLE");
+  });
+
+  it("WO-025 T1: capability truth comes from the evaluated runtime and adapter-unspecified truth never enables", () => {
+    const explicit = route([profile("economy", "economy")]);
+    expect(explicit.capabilityTruth.adapterId).toBe("fixture-adapter");
+    expect(explicit.capabilityTruth.provenanceConfidence).toBe("unknown");
+    expect(explicit.capabilityTruth.capabilities.modelSelection).toBe("SUPPORTED");
+    expect(explicit.capabilityTruth.reasonCodes).not.toContain("CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED");
+    const unspecified = route([profile("economy", "economy")], workOrder(), conservativeRuntimeCapabilitySnapshot());
+    expect(unspecified.status).toBe("BLOCKED");
+    expect(unspecified.capabilityTruth.adapterId).toBeNull();
+    expect(unspecified.capabilityTruth.reasonCodes).toContain("CAPABILITY_TRUTH_ADAPTER_UNSPECIFIED");
+    expect(Object.values(unspecified.capabilityTruth.capabilities).every((value) => value === "UNKNOWN")).toBe(true);
+  });
+
+  it("WO-025 T10: the plan schema is closed at 0.9.0 with deterministic digests", () => {
+    const plan = route([profile("economy", "economy")]);
+    const repeat = route([profile("economy", "economy")]);
+    expect(plan.schemaVersion).toBe("0.9.0");
+    expect(capableRuntime().schemaVersion).toBe("0.8.0");
+    expect(validateAgainstSchema("model-execution-plan.schema.json", plan)).toEqual([]);
+    expect(Object.keys(plan.capabilityTruth.capabilities).sort()).toEqual([...RUNTIME_CAPABILITY_KEYS].sort());
+    expect(plan.planId).toBe(repeat.planId);
+    const text = JSON.stringify(plan);
+    expect(text.includes("ghp_")).toBe(false);
+    const backslash = String.fromCharCode(92);
+    expect(text.includes("C:" + backslash)).toBe(false);
   });
 });

@@ -4,10 +4,10 @@
   "title": "UADS Model Execution Plan",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "schemaVersion", "planId", "projectId", "workOrderId", "workOrderDigest", "changeDigest", "risk", "scopeClass", "complexity", "uncertainty", "requiredCapabilityClass", "requiredCapabilities", "runtimeIdentityDigest", "registryDigest", "policyDigest", "candidates", "eligibleCandidates", "rejections", "selectedProfileId", "selectedProviderId", "selectedModelId", "roleSelections", "selectionReasonCodes", "fallbackProfileIds", "escalation", "cacheHints", "execution", "budget", "selectionMode", "status", "blockedReason"],
+  "required": ["schema", "schemaVersion", "planId", "projectId", "workOrderId", "workOrderDigest", "changeDigest", "risk", "scopeClass", "complexity", "uncertainty", "requiredCapabilityClass", "requiredCapabilities", "runtimeIdentityDigest", "registryDigest", "policyDigest", "candidates", "eligibleCandidates", "rejections", "selectedProfileId", "selectedProviderId", "selectedModelId", "roleSelections", "selectionReasonCodes", "fallbackProfileIds", "escalation", "cacheHints", "execution", "budget", "selectionMode", "status", "blockedReason", "routingMode", "modelLock", "capabilityTruth", "routingEnforcement"],
   "properties": {
     "schema": { "const": "uads.model-execution-plan" },
-    "schemaVersion": { "const": "0.8.0" },
+    "schemaVersion": { "const": "0.9.0" },
     "planId": { "type": "string", "pattern": "^mrp_[a-f0-9]{16}$" },
     "projectId": { "type": "string", "minLength": 1 },
     "workOrderId": { "type": "string", "minLength": 1 },
@@ -78,9 +78,66 @@
     },
     "selectionMode": { "enum": ["router", "host-managed"] },
     "status": { "enum": ["SELECTED", "BLOCKED"] },
-    "blockedReason": { "type": ["string", "null"] }
+    "blockedReason": { "type": ["string", "null"] },
+    "routingMode": { "enum": ["MODEL_LOCK", "CHEAPEST_QUALIFIED", "QUALITY_FLOOR_AUTOROUTE"] },
+    "modelLock": { "$ref": "#/$defs/modelLock" },
+    "capabilityTruth": { "$ref": "#/$defs/capabilityTruth" },
+    "routingEnforcement": { "$ref": "#/$defs/routingEnforcement" }
   },
   "$defs": {
+    "modelLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active", "mode", "revision", "profileId", "providerId", "modelId", "reasonCodes"],
+      "properties": {
+        "active": { "type": "boolean" },
+        "mode": { "enum": ["MODEL_LOCK", "CHEAPEST_QUALIFIED", "QUALITY_FLOOR_AUTOROUTE"] },
+        "revision": { "type": "integer", "minimum": 0 },
+        "profileId": { "type": ["string", "null"] },
+        "providerId": { "type": ["string", "null"] },
+        "modelId": { "type": ["string", "null"] },
+        "reasonCodes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "capabilityTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapterId", "runtimeIdentityDigest", "subjectDigest", "adapterContractDigest", "provenanceConfidence", "capabilities", "reasonCodes"],
+      "properties": {
+        "adapterId": { "type": ["string", "null"] },
+        "runtimeIdentityDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "subjectDigest": { "type": ["string", "null"] },
+        "adapterContractDigest": { "type": ["string", "null"] },
+        "provenanceConfidence": { "const": "unknown" },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["modelSelection", "toolCalling", "structuredOutput", "promptCache", "explicitCache", "persistentContext", "subagents", "parallelAgents", "usageTelemetry", "visionInput"],
+          "properties": {
+            "modelSelection": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "toolCalling": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "structuredOutput": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "promptCache": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "explicitCache": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "persistentContext": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "subagents": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "parallelAgents": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "usageTelemetry": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] },
+            "visionInput": { "enum": ["SUPPORTED", "UNSUPPORTED", "UNKNOWN", "BLOCKED"] }
+          }
+        },
+        "reasonCodes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "routingEnforcement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reasonCodes"],
+      "properties": {
+        "state": { "enum": ["ENFORCED", "VERIFIED_MATCH", "HOST_FIXED", "MISMATCH", "UNKNOWN"] },
+        "reasonCodes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
     "candidate": {
       "type": "object",
       "additionalProperties": false,

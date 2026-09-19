@@ -20,5 +20,14 @@
   { "id": "MR19", "name": "malicious profile rejection" },
   { "id": "MR20", "name": "stale plan invalidation" },
   { "id": "MR21", "name": "host runtime subagent dispatch" },
-  { "id": "MR22", "name": "host runtime parallel dispatch with concurrency guard" }
+  { "id": "MR22", "name": "host runtime parallel dispatch with concurrency guard" },
+  { "id": "MR23", "name": "model lock hard constraint" },
+  { "id": "MR24", "name": "model lock fail-closed without substitution" },
+  { "id": "MR25", "name": "unavailable routing state fails closed" },
+  { "id": "MR26", "name": "ensemble broadcast rejection single target" },
+  { "id": "MR27", "name": "cheapest qualified price discipline" },
+  { "id": "MR28", "name": "capability truth from evaluated runtime only" },
+  { "id": "MR29", "name": "plan schema 0.9.0 determinism and hygiene" },
+  { "id": "MR30", "name": "legacy and corrupt plan state degradation" },
+  { "id": "MR31", "name": "unproven successor model requires host proof" }
 ]
